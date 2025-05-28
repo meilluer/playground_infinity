@@ -6,6 +6,7 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
@@ -20,7 +21,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import android.app.ActivityManager
 
+import android.os.Bundle
+import android.provider.Settings
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
 var timesin = 0
 var show = false
@@ -35,7 +42,49 @@ var scorea = 0
 var scoreb = 0
 var tit = titlesp
 
+
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        if (!isNotificationListenerEnabled()) {
+            val intent = Intent(Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS)
+            startActivity(intent)
+        } else {
+            startNotificationListenerService()
+        }
+    }
+
+    private fun startNotificationListenerService() {
+        val serviceIntent = Intent(this, MyNotificationListenerService::class.java)
+        startService(serviceIntent)
+
+        // Show a toast indicating that the service is now listening for notifications
+        Toast.makeText(this, "App is now listening for notifications", Toast.LENGTH_SHORT).show()
+    }
+
+    private fun isNotificationListenerEnabled(): Boolean {
+        val flat = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+        val colonSplitter = flat?.split(":") ?: return false
+        return colonSplitter.any { it.contains(packageName) }
+    }
+}
+
+
+
+
+
+
 class MyNotificationListenerService : NotificationListenerService() {
+    override fun onCreate() {
+        super.onCreate()
+
+        // Show a toast when the service starts listening for notifications
+        Toast.makeText(applicationContext, "App is now listening for notifications", Toast.LENGTH_SHORT).show()
+        Log.d("NotificationListener", "Notification Listener Service is now listening.")
+    }
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         val targetPackage = "eu.livesport.FlashScore_com"
         if (sbn.packageName != targetPackage) return
@@ -51,19 +100,19 @@ class MyNotificationListenerService : NotificationListenerService() {
                 titlesp = title
                 splitTeams()
                 show = true
+                SmartspacerTargetProvider.notifyChange(this, football::class.java, smartspacerId = "football_")
                 startMatchAlarm(this)
             }
 
             handleMatchNotification(this, subtitle)
 
             if (subtitle.contains("Correction!", ignoreCase = true)) {
-                handleCorrection(this,subtitle)
+                handleCorrection(this, subtitle)
             }
-            if(subtitle.contains("Finished.")){
-               closer(this,subtitle);
-            }
-            else {
-                handleScoreUpdate(subtitle)
+            if (subtitle.contains("Finished.", ignoreCase = true)) {
+                closer(this, subtitle)
+            } else {
+                handleScoreUpdate(subtitle, this)
             }
         }
     }
@@ -86,8 +135,31 @@ fun startMatchAlarm(context: Context) {
         context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
     )
 
-    val triggerTime = System.currentTimeMillis() + 10 * 60 * 1000L
-    alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+    val triggerTime = System.currentTimeMillis() + 10 * 60 * 1000L // 10 minutes
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        if (alarmManager.canScheduleExactAlarms()) {
+            try {
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            } catch (e: SecurityException) {
+                Log.e("AlarmPermission", "Exact alarm scheduling failed", e)
+            }
+        } else {
+            // Request permission via Settings screen
+            val intentPerm = Intent(android.provider.Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                data = android.net.Uri.parse("package:${context.packageName}")
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intentPerm)
+
+            // Optional fallback
+            alarmManager.set(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+            Log.w("AlarmPermission", "Fallback to set() used due to missing exact alarm permission")
+        }
+    } else {
+        // For older versions, just use setExact
+        alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
+    }
 }
 
 // BroadcastReceiver triggered by AlarmManager
@@ -96,7 +168,7 @@ class MatchAlarmReceiver : BroadcastReceiver() {
         timesin += 10
         subt = timesin.toString()
         Toast.makeText(context, "Alarm Triggered: $subt mins elapsed", Toast.LENGTH_SHORT).show()
-        notifyChange(context, football::class.java, "football")
+        SmartspacerTargetProvider.notifyChange(context, football::class.java, smartspacerId = "football_")
     }
 }
 
@@ -112,30 +184,31 @@ fun handleMatchNotification(context: Context, notificationText: String) {
         notificationText.contains("half time.", ignoreCase = true) -> {
             alarmManager.cancel(pendingIntent)
             subt = "Half time"
-            notifyChange(context, football::class.java, "football")
+            SmartspacerTargetProvider.notifyChange(context, football::class.java, smartspacerId = "football_")
         }
         notificationText.contains("start of 2nd half.", ignoreCase = true) -> {
             val triggerTime = System.currentTimeMillis() + 10 * 60 * 1000L
             alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerTime, pendingIntent)
             subt = timesin.toString()
-            notifyChange(context, football::class.java, "football")
+            SmartspacerTargetProvider.notifyChange(context, football::class.java, smartspacerId = "football_")
         }
     }
 }
+
 fun closer(context: Context, notificationText: String) {
     // Immediately update UI to show "Match ended"
     subt = "Match Ended"
-    notifyChange(context, football::class.java, "football")
+    SmartspacerTargetProvider.notifyChange(context, football::class.java, smartspacerId = "football_")
 
     // Delay hiding for 30 minutes (in background)
     CoroutineScope(Dispatchers.Main).launch {
         delay(30 * 60 * 1000L) // 30 minutes in milliseconds
         display = false
-        notifyChange(context, football::class.java, "football")
+        SmartspacerTargetProvider.notifyChange(context, football::class.java, smartspacerId = "football_")
     }
 }
 
-fun handleCorrection(context: Context,subtitle: String) {
+fun handleCorrection(context: Context, subtitle: String) {
     val regex = Regex("""Correction!\s*(\[?\d+\]?)\s*-\s*(\[?\d+\]?)""", RegexOption.IGNORE_CASE)
     val match = regex.find(subtitle)
 
@@ -154,12 +227,12 @@ fun handleCorrection(context: Context,subtitle: String) {
         }
 
         tit = "$team1 $scorea vs $scoreb $team2"
-        notifyChange(context, football::class.java, "football")
+        SmartspacerTargetProvider.notifyChange(context, football::class.java, smartspacerId = "football_")
     }
 }
 
 // Score parsing logic
-fun handleScoreUpdate(subtitle: String) {
+fun handleScoreUpdate(subtitle: String, context: Context) {
     val parts = subtitle.split(" - ")
     if (parts.size >= 2) {
         scorer = parts[1].trim()
@@ -170,14 +243,17 @@ fun handleScoreUpdate(subtitle: String) {
         }
         subt = scorer
         tit = "$team1 $scorea vs $scoreb $team2"
+        show = true
+        SmartspacerTargetProvider.notifyChange(context, football::class.java, smartspacerId = "football_")
     }
 }
+
 
 // Smartspacer Target Provider <--DO NOT TOUCH THIS-->
 class football : SmartspacerTargetProvider() {
 
     fun disp() {
-        if (show) {
+        if (show==true) {
             display = true
             notifyChange()
         }
@@ -188,7 +264,7 @@ class football : SmartspacerTargetProvider() {
        targets.add(
 
                 TargetTemplate.Basic(
-                    id = "football",
+                    id = "football_",
                     componentName = ComponentName(context!!, football::class.java),
                     title = Text(tit),
                     subtitle = Text(subt),
@@ -196,7 +272,9 @@ class football : SmartspacerTargetProvider() {
                 ).create()
        )
 if(display==true){
+    notifyChange()
     return targets
+
         }
         else{
             return emptyList()

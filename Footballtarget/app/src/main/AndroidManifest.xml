@@ -4,6 +4,7 @@
     <application
         android:allowBackup="true"
         android:label="@string/app_name"
+        android:theme="@style/Theme.AppCompat.DayNight"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
@@ -34,5 +35,6 @@
             </intent-filter>
         </provider>
     </application>
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
 
 </manifest>
