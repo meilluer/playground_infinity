@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:application=".SubscribedThingListingActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout_subscribed_thing_listing_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar_layout_subscribed_thing_listing_activity"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:titleEnabled="false"
+            app:toolbarId="@+id/toolbar_subscribed_thing_listing_activity">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_subscribed_thing_listing_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:layout_scrollFlags="scroll|enterAlways"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:navigationIcon="?attr/homeAsUpIndicator">
+
+                <EditText
+                    android:id="@+id/search_edit_text_subscribed_thing_listing_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#00000000"
+                    android:gravity="top"
+                    android:hint="@string/search"
+                    android:maxLines="1"
+                    android:textSize="?attr/font_20"
+                    android:fontFamily="?attr/font_family"
+                    android:inputType="textNoSuggestions"
+                    android:imeOptions="actionSearch"
+                    android:visibility="gone" />
+
+            </androidx.appcompat.widget.Toolbar>
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout_subscribed_thing_listing_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabIndicatorHeight="3dp"
+            app:tabRippleColor="?attr/colorControlHighlight"
+            app:tabUnboundedRipple="false" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <ml.docilealligator.infinityforreddit.customviews.ViewPagerBugFixed
+        android:id="@+id/view_pager_subscribed_thing_listing_activity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_subscribed_thing_listing_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:layout_gravity="bottom|end"
+        android:contentDescription="@string/content_description_create_multireddit"
+        app:srcCompat="@drawable/ic_add_day_night_24dp" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

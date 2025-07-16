@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:application="ml.docilealligator.infinityforreddit.activities.SearchActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout_search_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            app:popupTheme="@style/AppTheme.PopupOverlay"
+            app:navigationIcon="?attr/homeAsUpIndicator">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp">
+
+                <EditText
+                    android:id="@+id/search_edit_text_search_activity"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="#00000000"
+                    android:hint="@string/search"
+                    android:maxLines="1"
+                    android:textSize="?attr/font_20"
+                    android:fontFamily="?attr/font_family"
+                    android:inputType="textNoSuggestions"
+                    android:imeOptions="actionSearch" />
+
+                <ImageView
+                    android:id="@+id/clear_search_edit_view_search_activity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_cancel_24dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/actionBarItemBackground"
+                    android:contentDescription="@string/content_description_delete_texts" />
+
+                <ImageView
+                    android:id="@+id/link_handler_image_view_search_activity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_open_link_day_night_24dp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/actionBarItemBackground"
+                    android:contentDescription="@string/content_description_handle_link" />
+
+            </LinearLayout>
+
+        </androidx.appcompat.widget.Toolbar>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view_search_activity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:id="@+id/subreddit_name_relative_layout_search_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="?attr/selectableItemBackground"
+                android:clickable="true"
+                android:focusable="true">
+
+                <TextView
+                    android:id="@+id/search_in_text_view_search_activity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:layout_centerVertical="true"
+                    android:fontFamily="?attr/font_family"
+                    android:text="@string/search_in"
+                    android:textColor="?attr/colorAccent"
+                    android:textSize="?attr/font_default" />
+
+                <TextView
+                    android:id="@+id/subreddit_name_text_view_search_activity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="32dp"
+                    android:layout_marginEnd="16dp"
+                    android:layout_toEndOf="@id/search_in_text_view_search_activity"
+                    android:text="@string/all_subreddits"
+                    android:textColor="?attr/primaryTextColor"
+                    android:textSize="?attr/font_default"
+                    android:fontFamily="?attr/font_family" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/delete_all_recent_searches_button_search_activity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    app:strokeWidth="0dp"
+                    app:icon="@drawable/ic_delete_all_24"
+                    app:iconSize="24dp"
+                    style="?attr/materialIconButtonOutlinedStyle" />
+
+            </RelativeLayout>
+
+            <View
+                android:id="@+id/divider_search_activity"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recent_search_query_recycler_view_search_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:spanCount="2"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/subreddit_autocomplete_recycler_view_search_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layoutManager="ml.docilealligator.infinityforreddit.customviews.LinearLayoutManagerBugFixed" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -1,0 +1,1576 @@
+<resources>
+    <string name="application_name" translatable="false">Infinity</string>
+    <string name="login_activity_label">Login</string>
+    <string name="search_activity_label" translatable="false"> </string>
+    <string name="comment_activity_label">Send Comment</string>
+    <string name="comment_activity_label_is_replying">Reply</string>
+    <string name="post_text_activity_label">Text Post</string>
+    <string name="subreddit_selection_activity_label">Select a Subreddit</string>
+    <string name="post_link_activity_label">Link Post</string>
+    <string name="post_image_activity_label">Image Post</string>
+    <string name="post_video_activity_label">Video Post</string>
+    <string name="rules_activity_label">Rules</string>
+    <string name="search_subreddits_activity_label">Subreddits</string>
+    <string name="edit_post_activity_label">Edit Post</string>
+    <string name="edit_comment_activity_label">Edit Comment</string>
+    <string name="view_message_activity_label">Inbox</string>
+    <string name="settings_activity_label">Settings</string>
+    <string name="account_saved_thing_activity_label">Saved</string>
+    <string name="create_multi_reddit_activity_label">Create Multireddit</string>
+    <string name="subreddit_multiselection_activity_label">Select Subreddits</string>
+    <string name="custom_theme_listing_activity_label">Custom Themes</string>
+    <string name="customize_theme_activity_label">Customize Theme</string>
+    <string name="customize_theme_activity_create_theme_label">Create Theme</string>
+    <string name="theme_preview_activity_label">Theme Preview</string>
+    <string name="edit_multi_reddit_activity_label">Edit Multireddit</string>
+    <string name="selected_subeddits_activity_label">Selected Subreddits</string>
+    <string name="report_activity_label">Report</string>
+    <string name="view_imgur_media_activity_image_label">Image %1$d/%2$d</string>
+    <string name="view_imgur_media_activity_video_label">Video %1$d/%2$d</string>
+    <string name="send_private_message_activity_label">Send PM</string>
+    <string name="view_reddit_gallery_activity_image_label">Image %1$d/%2$d</string>
+    <string name="view_reddit_gallery_activity_gif_label">Gif %1$d/%2$d</string>
+    <string name="view_reddit_gallery_activity_video_label">Video %1$d/%2$d</string>
+    <string name="submit_crosspost_activity_label">Crosspost</string>
+    <string name="give_award_activity_label">Give Award</string>
+    <string name="subreddit_filter_popular_and_all_activity_label">r/all and r/popular</string>
+    <string name="customize_post_filter_activity_label">Customize Post Filter</string>
+    <string name="filtered_posts_activity_subtitle">Filtered Posts</string>
+    <string name="post_filter_preference_activity_label">Post Filter</string>
+    <string name="search_users_result_activity_label">Users</string>
+    <string name="multireddit_selection_activity_label">Select a Multireddit</string>
+    <string name="post_gallery_activity_label">Gallery Post</string>
+    <string name="wiki_activity_label">Wiki</string>
+    <string name="edit_profile_activity_label">Edit Profile</string>
+    <string name="post_poll_activity_label">Poll Post</string>
+    <string name="history_activity_label">History</string>
+    <string name="subscription_activity_label">Subscription</string>
+    <string name="comment_filter_preference_activity_label">Comment Filter</string>
+    <string name="customize_comment_filter_activity_label">Customize Comment Filter</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="action_download">Download</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_add_comment">Add a comment</string>
+    <string name="action_save_post">Save post</string>
+    <string name="action_view_crosspost_parent">View crosspost parent</string>
+    <string name="action_search">Search</string>
+    <string name="action_start_lazy_mode">Start Lazy Mode</string>
+    <string name="action_stop_lazy_mode">Stop Lazy Mode</string>
+    <string name="action_send">Send</string>
+    <string name="action_sort">Sort</string>
+    <string name="action_hide_post">Hide Post</string>
+    <string name="action_unhide_post">Unhide Post</string>
+    <string name="action_edit_post">Edit Post</string>
+    <string name="action_delete_post">Delete Post</string>
+    <string name="action_mark_nsfw">Mark Sensitive</string>
+    <string name="action_unmark_nsfw">Unmark Sensitive</string>
+    <string name="action_mark_spoiler">Mark Spoiler</string>
+    <string name="action_unmark_spoiler">Unmark Spoiler</string>
+    <string name="action_edit_flair">Edit Flair</string>
+    <string name="action_change_post_layout">Change Post Layout</string>
+    <string name="action_save">Save</string>
+    <string name="action_edit_multi_reddit">Edit MultiReddit</string>
+    <string name="action_delete_multi_reddit">Delete Multireddit</string>
+    <string name="action_share">Share</string>
+    <string name="action_preview">Preview</string>
+    <string name="action_report">Report</string>
+    <string name="action_crosspost">Crosspost</string>
+    <string name="action_set_wallpaper">Set as Wallpaper</string>
+    <string name="action_send_private_message">Send Private Message</string>
+    <string name="action_block_user">Block User</string>
+    <string name="action_select_user_flair">Select User Flair</string>
+    <string name="action_give_award">Give Award</string>
+    <string name="action_save_to_database">Save to Database</string>
+    <string name="action_read_all_messages">Read All Messages</string>
+    <string name="action_add_to_multireddit">Add to Multireddit</string>
+    <string name="action_share_link">Share Link</string>
+    <string name="action_copy_link">Copy Link</string>
+    <string name="action_open_external_browser">Open in browser</string>
+    <string name="action_add_to_post_filter">Add to Post Filter</string>
+    <string name="action_delete_logs">Delete Logs</string>
+    <string name="action_create_github_issue">Create GitHub Issue</string>
+    <string name="action_share_post_link">Share Post Link</string>
+    <string name="action_go_to_wiki">Go to Wiki</string>
+    <string name="action_playback_speed">Playback Speed</string>
+    <string name="action_contact_mods">Contact Mods</string>
+    <string name="action_more_options">More Options</string>
+    <string name="action_add_to_home_screen">Add to Home screen</string>
+    <string name="action_reset_fab_position">Reset FAB position</string>
+    <string name="action_download_all_gallery_media">Download All Gallery Media</string>
+    <string name="action_download_all_imgur_album_media">Download All Imgur Album Media</string>
+    <string name="action_next_parent_comment">Next Top-Level Comment</string>
+    <string name="action_previous_parent_comment">Previous Top-Level Comment</string>
+
+    <string name="parse_json_response_error">Error occurred when parsing the JSON response</string>
+    <string name="retrieve_token_error">Error Retrieving the token</string>
+    <string name="something_went_wrong">Something went wrong. Try again later.</string>
+    <string name="access_denied">Access denied</string>
+    <string name="parse_user_info_error">Error occurred when parsing the user info</string>
+    <string name="no_system_webview_error">Error opening System\'s WebView</string>
+
+    <string name="error_loading_image_tap_to_retry">Error loading the image. Tap to retry.</string>
+    <string name="load_posts_error">Error loading posts.\nTap to retry.</string>
+    <string name="load_more_posts_error">Error loading posts.</string>
+    <string name="load_post_error">Error loading this post.\nTap to retry.</string>
+    <string name="search_subreddits_error">Error searching subreddits.\nTap to retry.</string>
+    <string name="search_users_error">Error searching users.\nTap to retry.</string>
+    <string name="no_posts">No posts found</string>
+    <string name="no_comments">No comments found</string>
+    <string name="no_subreddits">No subreddits found</string>
+    <string name="no_users">No users found</string>
+    <string name="no_multi_reddits">No Multireddits found</string>
+    <string name="no_storage_permission">No storage permission to save this file</string>
+
+    <string name="load_comments_failed">Error loading comments.\nTap to retry.</string>
+    <string name="retry">Retry</string>
+    <string name="no_comments_yet">No comments yet. Write a comment?</string>
+    <string name="vote_failed">Vote failed</string>
+    <string name="refresh_post_failed">Error refreshing the post</string>
+
+    <string name="load_messages_failed">Error loading messages.\nTap to retry.</string>
+    <string name="no_messages">Empty</string>
+
+    <string name="nsfw">Sensitive</string>
+    <string name="karma_info">Karma: %1$,d</string>
+    <string name="karma_info_user_detail">Karma:\n%1$,d (%2$d + %3$d)</string>
+    <string name="cakeday_info">Cake day:\n%1$s</string>
+    <string name="since">Since:</string>
+
+    <string name="profile">Profile</string>
+    <string name="subscriptions">Subscriptions</string>
+    <string name="multi_reddit">Multireddit</string>
+    <string name="history">History</string>
+    <string name="inbox">Inbox</string>
+    <string name="inbox_with_count">Inbox (%1$,d)</string>
+    <string name="upvoted">Upvoted</string>
+    <string name="downvoted">Downvoted</string>
+    <string name="hidden">Hidden</string>
+    <string name="saved">Saved</string>
+    <string name="settings">Settings</string>
+    <string name="subscribers_number_detail">Subscribers: %1$,d</string>
+    <string name="online_subscribers_number_detail">Online: %1$,d</string>
+    <string name="cannot_fetch_subreddit_info">Cannot fetch subreddit info</string>
+    <string name="cannot_fetch_user_info">Cannot fetch user info</string>
+    <string name="cannot_fetch_sidebar">Cannot fetch sidebar</string>
+    <string name="cannot_fetch_multireddit">Cannot fetch multireddit info</string>
+
+    <string name="subscribe">Subscribe</string>
+    <string name="unsubscribe">Unsubscribe</string>
+    <string name="subscribed">Subscribed</string>"
+    <string name="subscribe_failed">Subscribe Failed</string>
+    <string name="unsubscribed">Unsubscribed</string>"
+    <string name="unsubscribe_failed">Unsubscribe Failed</string>
+
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="followed">Followed</string>
+    <string name="follow_failed">Following Failed</string>
+    <string name="unfollowed">Unfollowed</string>
+    <string name="unfollow_failed">Unfollowing Failed</string>
+
+    <string name="app_label">Infinity</string>
+    <string name="search_hint">Search anything</string>
+    <string name="search_only_subreddits_hint">Search subreddits</string>
+    <string name="search_only_users_hint">Search users</string>
+    <string name="search_subreddits_and_users_hint">Search subreddits and users</string>
+
+    <string name="no_posts_no_lazy_mode">No posts available</string>
+    <string name="lazy_mode_start">Lazy Mode starts in %1$.1fs</string>
+    <string name="lazy_mode_stop">Lazy Mode stopped</string>
+
+    <string name="write_comment_hint">Your interesting thoughts here</string>
+    <string name="comment_content_required">Where is your interesting thought?</string>
+    <string name="sending_comment">Sending</string>
+    <string name="send_comment_success">Comment sent</string>
+    <string name="send_comment_failed">Could not send this comment</string>
+
+    <string name="send_message_username_hint">User</string>
+    <string name="send_message_subject_hint">Subject (100 characters max)</string>
+    <string name="send_message_content_hint">Message</string>
+    <string name="reply_message_failed">Could not reply to this message</string>
+    <string name="error_getting_message">Error getting this message</string>
+    <string name="message_username_required">Hey, to whom to you want to send this message?</string>
+    <string name="message_subject_required">Your message should have a subject</string>
+    <string name="message_content_required">You need to tell the recipient something</string>
+    <string name="sending_message">Sending</string>
+    <string name="send_message_success">Message sent</string>
+    <string name="send_message_failed">Could not send this message</string>
+
+    <string name="select_a_subreddit">Please select a subreddit first</string>
+    <string name="title_required">The post needs a good title</string>
+    <string name="link_required">Hey where is the link?</string>
+    <string name="select_an_image">Please select an image first</string>
+    <string name="voting_length">Voting length: %1$d days</string>
+    <string name="posting">Posting</string>
+    <string name="post_failed">Could not post it</string>
+    <string name="error_processing_image">Error processing image</string>
+    <string name="error_processing_video">Error processing video</string>
+    <string name="two_options_required">A good poll needs two or more options!</string>
+    <string name="convert_to_richtext_json_failed">Could not process markdown</string>
+
+    <string name="download_started">Download Started. Check the notification for progress.</string>
+
+    <string name="comment_load_more_comments">Load more comments</string>
+    <string name="comment_load_more_comments_failed">Load failed. Tap to retry.</string>
+    <string name="comment_continue_thread">Continue thread</string>
+
+    <string name="loading">Loading</string>
+
+    <string name="post_title_hint">Title</string>
+    <string name="post_text_content_hint">Content</string>
+    <string name="post_optional_text_content_hint">Content (optional)</string>
+    <string name="choose_a_subreddit">Choose a subreddit</string>
+    <string name="rules">Rules</string>
+    <string name="post_link_hint">URL</string>
+    <string name="receive_post_reply_notifications">Receive post reply notifications</string>
+
+    <string name="subreddits">Subreddits</string>
+    <string name="users">Users</string>
+    <string name="multi_reddits">MultiReddits</string>
+    <string name="posts">Posts</string>
+    <string name="comments">Comments</string>
+    <string name="about">About</string>
+
+    <string name="bottom_sheet_post_text">Text</string>
+    <string name="bottom_sheet_post_link">Link</string>
+    <string name="bottom_sheet_post_image">Image</string>
+    <string name="bottom_sheet_post_video">Video</string>
+    <string name="bottom_sheet_post_gallery">Gallery</string>
+    <string name="bottom_sheet_post_poll">Poll</string>
+    <string name="post_type_gif">Gif</string>
+    <string name="post_type_gallery">Gallery</string>
+
+    <string name="select_from_gallery">Select a picture</string>
+    <string name="select_again">Select again</string>
+    <string name="error_getting_image">Error getting the image</string>
+    <string name="error_getting_video">Error getting the video</string>
+    <string name="no_camera_available">No camera app available</string>
+    <string name="error_creating_temp_file">Error creating temp file</string>
+
+    <string name="video_is_processing">Video is processing. Please wait.</string>
+    <string name="image_is_processing">Image is processing. Please wait.</string>
+    <string name="gif_is_processing">Gif is processing. Please wait.</string>
+
+    <string name="flair">Flair</string>
+    <string name="spoiler">Spoiler</string>
+
+    <string name="no_flair">No flair</string>
+    <string name="error_loading_flairs">Error loading flairs.\nTap to retry.</string>
+
+    <string name="no_rule">No rules</string>
+    <string name="error_loading_rules">Error loading rules.\nTap to retry.</string>
+    <string name="error_loading_rules_without_retry">Error Loading Rules</string>
+
+    <string name="search_in">Search in</string>
+    <string name="all_subreddits">All subreddits</string>
+
+    <string name="confirm">Confirm</string>
+    <string name="confirm_delete_all_recent_searches">Are you sure you want to delete all recent search queries?</string>
+    <string name="all_recent_searches_deleted">All recent searches deleted</string>
+    <string name="recent_search_deleted">Recent search Deleted</string>
+    <string name="undo">Undo</string>
+
+    <string name="sort_best">Best</string>
+    <string name="sort_hot">Hot</string>
+    <string name="sort_new">New</string>
+    <string name="sort_random">Random</string>
+    <string name="sort_rising">Rising</string>
+    <string name="sort_top">Top</string>
+    <string name="sort_controversial">Controversial</string>
+    <string name="sort_relevance">Relevance</string>
+    <string name="sort_comments">Comments</string>
+    <string name="sort_activity">Activity</string>
+    <string name="sort_confidence">Confidence</string>
+    <string name="sort_old">Old</string>
+    <string name="sort_qa">QA</string>
+    <string name="sort_live">Live</string>
+    <string name="sort_time_hour">Hour</string>
+    <string name="sort_time_day">Day</string>
+    <string name="sort_time_week">Week</string>
+    <string name="sort_time_month">Month</string>
+    <string name="sort_time_year">Year</string>
+    <string name="sort_time_all_time">All Time</string>
+
+    <string name="no_activity_found_for_share">There is no app that can handle the share action</string>
+    <string name="no_activity_found_for_external_browser">There is no app that can handle the open in external app action</string>
+
+    <string name="archived_post_vote_unavailable">Archived post. Vote unavailable.</string>
+    <string name="archived_post_comment_unavailable">Archived post. Comment unavailable.</string>
+    <string name="archived_post_reply_unavailable">Archived post. Reply unavailable.</string>
+    <string name="locked_post_comment_unavailable">Locked post. Comment unavailable.</string>
+    <string name="locked_post_reply_unavailable">Locked post. Reply unavailable.</string>
+
+    <string name="text">TEXT</string>
+    <string name="link">LINK</string>
+    <string name="image">IMAGE</string>
+    <string name="video">VIDEO</string>
+    <string name="gif">GIF</string>
+    <string name="gallery">GALLERY</string>
+    <string name="best">Best</string>
+    <string name="search">Search</string>
+
+    <string name="posting_video">Posting Video</string>
+    <string name="posting_image">Posting Image</string>
+    <string name="posting_gallery">Posting Gallery</string>
+    <string name="posting_poll">Posting Poll</string>
+    <string name="please_wait">Please wait</string>
+
+    <string name="add_account">Add an account</string>
+    <string name="anonymous_account">Anonymous</string>
+    <string name="log_out">Log out</string>
+    <string name="press_here_to_login">Press here to login</string>
+    <string name="login_first">Login first</string>
+
+    <string name="post_saved_success">Post saved</string>
+    <string name="post_saved_failed">Unable to save post</string>
+    <string name="post_unsaved_success">Post unsaved</string>
+    <string name="post_unsaved_failed">Unable to unsave post</string>
+    <string name="post_hide_success">Post hidden</string>
+    <string name="post_hide_failed">Unable to hide post</string>
+    <string name="post_unhide_success">Post unhidden</string>
+    <string name="thing_favorite_failed">Failed to favorite it</string>
+    <string name="thing_unfavorite_failed">Failed to unfavorite it</string>
+    <string name="post_unhide_failed">Unable to unhide post</string>
+    <string name="delete_this_post">Delete This Post</string>
+    <string name="delete_this_comment">Delete This Comment</string>
+    <string name="are_you_sure">Are you sure?</string>
+    <string name="edit">Edit</string>
+    <string name="delete">Delete</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">OK</string>
+    <string name="edit_success">Edit successfully</string>
+    <string name="delete_post_success">Delete successfully</string>
+    <string name="delete_post_failed">Delete failed</string>
+    <string name="mark_nsfw_success">Mark sensitive successfully</string>
+    <string name="mark_nsfw_failed">Mark sensitive failed</string>
+    <string name="unmark_nsfw_success">Unmark sensitive successfully</string>
+    <string name="unmark_nsfw_failed">Unmark sensitive failed</string>
+    <string name="mark_spoiler_success">Mark spoiler successfully</string>
+    <string name="mark_spoiler_failed">Mark spoiler failed</string>
+    <string name="unmark_spoiler_success">Unmark spoiler successfully</string>
+    <string name="unmark_spoiler_failed">Unmark spoiler failed</string>
+    <string name="update_flair_success">Update flair successfully</string>
+    <string name="update_flair_failed">Update flair failed</string>
+
+    <string name="edit_flair">Edit Flair</string>
+    <string name="only_allow_64_chars">Only allow less than 64 characters</string>
+
+    <string name="view_all_comments">Click here to browse all comments</string>
+
+    <string name="notification_summary_account">Account</string>
+    <string name="notification_summary_message">New Message</string>
+    <string name="notification_summary_subreddit">Subreddit</string>
+    <string name="notification_summary_award">Award</string>
+    <string name="notification_new_messages">%1$d New Messages</string>
+
+    <string name="label_account">Account</string>
+    <string name="label_reddit">Reddit</string>
+    <string name="label_post">Post</string>
+    <string name="label_preferences">Preferences</string>
+
+    <string name="account_switched">Account Switched. So all other pages are gone.</string>
+
+    <string name="settings_notification_master_title">Notification</string>
+    <string name="settings_notification_enable_notification_title">Enable Notifications</string>
+    <string name="settings_notification_interval_title">Check Notifications Interval</string>
+    <string name="settings_theme_title">Theme</string>
+    <string name="settings_amoled_dark_title">Amoled Dark</string>
+    <string name="settings_interface_title">Interface</string>
+    <string name="settings_gestures_and_buttons_title">Gestures &amp; Buttons</string>
+    <string name="settings_save_front_page_scrolled_position_title">Save Scrolled Position in HOME</string>
+    <string name="settings_save_front_page_scrolled_position_summary">Browse new posts after refreshing in HOME (Front Page, sort type: Best)</string>
+    <string name="settings_link_handler_title">Link Handler</string>
+    <string name="settigns_video_title">Video</string>
+    <string name="settings_video_autoplay_title">Video Autoplay</string>
+    <string name="settings_mute_autoplaying_videos_title">Mute Autoplaying Videos</string>
+    <string name="settings_autoplay_nsfw_videos_title">Autoplay Sensitive Videos</string>
+    <string name="settings_start_autoplay_visible_area_offset_portrait_title">Autoplay Videos Visible Area Offset (Portrait)</string>
+    <string name="settings_start_autoplay_visible_area_offset_portrait_summary">Start autoplaying videos when %1$d%% of them are visible</string>
+    <string name="settings_start_autoplay_visible_area_offset_landscape_title">Autoplay Videos Visible Area Offset (Landscape)</string>
+    <string name="settings_start_autoplay_visible_area_offset_landscape_summary">Start autoplaying videos when %1$d%% of them are visible</string>
+    <string name="settings_immersive_interface_title">Immersive Interface</string>
+    <string name="settings_immersive_interface_summary">Does Not Apply to All Pages</string>
+    <string name="settings_immersive_interface_ignore_nav_bar_title">Ignore Navigation Bar in Immersive Interface</string>
+    <string name="settings_immersive_interface_ignore_nav_bar_summary">Prevent the Bottom Navigation Bar Having Extra Padding</string>
+    <string name="settings_disable_immersive_interface_in_landscape_mode">Disable Immersive Interface in Landscape Mode</string>
+    <string name="settings_customize_tabs_in_main_page_title">Customize Tabs in Main Page</string>
+    <string name="only_for_logged_in_user">Only for Logged-in User</string>
+    <string name="settings_enable_bottom_app_bar_title">Enable Bottom Navigation</string>
+    <string name="settings_category_post_and_comment_title">Post and Comment</string>
+    <string name="settings_vote_buttons_on_the_right_title">Vote Buttons on the Right</string>
+    <string name="settings_volume_keys_navigate_comments_title">Use Volume Keys to Navigate Comments in Posts</string>
+    <string name="settings_volume_keys_navigate_posts_title">Use Volume Keys to Navigate Posts</string>
+    <string name="settings_mute_video_title">Mute Videos</string>
+    <string name="settings_mute_nsfw_video_title">Mute Sensitive Videos</string>
+    <string name="settings_video_player_ignore_nav_bar_title">Ignore Navigation Bar in Video Player</string>
+    <string name="settings_video_player_ignore_nav_bar_summary">Prevent the Video Controller Having Extra Margin</string>
+    <string name="settings_main_page_back_button_action">Main Page Back Button Action</string>
+    <string name="settings_confirm_to_exit">Confirm to Exit</string>
+    <string name="settings_open_navigation_drawer">Open Navigation Drawer</string>
+    <string name="settings_category_comment_title">Comment</string>
+    <string name="settings_show_top_level_comments_first_title">Show Top-level Comments First</string>
+    <string name="settings_show_comment_divider_title">Show Comment Divider</string>
+    <string name="settings_comment_toolbar_hide_on_click">Click to Show/Hide Comment Toolbar</string>
+    <string name="settings_fully_collapse_comment_title">Fully Collapse Comment</string>
+    <string name="settings_comment_toolbar_hidden">Comment Toolbar Hidden by Default</string>
+    <string name="settings_show_absolute_number_of_votes_title">Show Absolute Number of Votes</string>
+    <string name="settings_show_elapsed_time">Show Elapsed Time in Posts and Comments</string>
+    <string name="settings_time_format_title">Time Format</string>
+    <string name="settings_category_post_title">Post</string>
+    <string name="settings_default_post_layout">Default Post Layout</string>
+    <string name="settings_default_link_post_layout">Default Link Post Layout</string>
+    <string name="settings_show_divider_in_compact_layout">Show Divider</string>
+    <string name="settings_show_thumbnail_on_the_left_in_compact_layout">Show Thumbnail on the Left</string>
+    <string name="settings_number_of_columns_in_post_feed_title">The Number of Columns in Post Feed</string>
+    <string name="settings_number_of_columns_in_post_feed_portrait_title">Portrait</string>
+    <string name="settings_number_of_columns_in_post_feed_landscape_title">Landscape</string>
+    <string name="settings_number_of_columns_in_post_feed_unfolded_portrait_title">Portrait (Unfolded)</string>
+    <string name="settings_number_of_columns_in_post_feed_unfolded_landscape_title">Landscape (Unfolded)</string>
+    <string name="settings_swap_tap_and_long_title">Swap Tap and Long Press in Comments</string>
+    <string name="settings_swipe_to_go_back_title">Swipe Right to Go Back</string>
+    <string name="settings_swipe_to_go_back_summary">Does Not Apply to All Pages</string>
+    <string name="settings_swipe_vertically_to_go_back_from_media_title">Swipe Vertically to Go Back From Image and Gif</string>
+    <string name="settings_lock_jump_to_next_top_level_comment_button_title">Lock Jump to Next Top-level Comment Button</string>
+    <string name="settings_lock_bottom_app_bar_title">Lock Bottom Navigation Bar</string>
+    <string name="settings_swipe_up_to_hide_jump_to_next_top_level_comment_button_title">Swipe Up to Hide Jump to Next Top-level Comment Button</string>
+    <string name="settings_lazy_mode_interval_title">Lazy Mode Interval</string>
+    <string name="settings_font_title">Font</string>
+    <string name="settings_preview_font_title">Font Preview</string>
+    <string name="settings_font_summary">Font</string>
+    <string name="settings_title_font_summary">Title</string>
+    <string name="settings_content_font_summary">Content</string>
+    <string name="settings_font_family_title">Font Family</string>
+    <string name="settings_title_font_family_title">Title Font Family</string>
+    <string name="settings_content_font_family_title">Content Font Family</string>
+    <string name="settings_font_size_title">Font Size</string>
+    <string name="settings_title_font_size_title">Title Font Size</string>
+    <string name="settings_content_font_size_title">Content Font Size</string>
+    <string name="settings_over_18_and_spoiler_title">Content Sensitivity Filter</string>
+    <string name="settings_over_18_title">Sensitive Content</string>
+    <string name="settings_blur_over_18_title">Blur Sensitive Images</string>
+    <string name="settings_blur_spoiler_title">Blur Spoiler Images</string>
+    <string name="settings_do_not_blur_over_18_in_over_18_subreddits_title">Don\'t blur Sensitive Images in Sensitive Subreddits</string>
+    <string name="settings_about_master_title">About</string>
+    <string name="settings_acknowledgement_master_title">Acknowledgement</string>
+    <string name="settings_credits_master_title">Credits</string>
+    <string name="settings_credits_icon_foreground_title">Icon Foreground</string>
+    <string name="settings_credits_icon_foreground_summary">Technology vector created by freepik - www.freepik.com</string>
+    <string name="settings_credits_icon_background_title">Icon Background</string>
+    <string name="settings_credits_icon_background_summary">Background vector created by freepik - www.freepik.com</string>
+    <string name="settings_credits_error_image_title">Error Image</string>
+    <string name="settings_credits_error_image_summary">Technology vector created by freepik - www.freepik.com</string>
+    <string name="settings_credits_crosspost_icon_title">Crosspost Icon</string>
+    <string name="settings_credits_crosspost_icon_summary">Icon made by Freepik from www.flaticon.com</string>
+    <string name="settings_credits_thumbtack_icon_title">Thumbtack Icon</string>
+    <string name="settings_credits_thumbtack_icon_summary">Icon made by Freepik from www.flaticon.com</string>
+    <string name="settings_credits_best_rocket_icon_title">Rocket Icon</string>
+    <string name="settings_credits_best_rocket_icon_summary">Icon made by Freepik from www.flaticon.com</string>
+    <string name="settings_credits_material_icons_title">Material Icons</string>
+    <string name="settings_open_source_title">Open Source</string>
+    <string name="settings_open_source_summary">Star it on Github if you like this app</string>
+    <string name="settings_rate_title">Rate on Google Play</string>
+    <string name="settings_rate_summary">Give me a 5-star rating and I will be really happy</string>
+    <string name="settings_email_title">Email</string>
+    <string name="settings_email_summary">docilealligator.app@gmail.com</string>
+    <string name="settings_reddit_account_title">Reddit Account</string>
+    <string name="settings_reddit_account_summary">u/Hostilenemy</string>
+    <string name="settings_subreddit_title">Subreddit</string>
+    <string name="settings_subreddit_summary">r/Infinity_For_Reddit</string>
+    <string name="settings_share_title">Share</string>
+    <string name="settings_share_summary">Share this app to other people if you enjoy it</string>
+    <string name="settings_privacy_policy_title">Privacy Policy</string>
+    <string name="settings_version_title">Infinity For Reddit</string>
+    <string name="settings_version_summary">Version %s</string>
+    <string name="settings_category_customization_title">Customization</string>
+    <string name="settings_customize_light_theme_title">Light Theme</string>
+    <string name="settings_customize_dark_theme_title">Dark Theme</string>
+    <string name="settings_customize_amoled_theme_title">Amoled Theme</string>
+    <string name="settings_manage_themes_title">Manage Themes</string>
+    <string name="settings_category_material_you_title">Material You</string>
+    <string name="settings_enable_material_you_warning_summary">Make sure you don\'t have themes named\n\"Material You\",\n\"Material You Dark\" or\n\"Material You Amoled\".\nOtherwise, rename them before enabling Material You.</string>
+    <string name="settings_enable_material_you_title">Enable Material You</string>
+    <string name="settings_enable_material_you_summary">Personalize Infinity based on Your Wallpaper</string>
+    <string name="settings_apply_material_you_title">Apply Material You</string>
+    <string name="settings_apply_material_you_summary">In case Infinity did not change the theme</string>
+    <string name="settings_advanced_master_title">Advanced</string>
+    <string name="settings_delete_all_subreddits_data_in_database_title">Delete All Subreddits in Database</string>
+    <string name="settings_delete_all_users_data_in_database_title">Delete All Users in Database</string>
+    <string name="settings_delete_all_sort_type_data_in_database_title">Delete All Sort Types in Database</string>
+    <string name="settings_delete_all_post_layout_data_in_database_title">Delete All Post Layouts in Database</string>
+    <string name="settings_delete_all_themes_in_database_title">Delete All Themes in Database</string>
+    <string name="settings_delete_front_page_scrolled_positions_in_database_title">Delete All Front Page Scrolled Positions in Database</string>
+    <string name="settings_delete_read_posts_in_database_title">Delete All Read Posts in Database</string>
+    <string name="settings_delete_all_legacy_settings_title">Delete All Legacy Settings</string>
+    <string name="settings_reset_all_settings_title">Reset All Settings</string>
+    <string name="restart_app_see_changes">Restart the app to see the changes</string>
+    <string name="settings_tab_count">Tab Count</string>
+    <string name="settings_show_tab_names">Show Tab Names</string>
+    <string name="settings_tab_1_summary">Tab 1</string>
+    <string name="settings_tab_2_summary">Tab 2</string>
+    <string name="settings_tab_3_summary">Tab 3</string>
+    <string name="settings_more_tabs_summary">More Tabs</string>
+    <string name="settings_more_tabs_info_summary">Enabling the following options will cause an unintended behaviour:\nTabs may lose all the content after switching to others. This is the same as refreshing the page.</string>
+    <string name="settings_more_tabs_show_favorite_multireddits_title">Show Favorite Multireddits</string>
+    <string name="settings_more_tabs_show_multireddits_title">Show Multireddits</string>
+    <string name="settings_more_tabs_show_favorite_subscribed_subreddits_title">Show Favorite Subscribed Subreddits</string>
+    <string name="settings_more_tabs_show_subscribed_subreddits_title">Show Subscribed Subreddits</string>
+    <string name="settings_tab_title">Title</string>
+    <string name="settings_tab_post_type">Type</string>
+    <string name="settings_tab_subreddit_name">Subreddit Name (Without r/ prefix)</string>
+    <string name="settings_tab_multi_reddit_name">MultiReddit Path (/user/yourusername/m/yourmultiredditname) (only lowercase characters)</string>
+    <string name="settings_tab_username">Username (Without u/ prefix)</string>
+    <string name="no_developer_easter_egg">There\'s no developer options here</string>
+    <string name="settings_download_location_title">Download Location</string>
+    <string name="settings_image_download_location_title">Image Download Location</string>
+    <string name="settings_gif_download_location_title">Gif Download Location</string>
+    <string name="settings_video_download_location_title">Video Download Location</string>
+    <string name="settings_separate_folder_for_each_subreddit">Separate Folder for Each Subreddit</string>
+    <string name="settings_save_nsfw_media_in_different_folder_title">Save Sensitive Media in Different Location</string>
+    <string name="settings_nsfw_download_location_title">Sensitive Download Location</string>
+    <string name="settings_swipe_action_title">Swipe Action</string>
+    <string name="settings_swipe_action_haptic_feedback_title">Haptic Feedback</string>
+    <string name="settings_disable_swiping_between_tabs_title">Disable Swiping Between Tabs</string>
+    <string name="settings_enable_swipe_action_title">Enable Swipe Action</string>
+    <string name="settings_swipe_action_threshold">Threshold</string>
+    <string name="settings_pull_to_refresh_title">Pull to Refresh</string>
+    <string name="settings_security_title">Security</string>
+    <string name="settings_require_authentication_to_show_accounts">Require Authentication to Show Accounts</string>
+    <string name="settings_long_press_to_hide_toolbar_in_compact_layout_title">Long Press to Hide Toolbar</string>
+    <string name="settings_post_compact_layout_toolbar_hidden_by_default_title">Hide Toolbar by Default</string>
+    <string name="settings_customize_bottom_app_bar_title">Customize Bottom Navigation Bar</string>
+    <string name="settings_main_activity_bottom_app_bar_group_summary">Main Page</string>
+    <string name="settings_other_activities_bottom_app_bar_group_summary">Other Pages</string>
+    <string name="settings_bottom_app_bar_option_count">Option Count</string>
+    <string name="settings_bottom_app_bar_option_1">Option 1</string>
+    <string name="settings_bottom_app_bar_option_2">Option 2</string>
+    <string name="settings_bottom_app_bar_option_3">Option 3</string>
+    <string name="settings_bottom_app_bar_option_4">Option 4</string>
+    <string name="settings_bottom_app_bar_fab">Floating Action Button</string>
+    <string name="settings_data_saving_mode">Data Saving Mode</string>
+    <string name="settings_data_saving_mode_info_summary">In data saving mode:\nPreview images are in lower resolution.\nReddit videos are in lower resolution.\nVideo autoplay is disabled.</string>
+    <string name="settings_translation_title">Translation</string>
+    <string name="settings_translation_summary">Translate this app on POEditor. Thanks to all contributors.</string>
+    <string name="settings_credits_national_flags">National Flags</string>
+    <string name="settings_credits_national_flags_summary">Icon made by Freepik from www.flaticon.com</string>
+    <string name="settings_miscellaneous_title">Miscellaneous</string>
+    <string name="settings_respect_subreddit_recommended_comment_sort_type_title">Respect Subreddit Recommended Comment Sort Type</string>
+    <string name="settings_respect_subreddit_recommended_comment_sort_type_summary">Comment sort type will not be saved</string>
+    <string name="settings_post_filter_title">Post Filter</string>
+    <string name="settings_subreddit_filter_category">Hide Subreddits</string>
+    <string name="settings_subreddit_filter_popular_and_all">In r/popular and r/all</string>
+    <string name="settings_credits_ufo_capturing_animation_title">UFO Capturing Animation</string>
+    <string name="settings_hide_subreddit_description_title">Hide Subreddit Description</string>
+    <string name="settings_disable_image_preview_title">Disable Image Preview in Data Saving Mode</string>
+    <string name="settings_only_disable_preview_in_video_and_gif_posts_title">Only Disable Preview in Video and Gif Posts</string>
+    <string name="settings_swipe_action_swipe_left_title">Swipe Left</string>
+    <string name="settings_swipe_action_swipe_right_title">Swipe Right</string>
+    <string name="settings_swipe_action_info_summary">Not applicable to post feed with more than 1 column or post detail.</string>
+    <string name="settings_language_title">Language</string>
+    <string name="settings_enable_search_history_title">Enable Search History</string>
+    <string name="settings_post_history_title">Post History</string>
+    <string name="settings_mark_posts_as_read_title">Mark Posts as Read</string>
+    <string name="settings_read_posts_limit_title">Limit Read Posts</string>
+    <string name="settings_read_posts_limit_hint">Set read posts limit</string>
+    <string name="settings_read_posts_db_summary">Read Posts DB Table \nSize: %1$d(KB) \nCount: %2$d</string>
+    <string name="settings_mark_posts_as_read_after_voting_title">Mark Posts as Read After Voting</string>
+    <string name="settings_mark_posts_as_read_on_scroll_title">Mark Posts as Read on Scroll</string>
+    <string name="settings_hide_read_posts_automatically_title">Hide Read Posts Automatically</string>
+    <string name="settings_sort_type_title">Sort Type</string>
+    <string name="settings_save_sort_type_title">Save Sort Type</string>
+    <string name="settings_subreddit_default_sort_type_title">Subreddit Default Sort Type</string>
+    <string name="settings_subreddit_default_sort_time_title">Subreddit Default Sort Time</string>
+    <string name="settings_user_default_sort_type_title">User Default Sort Type</string>
+    <string name="settings_user_default_sort_time_title">User Default Sort Time</string>
+    <string name="settings_click_to_show_media_in_gallery_layout">Click to Show Media in Gallery Layout</string>
+    <string name="settings_hide_post_type">Hide Post Type</string>
+    <string name="settings_hide_post_flair">Hide Post Flair</string>
+    <string name="settings_hide_subreddit_and_user_prefix">Hide Subreddit and User Prefix</string>
+    <string name="settings_hide_the_number_of_votes">Hide the Number of Votes</string>
+    <string name="settings_hide_the_number_of_comments">Hide the Number of Comments</string>
+    <string name="settings_show_avatar_on_the_right">Show Avatar on the Right</string>
+    <string name="settings_backup_settings_title">Backup Settings</string>
+    <string name="settings_backup_settings_summary">The backup file password is \"123321\".</string>
+    <string name="settings_restore_settings_title">Restore Settings</string>
+    <string name="settings_credits_love_animation_title">Love Animation</string>
+    <string name="settings_swipe_between_posts_title">Swipe Between Posts</string>
+    <string name="settings_navigation_drawer_title">Navigation Drawer</string>
+    <string name="settings_collapse_account_section_title">Collapse Account Section</string>
+    <string name="settings_collapse_reddit_section_title">Collapse Reddit Section</string>
+    <string name="settings_collapse_post_section_title">Collapse Post Section</string>
+    <string name="settings_collapse_preferences_section_title">Collapse Preferences Section</string>
+    <string name="settings_collapse_favorite_subreddits_section_title">Collapse Favorite Subreddits Section</string>
+    <string name="settings_collapse_subscribed_subreddits_section_title">Collapse Subscribed Subreddits Section</string>
+    <string name="settings_hide_favorite_subreddits_sections_title">Hide Favorite Subreddits Section</string>
+    <string name="settings_hide_subscribed_subreddits_sections_title">Hide Subscribed Subreddits Section</string>
+    <string name="settings_default_search_result_tab">Default Search Result Tab</string>
+    <string name="settings_crash_reports_title">Crash Reports</string>
+    <string name="settings_nsfw_and_spoiler_dangerous_group_title">Dangerous</string>
+    <string name="settings_disable_over_18_forever_title">Forever Disable Sensitive Content</string>
+    <string name="settings_show_only_one_comment_level_indicator">Show Only One Comment Level Indicator</string>
+    <string name="settings_video_player_automatic_landscape_orientation">Switch to Landscape Orientation in Video Player Automatically</string>
+    <string name="settings_loop_video_title">Loop Video</string>
+    <string name="settings_loop_video_summary">Restart the app to apply this setting to autoplaying videos</string>
+    <string name="settings_remember_muting_option_in_post_feed">Remember Muting Option in Post Feed</string>
+    <string name="settings_post_details_title">Post Details</string>
+    <string name="settings_separate_post_and_comments_in_portrait_mode_title">Separate Post And Comments in Portrait Mode</string>
+    <string name="settings_separate_post_and_comments_in_landscape_mode_title">Separate Post And Comments in Landscape Mode</string>
+    <string name="settings_separate_post_and_comments_summary">Video autoplay will be disabled in the post detail page</string>
+    <string name="settings_use_bottom_toolbar_in_media_viewer_title">Use Bottom Toolbar in Media Viewer</string>
+    <string name="settings_navigation_drawer_enable_hide_karma_title">Hide Account Karma</string>
+    <string name="settings_secure_mode_title">Secure Mode</string>
+    <string name="settings_secure_mode_summary">Screenshot and video recording are not allowed. No preview in recent app screen.</string>
+    <string name="settings_credits_lock_screen_animation_title">Lock Screen Animation</string>
+    <string name="settings_app_lock_title">App Lock</string>
+    <string name="settings_app_lock_summary">Require authentication before using the app</string>
+    <string name="settings_app_lock_timeout_title">App Lock Timeout</string>
+    <string name="settings_enable_fold_support_title">Enable folding phone support</string>
+    <string name="settings_default_playback_speed_title">Default Playback Speed</string>
+    <string name="settings_link_handler_value_external_browser">External App</string>
+    <string name="settings_link_handler_value_custom_tab">Custom Tab</string>
+    <string name="settings_link_handler_value_internal_browser">Internal Browser</string>
+    <string name="settings_legacy_autoplay_video_controller_ui_title">Legacy Video Controller UI</string>
+    <string name="settings_pinch_to_zoom_video_title">Pinch to Zoom Video</string>
+    <string name="settings_experimental_feature">Experimental feature</string>
+    <string name="settings_custom_font_family_title">Custom Font Family</string>
+    <string name="settings_custom_title_font_family_title">Custom Title Font Family</string>
+    <string name="settings_custom_content_font_family_title">Custom Content Font Family</string>
+    <string name="settings_fixed_height_preview_in_card_title">Fixed Height in Card</string>
+    <string name="settings_hide_text_post_content">Hide Text Post Content</string>
+    <string name="settings_show_fewer_toolbar_options_threshold_title">Show Fewer Toolbar Options Starting From</string>
+    <string name="settings_show_fewer_toolbar_options_threshold_summary">Level %1$d</string>
+    <string name="settings_show_author_avatar_title">Show Author Avatar</string>
+    <string name="settings_reddit_user_agreement_title">Reddit User Agreement</string>
+    <string name="settings_always_show_child_comment_count_title">Always Show the Number of Child Comments</string>
+    <string name="settings_hide_upvote_ratio_title">Hide Upvote Ratio</string>
+    <string name="settings_miscellaneous_dangerous_group_title">Dangerous</string>
+    <string name="settings_post_feed_max_resolution_warning_title">Increase the value to show previews in higher resolution, but the app may crash unexpectedly.</string>
+    <string name="settings_post_feed_max_resolution_title">Post Feed Preview Max Resolution (Width * Height)</string>
+    <string name="settings_reddit_video_default_resolution">Reddit Video Default Resolution</string>
+    <string name="settings_easier_to_watch_in_full_screen_title">Easier to Watch in Full Screen</string>
+    <string name="settings_hide_fab_in_post_feed">Hide FAB in Post Feed</string>
+    <string name="settings_comment_divider_type">Comment Divider Type</string>
+    <string name="settings_comment_filter_title">Comment Filter</string>
+    <string name="settings_embedded_media_type_title">Embedded Media Type</string>
+    <string name="settings_proxy_title">Proxy</string>
+    <string name="settings_proxy_enabled">Proxy Enabled</string>
+    <string name="settings_proxy_type">Proxy Type</string>
+    <string name="settings_proxy_hostname">Hostname</string>
+    <string name="settings_proxy_port">Port</string>
+    <string name="settings_hide_fab_in_post_details">Hide Floating Action Button</string>
+    <string name="settings_category_media_title">Media</string>
+
+    <string name="no_link_available">Cannot get the link</string>
+
+    <string name="exit_when_submit">Leave?</string>
+    <string name="exit_when_submit_post_detail">The post will still be submitted even if you leave here.</string>
+    <string name="exit_when_edit_post_detail">The post may still be submitted even if you leave here.</string>
+    <string name="exit_when_edit_comment_detail">The comment may still be submitted even if you leave here.</string>
+    <string name="discard">Discard?</string>
+    <string name="discard_detail">All the draft will NOT be saved.</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="discard_dialog_button">Discard</string>
+    <string name="save_comment_draft">Save comment draft?</string>
+    <string name="save_comment_draft_detail">Your draft will be saved.</string>
+
+    <string name="no_data_received">No data received</string>
+    <string name="no_image_path_received">No image path received</string>
+    <string name="no_video_path_received">No video path received</string>
+    <string name="cannot_handle_intent">Could not handle the share request</string>
+
+    <string name="share">Share</string>
+
+    <string name="no_email_client">No Email client found</string>
+    <string name="no_app">No app available</string>
+
+    <string name="save_comment">Save</string>
+    <string name="unsave_comment">Unsave</string>
+    <string name="comment_saved_success">Comment saved</string>
+    <string name="comment_saved_failed">Unable to save comment</string>
+    <string name="comment_unsaved_success">Comment unsaved</string>
+    <string name="comment_unsaved_failed">Unable to unsave comment</string>
+
+    <string name="favorites">Favorites</string>
+    <string name="all">All</string>
+
+    <string name="link_post_layout_auto">Auto</string>
+    <string name="post_layout_card">Card Layout</string>
+    <string name="post_layout_compact">Compact Layout</string>
+    <string name="post_layout_compact_2">Compact Layout 2</string>
+    <string name="post_layout_gallery">Gallery Layout</string>
+    <string name="post_layout_card_2">Card Layout 2</string>
+    <string name="post_layout_card_3">Card Layout 3</string>
+
+    <string name="elapsed_time_just_now">Just Now</string>
+    <string name="elapsed_time_a_minute_ago">1 Minute</string>
+    <string name="elapsed_time_minutes_ago">%1$d Minutes</string>
+    <string name="elapsed_time_an_hour_ago">1 Hour</string>
+    <string name="elapsed_time_hours_ago">%1$d Hours</string>
+    <string name="elapsed_time_yesterday">Yesterday</string>
+    <string name="elapsed_time_days_ago">%1$d Days</string>
+    <string name="elapsed_time_a_month_ago">1 Month</string>
+    <string name="elapsed_time_months_ago">%1$d Months</string>
+    <string name="elapsed_time_a_year_ago">1 Year</string>
+    <string name="elapsed_time_years_ago">%1$d Years</string>
+
+    <string name="error_getting_multi_reddit_data">Error getting multireddit data</string>
+    <string name="error_loading_multi_reddit_list">Cannot sync multireddits</string>
+    <string name="error_loading_subscriptions">Cannot sync subscriptions</string>
+
+    <string name="share_this_app">Check out Infinity for Reddit, an awesome Reddit client!\nhttps://play.google.com/store/apps/details?id=ml.docilealligator.infinityforreddit</string>
+
+    <string name="error_getting_subreddit_name">Error getting subreddit name</string>
+
+    <string name="share_post_link">Share Post Link</string>
+    <string name="share_image_link">Share Image Link</string>
+    <string name="share_gif_link">Share Gif Link</string>
+    <string name="share_video_link">Share Video Link</string>
+    <string name="share_link">Share Link</string>
+    <string name="copy_post_link">Copy Post Link</string>
+    <string name="copy_image_link">Copy Image Link</string>
+    <string name="copy_gif_link">Copy Gif Link</string>
+    <string name="copy_video_link">Copy Video Link</string>
+    <string name="copy_link">Copy Link</string>
+    <string name="open_link">Open Link</string>
+    <string name="share_as_image">Share as Image</string>
+
+    <string name="copy_success">Copied</string>
+    <string name="copy_link_failed">Cannot copy the link</string>
+    <string name="copy_text">Copy</string>
+    <string name="copy_all">Copy All</string>
+    <string name="copy_markdown">Copy Markdown</string>
+    <string name="copy_raw_text">Copy Raw Text</string>
+    <string name="copy_all_markdown">Copy All Markdown</string>
+    <string name="copy_all_raw_text">Copy All Raw Text</string>
+    <string name="copy_failed">Copy failed</string>
+
+    <string name="exit_app">Exit?</string>
+
+    <string name="light_theme">Light Theme</string>
+    <string name="dark_theme">Dark Theme</string>
+    <string name="device_default">Device Default</string>
+    <string name="set_by_battery_saver">Set by Battery Saver</string>
+
+    <string name="multi_reddit_name_explanation">The name should be unique.</string>
+    <string name="multi_reddit_name_hint">Name (Max 50 Characters)</string>
+    <string name="multi_reddit_description_hint">Description</string>
+    <string name="private_multi_reddit">Private</string>
+    <string name="select_subreddits_and_users">Select Subreddits and Users</string>
+    <string name="no_multi_reddit_name">Where is the name?</string>
+    <string name="create_multi_reddit_failed">Cannot create this multireddit</string>
+    <string name="duplicate_multi_reddit">This multireddit already exists</string>
+    <string name="edit_multi_reddit_failed">Cannot edit this multireddit</string>
+    <string name="delete_multi_reddit_success">Deleted successfully</string>
+    <string name="delete_multi_reddit_failed">Delete failed</string>
+    <string name="delete_multi_reddit_dialog_message">Are you sure?</string>
+
+    <string name="cannot_save_image">Cannot save the image</string>
+    <string name="cannot_save_gif">Cannot save the gif</string>
+    <string name="cannot_get_storage">Cannot access the app storage</string>
+    <string name="save_image_first">Saving the image. Please wait.</string>
+    <string name="save_gif_first">Saving the gif. Please wait.</string>
+
+    <string name="theme_name_description">Tap to change the name of this theme.</string>
+    <string name="theme_item_is_light_theme">Set as Light Theme</string>
+    <string name="theme_item_is_dark_theme">Set as Dark Theme</string>
+    <string name="theme_item_is_amoled_theme">Set as Amoled Theme</string>
+    <string name="theme_item_color_primary">Color Primary</string>
+    <string name="theme_item_color_primary_detail">Applied to: Toolbar</string>
+    <string name="theme_item_color_primary_dark">Color Primary Dark</string>
+    <string name="theme_item_color_primary_dark_detail">Applied to: Status Bar</string>
+    <string name="theme_item_color_accent">Color Accent</string>
+    <string name="theme_item_color_accent_detail">Applied to: Progress Bar and background of Floating Action Button, etc</string>
+    <string name="theme_item_color_primary_light_theme">Color Primary Light Theme</string>
+    <string name="theme_item_color_primary_light_theme_detail">Applied to: Button</string>
+    <string name="theme_item_primary_text_color">Primary Text Color</string>
+    <string name="theme_item_primary_text_color_detail">Applied to: Primary text</string>
+    <string name="theme_item_secondary_text_color">Secondary Text Color</string>
+    <string name="theme_item_secondary_text_color_detail">Applied to: Secondary text</string>
+    <string name="theme_item_post_title_color">Post Title Color</string>
+    <string name="theme_item_post_title_color_detail">Applied to: Post title</string>
+    <string name="theme_item_post_content_color">Post Content Color</string>
+    <string name="theme_item_post_content_color_detail">Applied to: Post content</string>
+    <string name="theme_item_read_post_title_color">Read Post Title Color</string>
+    <string name="theme_item_read_post_title_color_detail">Applied to: Read Post Title</string>
+    <string name="theme_item_read_post_content_color">Read Post Content Color</string>
+    <string name="theme_item_read_post_content_color_detail">Applied to: Read Post Content</string>
+    <string name="theme_item_comment_color">Comment Color</string>
+    <string name="theme_item_comment_color_detail">Applied to: Comment</string>
+    <string name="theme_item_button_text_color">Button Text Color</string>
+    <string name="theme_item_button_text_color_detail">Applied to: Text on button</string>
+    <string name="theme_item_chip_text_color">Chip Text Color</string>
+    <string name="theme_item_chip_text_color_detail">Applied to: Subscribe Button</string>
+    <string name="theme_item_link_color">Link Color</string>
+    <string name="theme_item_link_color_detail">Applied to: URL</string>
+    <string name="theme_item_received_message_text_color">Received Message Text Color</string>
+    <string name="theme_item_received_message_text_color_detail">Applied to: Received Private Messages</string>
+    <string name="theme_item_sent_message_text_color">Sent Message Text Color</string>
+    <string name="theme_item_sent_message_text_color_detail">Applied to: Sent Private Messages</string>
+    <string name="theme_item_background_color">Background Color</string>
+    <string name="theme_item_background_color_detail">Applied to: Background of every page and navigation drawer</string>
+    <string name="theme_item_card_view_background_color">Card View Background Color</string>
+    <string name="theme_item_card_view_background_color_detail">Applied to: Post background and message background</string>
+    <string name="theme_item_read_post_card_view_background_color">Read Post Card View Background Color</string>
+    <string name="theme_item_read_post_card_view_background_color_detail">Applied to: Read Post background</string>
+    <string name="theme_item_filled_card_view_background_color">Filled Card View Background Color</string>
+    <string name="theme_item_filled_card_view_background_color_detail">Applied to: Background of a post in a filled card view, some edit text fields</string>
+    <string name="theme_item_read_post_filled_card_view_background_color">Read Post Filled Card View Background Color</string>
+    <string name="theme_item_read_post_filled_card_view_background_color_detail">Applied to: Background of a read post in a filled card view</string>
+    <string name="theme_item_comment_background_color">Comment Background Color</string>
+    <string name="theme_item_comment_background_color_detail">Applied to: Comment background</string>
+    <string name="theme_item_fully_collapsed_comment_background_color">Fully-Collapsed Comment Background Color</string>
+    <string name="theme_item_fully_collapsed_comment_background_color_detail">Applied to: Background of fully-collapsed comments</string>
+    <string name="theme_item_awarded_comment_background_color">Awarded Comment Background Color</string>
+    <string name="theme_item_awarded_comment_background_color_detail">Applied to: Background of awarded comments</string>
+    <string name="theme_item_received_message_background_color">Received Message Background Color</string>
+    <string name="theme_item_received_message_background_color_detail">Applied to: Background of received private messages</string>
+    <string name="theme_item_sent_message_background_color">Sent Message Background Color</string>
+    <string name="theme_item_sent_message_background_color_detail">Applied to: Background of sent private messages</string>
+    <string name="theme_item_bottom_app_bar_background_color">Bottom Navigation Bar Color</string>
+    <string name="theme_item_bottom_app_bar_background_color_detail">Applied to: Bottom navigation bar</string>
+    <string name="theme_item_primary_icon_color">Primary Icon Color</string>
+    <string name="theme_item_primary_icon_color_detail">Applied to: Icons in the navigation drawer.</string>
+    <string name="theme_item_bottom_app_bar_icon_color">Bottom Navigation Bar Icon Color</string>
+    <string name="theme_item_bottom_app_bar_icon_color_detail">Applied to: Icons in the bottom navigation bar</string>
+    <string name="theme_item_post_icon_and_info_color">Post Icon and Info Color</string>
+    <string name="theme_item_post_icon_and_info_color_detail">Applied to: Icons, score and the number of comments in posts</string>
+    <string name="theme_item_comment_icon_and_info_color">Comment Icon and Info Color</string>
+    <string name="theme_item_comment_icon_and_info_color_detail">Applied to: Icons and score in comments</string>
+    <string name="theme_item_fab_icon_color">Floating Action Button Icon Color</string>
+    <string name="theme_item_fab_icon_color_detail">Applied to: Floating action button icon</string>
+    <string name="theme_item_send_message_icon_color">Send Message Icon Color</string>
+    <string name="theme_item_send_message_icon_color_detail">Applied to: send private message icon</string>
+    <string name="theme_item_toolbar_primary_text_and_icon_color">Toolbar Primary Text and Icon Color</string>
+    <string name="theme_item_toolbar_primary_text_and_icon_color_detail">Applied to: Primary texts and icons in toolbars</string>
+    <string name="theme_item_toolbar_secondary_text_color">Toolbar Secondary Text Color</string>
+    <string name="theme_item_toolbar_secondary_text_color_detail">Applied to: Secondary texts in toolbars</string>
+    <string name="theme_item_circular_progress_bar_background_color">Circular Progress Bar Background Color</string>
+    <string name="theme_item_circular_progress_bar_background_color_detail">Applied to: Background of Circular progress bar</string>
+    <string name="theme_item_media_indicator_icon_color">Media Indicator Icon Color</string>
+    <string name="theme_item_media_indicator_icon_color_detail">Applied to: Video or gallery icon on post preview</string>
+    <string name="theme_item_media_indicator_background_color">Media Indicator Background Color</string>
+    <string name="theme_item_media_indicator_background_color_detail">Applied to: Background of video or gallery icon on post preview</string>
+    <string name="theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background">Background Color of Tab Layout in Expanded Toolbar</string>
+    <string name="theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_background_detail">Applied to: Tab layout background (expanded toolbar)</string>
+    <string name="theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color">Text Color of Tab Layout in Expanded Toolbar</string>
+    <string name="theme_item_tab_layout_with_expanded_collapsing_toolbar_text_color_detail">Applied to: Tab layout text color (expanded toolbar)</string>
+    <string name="theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator">Tab Indicator Color of Tab Layout in Expanded Toolbar</string>
+    <string name="theme_item_tab_layout_with_expanded_collapsing_toolbar_tab_indicator_detail">Applied to: Tab indicator color in tab layout (expanded toolbar)</string>
+    <string name="theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background">Background Color of Tab Layout in Collapsed Toolbar</string>
+    <string name="theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_background_detail">Applied to: Tab layout background (collapsed toolbar)</string>
+    <string name="theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color">Text Color of Tab Layout in Collapsed Toolbar</string>
+    <string name="theme_item_tab_layout_with_collapsed_collapsing_toolbar_text_color_detail">Applied to: Tab layout text color (collapsed toolbar)</string>
+    <string name="theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator">Tab Indicator Color of Tab Layout in Collapsed Toolbar</string>
+    <string name="theme_item_tab_layout_with_collapsed_collapsing_toolbar_tab_indicator_detail">Applied to: Tab indicator color in tab layout (collapsed toolbar)</string>
+    <string name="theme_item_upvoted_color">Upvoted Color</string>
+    <string name="theme_item_upvoted_color_detail">Applied to: Vote buttons and scores (upvoted)</string>
+    <string name="theme_item_downvoted_color">Downvoted Color</string>
+    <string name="theme_item_downvoted_color_detail">Applied to: Vote buttons and scores (downvoted)</string>
+    <string name="theme_item_post_type_background_color">Post Type Background Color</string>
+    <string name="theme_item_post_type_background_color_detail">Applied to: Background of the post type (IMAGE, TEXT, VIDEO, GIF, LINK)</string>
+    <string name="theme_item_post_type_text_color">Post Type Text Color</string>
+    <string name="theme_item_post_type_text_color_detail">Applied to: Text color of the post type (IMAGE, TEXT, VIDEO, GIF LINK)</string>
+    <string name="theme_item_spoiler_background_color">Spoiler Background Color</string>
+    <string name="theme_item_spoiler_background_color_detail">Applied to: Background of the spoiler tag</string>
+    <string name="theme_item_spoiler_text_color">Spoiler Text Color</string>
+    <string name="theme_item_spoiler_text_color_detail">Applied to: Text color in the spoiler tag</string>
+    <string name="theme_item_nsfw_background_color">Sensitive Tag Background Color</string>
+    <string name="theme_item_nsfw_background_color_detail">Applied to: Background of the sensitive tag</string>
+    <string name="theme_item_nsfw_text_color">Sensitive Tag Text Color</string>
+    <string name="theme_item_nsfw_text_color_detail">Applied to: Text color of the sensitive tag</string>
+    <string name="theme_item_flair_background_color">Flair Background Color</string>
+    <string name="theme_item_flair_background_color_detail">Applied to: Background of the flair tag</string>
+    <string name="theme_item_flair_text_color">Flair Text Color</string>
+    <string name="theme_item_flair_text_color_detail">Applied to: Text color of the flair tag</string>
+    <string name="theme_item_awards_background_color">Awards Background Color</string>
+    <string name="theme_item_awards_background_color_detail">Applied to: Background of the awards tag</string>
+    <string name="theme_item_awards_text_color">Awards Text Color</string>
+    <string name="theme_item_awards_text_color_detail">Applied to: Text color of the awards tag</string>
+    <string name="theme_item_archived_tint">Archived Icon Color</string>
+    <string name="theme_item_archived_tint_detail">Applied to: Archived icon</string>
+    <string name="theme_item_locked_icon_tint">Locked Icon Color</string>
+    <string name="theme_item_locked_icon_tint_detail">Applied to: Locked icon</string>
+    <string name="theme_item_crosspost_icon_tint">Crosspost Icon Color</string>
+    <string name="theme_item_crosspost_icon_tint_detail">Applied to: Crosspost icon</string>
+    <string name="theme_item_upvote_ratio_icon_tint">Upvote Ratio Icon Color</string>
+    <string name="theme_item_upvote_ratio_icon_tint_detail">Applied to: Upvote ratio icon</string>
+    <string name="theme_item_stickied_post_icon_tint">Stickied Post Icon Color</string>
+    <string name="theme_item_stickied_post_icon_tint_detail">Applied to: Stickied post icon</string>
+    <string name="theme_item_no_preview_post_type_icon_tint">No-preview Post Type Icon Color</string>
+    <string name="theme_item_no_preview_post_type_icon_tint_detail">Applied to: Icon indicating the type of post when there is no preview available</string>
+    <string name="theme_item_subscribed_color">Subscribed</string>
+    <string name="theme_item_subscribed_color_detail">Applied to: Unsubscribe button</string>
+    <string name="theme_item_unsubscribed_color">Unsubscribed</string>
+    <string name="theme_item_unsubscribed_color_detail">Applied to: Subscribe button</string>
+    <string name="theme_item_username_color">Username Color</string>
+    <string name="theme_item_username_color_detail">Applied to: Username</string>
+    <string name="theme_item_subreddit_color">Subreddit Color</string>
+    <string name="theme_item_subreddit_color_detail">Applied to: Subreddit name</string>
+    <string name="theme_item_author_flair_text_color">Author Flair Color</string>
+    <string name="theme_item_author_flair_text_color_detail">Applied to: Author flair in comments</string>
+    <string name="theme_item_submitter_color">Submitter</string>
+    <string name="theme_item_submitter_color_detail">Applied to: Submitter in comments</string>
+    <string name="theme_item_moderator_color">Moderator</string>
+    <string name="theme_item_moderator_color_detail">Applied to: Moderator in comments</string>
+    <string name="theme_item_current_user_color">Current User</string>
+    <string name="theme_item_current_user_color_detail">Applied to: Current user in comments</string>
+    <string name="theme_item_single_comment_thread_background_color">Single Comment Thread Background Color</string>
+    <string name="theme_item_single_comment_thread_background_color_detail">Applied to: Single Comment</string>
+    <string name="theme_item_unread_message_background_color">Unread Message Background Color</string>
+    <string name="theme_item_unread_message_background_color_detail">Applied to: Unread Message Background Color</string>
+    <string name="theme_item_divider_color">Divider Color</string>
+    <string name="theme_item_divider_color_detail">Applied to: Comment divider, dividers in pages for submitting posts, etc.</string>
+    <string name="theme_item_no_preview_post_type_background_color">No-preview Post Type Background Color</string>
+    <string name="theme_item_no_preview_post_type_background_color_detail">Applied to: Placeholder indicating the type of post when there is no preview available</string>
+    <string name="theme_item_vote_and_reply_unavailable_button_color">Vote and Reply Unavailable Button Color</string>
+    <string name="theme_item_vote_and_reply_unavailable_button_color_detail">Applied to: Vote and reply buttons (Unavailable)</string>
+    <string name="theme_item_comment_vertical_bar_color_1">Comment Vertical Bar Color 1</string>
+    <string name="theme_item_comment_vertical_bar_color_1_detail">Applied to: Comment Vertical Bar (Level 1)</string>
+    <string name="theme_item_comment_vertical_bar_color_2">Comment Vertical Bar Color 2</string>
+    <string name="theme_item_comment_vertical_bar_color_2_detail">Applied to: Comment Vertical Bar (Level 2)</string>
+    <string name="theme_item_comment_vertical_bar_color_3">Comment Vertical Bar Color 3</string>
+    <string name="theme_item_comment_vertical_bar_color_3_detail">Applied to: Comment Vertical Bar (Level 3)</string>
+    <string name="theme_item_comment_vertical_bar_color_4">Comment Vertical Bar Color 4</string>
+    <string name="theme_item_comment_vertical_bar_color_4_detail">Applied to: Comment Vertical Bar (Level 4)</string>
+    <string name="theme_item_comment_vertical_bar_color_5">Comment Vertical Bar Color 5</string>
+    <string name="theme_item_comment_vertical_bar_color_5_detail">Applied to: Comment Vertical Bar (Level 5)</string>
+    <string name="theme_item_comment_vertical_bar_color_6">Comment Vertical Bar Color 6</string>
+    <string name="theme_item_comment_vertical_bar_color_6_detail">Applied to: Comment Vertical Bar (Level 6)</string>
+    <string name="theme_item_comment_vertical_bar_color_7">Comment Vertical Bar Color 7</string>
+    <string name="theme_item_comment_vertical_bar_color_7_detail">Applied to: Comment Vertical Bar (Level 7)</string>
+    <string name="theme_item_nav_bar_color">Navigation Bar Color</string>
+    <string name="theme_item_nav_bar_color_detail">Applied to: Navigation bar</string>
+    <string name="theme_item_light_status_bar">Dark Status Bar Icon Color</string>
+    <string name="theme_item_light_nav_bar">Dark Navigation Bar Icon Color</string>
+    <string name="theme_item_change_status_bar_icon_color_after_toolbar_collapsed_in_immersive_interface">Change Status Bar Icon Color After Toolbar Collapsed In Immersive Interface</string>
+    <string name="theme_item_available_on_android_8">Only available for Android 8.0 or above.</string>
+    <string name="theme_item_available_on_android_6">Only available for Android 6.0 or above.</string>
+
+    <string name="predefined_themes">Predefined Themes</string>
+    <string name="user_themes">Your Themes</string>
+    <string name="no_theme_name">What is the name of this theme?</string>
+    <string name="theme_name_hint">Theme Name</string>
+    <string name="theme_name_indigo">Indigo</string>
+    <string name="theme_name_indigo_dark">Indigo Dark</string>
+    <string name="theme_name_indigo_amoled">Indigo Amoled</string>
+    <string name="theme_name_white">White</string>
+    <string name="theme_name_white_dark">White Dark</string>
+    <string name="theme_name_white_amoled">White Amoled</string>
+    <string name="theme_name_red">Red</string>
+    <string name="theme_name_red_dark">Red Dark</string>
+    <string name="theme_name_red_amoled">Red Amoled</string>
+    <string name="theme_name_dracula">Dracula</string>
+    <string name="theme_name_calm_pastel">Calm Pastel</string>
+    <string name="create_light_theme">Create a Light Theme\nBase on Indigo Theme</string>
+    <string name="create_dark_theme">Create a Dark Theme\nBase on Indigo Dark Theme</string>
+    <string name="create_amoled_theme">Create an Amoled Theme\nBase on Indigo Amoled Theme</string>
+    <string name="create_theme_info">If you want to create a theme based on another theme, click the \"+\" button on a theme instead.</string>
+    <string name="edit_theme_name">Edit Theme Name</string>
+    <string name="edit_theme">Edit Theme</string>
+    <string name="delete_theme">Delete Theme</string>
+    <string name="delete_theme_dialog_message">Are you sure you want to delete %1$s?</string>
+    <string name="share_theme">Share Theme</string>
+    <string name="change_theme_name">Change Name</string>
+    <string name="theme_copied">Copied! Paste and share it to other people.</string>
+    <string name="copy_theme_faied">Cannot copy the theme configuration</string>
+    <string name="cannot_find_theme">Cannot find this theme</string>
+    <string name="cannot_download_theme_data">Cannot download theme data</string>
+    <string name="import_theme">Import Theme</string>
+    <string name="no_data_in_clipboard">Cannot find data in clipboard</string>
+    <string name="import_theme_success">Import theme successfully</string>
+    <string name="parse_theme_failed">Parse Theme Failed</string>
+    <string name="duplicate_theme_name_dialog_title">Duplicate Theme Found</string>
+    <string name="duplicate_theme_name_dialog_message">A theme in the database is also called %1$s. Do you want to change the name of this imported theme?</string>
+    <string name="rename">Rename</string>
+    <string name="override">Override</string>
+    <string name="save_theme_options_title">Save options</string>
+    <string name="save_theme_options_message">You uploaded this theme so you can make changes.</string>
+    <string name="save_locally">Save locally</string>
+    <string name="save_online">Save online</string>
+    <string name="save_online_anonymous">Save online (anonymously)</string>
+    <string name="save_locally_and_online">Save both locally and online</string>
+    <string name="save_locally_and_online_anonymous">Save both locally and online (anonymously)</string>
+    <string name="theme_saved_locally">Theme saved locally</string>
+    <string name="theme_saved_online">Theme saved online</string>
+    <string name="upload_theme_failed">Failed to upload this theme. Try again later.</string>
+
+    <string name="color_picker">Color Picker</string>
+    <string name="invalid_color">Invalid Color</string>
+
+    <string name="delete_all_subreddits_success">Delete all subreddits successfully</string>
+    <string name="delete_all_users_success">Delete all users successfully</string>
+    <string name="delete_all_sort_types_success">Delete all sort types successfully</string>
+    <string name="delete_all_post_layouts_success">Delete all post layouts successfully</string>
+    <string name="delete_all_themes_success">Delete all themes successfully</string>
+    <string name="delete_all_front_page_scrolled_positions_success">Delete all scrolled positions in front page successfully</string>
+    <string name="delete_all_read_posts_success">Delete all read posts successfully</string>
+    <string name="delete_all_legacy_settings_success">Delete all legacy settings successfully</string>
+    <string name="reset_all_settings_success">Reset all settings successfully</string>
+
+    <string name="username_preview">u/Hostilenemy</string>
+    <string name="subreddit_preview">r/Infinity_For_Reddit</string>
+    <string name="primary_text_preview">Primary Text</string>
+    <string name="secondary_text_preview">Secondary Text</string>
+    <string name="post_title_preview">This is a post</string>
+    <string name="post_content_preview">This gravity joke is getting a bit old, but I fall for it every time.</string>
+    <string name="post_type_preview">POST</string>
+    <string name="flair_preview">Flair</string>
+    <string name="awards_preview">4 Awards</string>
+    <string name="author_flair_preview">Author Flair</string>
+    <string name="comment_content_preview">I got my girlfriend a “Get better soon” card.\nShe\'s not ill or anything, but she could definitely get better.</string>
+
+    <string name="copy_multi_reddit_path">Copy Multireddit\'s Path</string>
+    <string name="copy_multi_reddit_path_failed">Unable to copy multireddit\'s path</string>
+    <string name="edit_multi_reddit">Edit Multireddit</string>
+    <string name="delete_multi_reddit">Delete Multireddit</string>
+
+    <string name="report">Report</string>
+    <string name="reporting">Reporting</string>
+    <string name="report_successful">Reported</string>
+    <string name="report_failed">Report failed</string>
+    <string name="report_reason_not_selected">You haven\'t selected a reason</string>
+
+    <string name="report_reason_general_spam">It Is Spam</string>
+    <string name="report_reason_general_copyright_issue">It Contains Copyright Issue</string>
+    <string name="report_reason_general_child_pornography">It Contains Child Pornography</string>
+    <string name="report_reason_general_abusive_content">It Contains Abusive Content</string>
+
+    <string name="home">Home</string>
+    <string name="popular">Popular</string>
+    <string name="notifications">Notifications</string>
+    <string name="messages">Messages</string>
+    <string name="message">Message</string>
+
+    <string name="fetch_redgifs_video_failed">Fetch Redgifs video failed</string>
+    <string name="fetching_video_info_please_wait">Fetching video info. Please wait.</string>
+    <string name="fetch_streamable_video_failed">Fetch Streamable video failed</string>
+
+    <string name="error_fetching_imgur_media">Cannot load images</string>
+
+    <string name="downloading_reddit_video">Downloading Video Track</string>
+    <string name="downloading_reddit_video_audio_track">Downloading Audio Track</string>
+    <string name="downloading_reddit_video_muxing">Muxing Video and Audio</string>
+    <string name="downloading_reddit_video_save_file_to_public_dir">Saving Video</string>
+    <string name="downloading_reddit_video_finished">Downloaded</string>
+    <string name="downloading_reddit_video_failed_cannot_get_cache_directory">Download failed: cannot access cache directory </string>
+    <string name="downloading_reddit_video_failed_cannot_download_video">Download failed: cannot download video</string>
+    <string name="downloading_reddit_video_failed_cannot_save_video">Download failed: cannot save video to cache directory</string>
+    <string name="downloading_reddit_video_failed_cannot_save_audio">Download failed: cannot save audio to cache directory</string>
+    <string name="downloading_reddit_video_failed_cannot_mux">Download failed: cannot mux video and audio</string>
+    <string name="downloading_reddit_video_failed_cannot_save_mux_video">Download failed: cannot save the video to public directory</string>
+
+    <string name="downloading">Downloading</string>
+    <string name="downloading_media_finished">Downloaded</string>
+    <string name="downloading_image_or_gif_failed_cannot_get_destination_directory">Download failed: cannot access destination directory</string>
+    <string name="downloading_media_failed_cannot_download_media">Download failed</string>
+    <string name="downloading_media_failed_cannot_save_to_destination_directory">Download failed: cannot save the file to destination directory</string>
+    <string name="download_media_failed_cannot_fetch_redgifs_url">Download failed: cannot fetch Redgifs video url</string>
+    <string name="download_media_failed_cannot_fetch_streamable_url">Download failed: cannot fetch Streamable video url</string>
+    <string name="download_media_failed_invalid_argument">Invalid argument</string>
+    <string name="download_all_gallery_media_notification_title">All Gallery Media</string>
+    <string name="download_all_imgur_album_media_notification_title">All Imgur Album Media</string>
+    <string name="download_gallery_failed_some_images">Downloaded. Some media failed to download.</string>
+
+    <string name="wallpaper_set">Wallpaper set</string>
+    <string name="error_set_wallpaper">Cannot set wallpaper</string>
+
+    <string name="set_to_home_screen">Set to Home Screen</string>
+    <string name="set_to_lock_screen">Set to Lock Screen</string>
+    <string name="set_to_both">Set to Both</string>
+
+    <string name="default_font_font_preview">Default</string>
+
+    <string name="load_video_in_redgifs">Try loading the video on Redgifs</string>
+
+    <string name="top_score">%1$s pts</string>
+
+    <string name="login_activity_2fa_prompt">2-factor authentication: &lt;password&gt;:&lt;2FA code&gt;.\nExample: yourpass:123456\nGoogle login or having trouble login: click the bottom right button.</string>
+
+    <string name="block_user">Block User</string>
+    <string name="block_user_success">Blocked</string>
+    <string name="block_user_failed">Failed to block user</string>
+
+    <string name="select_user_flair_success">User flair selected</string>
+    <string name="select_this_user_flair">Select this user flair?</string>
+    <string name="clear_user_flair">Clear Flair</string>
+    <string name="clear_user_flair_success">User flair cleared</string>
+
+    <string name="select_header_size">Select Header Size</string>
+    <string name="large">Large</string>
+    <string name="small">Small</string>
+    <string name="insert_link">Insert Link</string>
+    <string name="text_hint">Text</string>
+    <string name="link_hint">Link</string>
+
+    <string name="unlock_account_section">Unlock Account Section</string>
+    <string name="unlock">Unlock</string>
+
+    <string name="submit_post">Submit Post</string>
+    <string name="refresh">Refresh</string>
+    <string name="change_sort_type">Change Sort Type</string>
+    <string name="change_post_layout">Change Post Layout</string>
+
+    <string name="edited">Edited</string>
+    <string name="edited_time">Edited on %s</string>
+
+    <string name="warning">Warning</string>
+    <string name="this_is_a_nsfw_subreddit">This is a sensitive subreddit.</string>
+    <string name="this_user_has_nsfw_content">This user has sensitive content</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="leave">Leave</string>
+
+    <string name="go_to_subreddit">Go to Subreddit</string>
+    <string name="go_to_user">Go to User</string>
+    <string name="go_to_thing_hint">Name</string>
+    <string name="go_to_top">Go To Top</string>
+    <string name="random">Random</string>
+    <string name="random_subreddit">Random Subreddit</string>
+    <string name="random_nsfw_subreddit">Random Sensitive Subreddit</string>
+    <string name="random_post">Random Post</string>
+    <string name="random_nsfw_post">Random Sensitive post</string>
+    <string name="fetch_random_thing_failed">Try again later</string>
+
+    <string name="select_video_quality">Select Video Quality</string>
+
+    <string name="hide_read_posts">Hide Read Posts</string>
+    <string name="filter_posts">Filter Posts</string>
+
+    <string name="only_sensitive_content">Only Sensitive Content</string>
+    <string name="only_spoiler">Only Spoiler</string>
+    <string name="title_excludes_strings_hint">Title: excludes keywords (key1,key2)</string>
+    <string name="title_contains_strings_hint">Title: contains keywords (key1,key2)</string>
+    <string name="title_excludes_regex_hint">Title: excludes regex</string>
+    <string name="title_contains_regex_hint">Title: contains regex</string>
+    <string name="exclude_subreddits_hint">Exclude subreddits (e.g. funny,AskReddit)</string>
+    <string name="exclude_users_hint">Exclude users (e.g. Hostilenemy,random)</string>
+    <string name="exclude_flairs_hint">Exclude flairs (e.g. flair1,flair2)</string>
+    <string name="contain_flairs_hint">Contain flairs (e.g. flair1,flair2)</string>
+    <string name="exclude_domains_hint">Exclude domains</string>
+    <string name="contain_domains_hint">Contain domains</string>
+    <string name="min_vote_hint">Min vote (-1: no restriction)</string>
+    <string name="max_vote_hint">Max vote (-1: no restriction)</string>
+    <string name="min_comments_hint">Min comments (-1: no restriction)</string>
+    <string name="max_comments_hint">Max comments (-1: no restriction)</string>
+    <string name="min_awards_hint">Min awards (-1: no restriction)</string>
+    <string name="max_awards_hint">Max awards (-1: no restriction)</string>
+    <string name="post_filter_name_hint">Post Filter Name</string>
+    <string name="post_filter_requires_a_name">What is the name of this post filter?</string>
+    <string name="duplicate_post_filter_dialog_title">\'%1$s\' Already Exists</string>
+    <string name="duplicate_post_filter_dialog_message">Override it?</string>
+    <string name="apply_to">Apply to</string>
+    <string name="post_filter_usage_home">Home</string>
+    <string name="post_filter_usage_subreddit">Subreddit: %1$s</string>
+    <string name="post_filter_usage_subreddit_all">Subreddit</string>
+    <string name="post_filter_usage_embedded_subreddit_all">All subreddits</string>
+    <string name="post_filter_usage_user">User: %1$s</string>
+    <string name="post_filter_usage_user_all">User</string>
+    <string name="post_filter_usage_embedded_user_all">All users</string>
+    <string name="post_filter_usage_multireddit">MultiReddit: %1$s</string>
+    <string name="post_filter_usage_multireddit_all">MultiReddit</string>
+    <string name="post_filter_usage_embedded_multireddit_all">All Multireddits</string>
+    <string name="post_filter_usage_search">Search</string>
+    <string name="subreddit">Subreddit</string>
+    <string name="user">User</string>
+    <string name="edit_post_filter_name_of_usage_info">Leave it blank to apply this post filter to all the subreddits / users / multireddits</string>
+    <string name="click_to_apply_post_filter">Click here to apply it to some post feeds</string>
+    <string name="post_filter_usage_embedded_more_count">and %1$d more</string>
+    <string name="post_filter_name_explanation">The post filter name should be unique.</string>
+    <string name="post_filter_post_type_explanation">To see certain types of posts, please turn on the switch corresponding to the types.</string>
+    <string name="post_filter_only_sensitive_spoiler_explanation">To only see sensitive or spoiler posts, please turn on the corresponding switch.</string>
+    <string name="post_filter_title_excludes_strings_explanation">Posts will be filtered out if they contain the following keywords in their title.</string>
+    <string name="post_filter_title_contains_strings_explanation">Posts will be filtered out if they do not contain the following keywords in their title.</string>
+    <string name="post_filter_title_excludes_regex_explanation">Posts will be filtered out if their title matches the following regular expression.</string>
+    <string name="post_filter_title_contains_regex_explanation">Posts will be filtered out if their title does not match the following regular expression.</string>
+    <string name="post_filter_exclude_subreddits_explanation">Posts from the following subreddits will be filtered out.</string>
+    <string name="post_filter_exclude_users_explanation">Posts submitted by the following users will be filtered out.</string>
+    <string name="post_filter_exclude_flairs_explanation">Posts that have the following flairs will be filtered out.</string>
+    <string name="post_filter_contain_flairs_explanation">Posts that do not have the following flairs will be filtered out.</string>
+    <string name="post_filter_exclude_domains_explanation">Link posts that have the following urls will be filtered out.</string>
+    <string name="post_filter_contain_domains_explanation">Link posts that do not have the following urls will be filtered out.</string>
+    <string name="post_filter_min_vote_explanation">Posts that have a score lower than the following value will be filtered out (-1 means no restriction).</string>
+    <string name="post_filter_max_vote_explanation">Posts that have a score higher than the following value will be filtered out (-1 means no restriction).</string>
+    <string name="post_filter_min_comments_explanation">Posts will be filtered out if the number of their comments is less than the following value. (-1 means no restriction).</string>
+    <string name="post_filter_max_comments_explanation">Posts will be filtered out if the number of their comments is larger than the following value. (-1 means no restriction).</string>
+
+    <string name="excludes_strings_hint">Exclude keywords (key1,key2)</string>
+    <string name="comment_filter_name_hint">Comment Filter Name</string>
+    <string name="comment_filter_requires_a_name">What is the name of this comment filter?</string>
+    <string name="duplicate_comment_filter_dialog_title">\'%1$s\' Already Exists</string>
+    <string name="duplicate_comment_filter_dialog_message">Override it?</string>
+    <string name="comment_filter_applied_to_all_subreddits">Applied to all subreddits</string>
+    <string name="comment_filter_usage_embedded_more_count">and %1$d more</string>
+
+    <string name="read_all_messages_time_limit">You are doing this too frequently. Try again later. This is Reddit API\'s rate limit.</string>
+    <string name="read_all_messages_success">Read all messages successfully</string>
+    <string name="read_all_messages_failed">Unable to read all messages</string>
+
+    <string name="add_subreddit_or_user_to_multireddit_success">%1$s is added to multireddit %2$s</string>
+    <string name="add_subreddit_or_user_to_multireddit_failed">Unable to add %1$s to multireddit %2$s</string>
+
+    <string name="choose_a_user">Choose a user</string>
+
+    <string name="open_login_page">Open login page</string>
+    <string name="custom_tab_not_available">Chrome custom tab not available. Is Chrome or Firefox installed?</string>
+
+    <string name="vote">Vote</string>
+
+    <string name="anonymous_front_page_no_subscriptions">Start by joining a subreddit!</string>
+    <string name="anonymous_multireddit_no_subreddit">This multireddit does not have a subreddit!</string>
+
+    <string name="backup_settings_success">Successfully exported settings to the destination directory.</string>
+    <string name="create_zip_in_destination_directory_failed">Could not create backup zip in the destination directory</string>
+    <string name="backup_some_settings_failed">Could not backup some settings but others were successfully exported to the destination directory</string>
+    <string name="restore_settings_success">Successfully restored settings. Restart the app to see the changes.</string>
+    <string name="restore_settings_partially_failed">Some settings may not be restored successfully. Restart the app to see the changes.</string>
+    <string name="restore_settings_failed_file_corrupted">Cannot restore settings. The file may be corrupted.</string>
+    <string name="restore_settings_failed_cannot_get_file">Cannot access the file</string>
+
+    <string name="suicide_prevention_quote">If you are looking for a sign not to kill yourself, this is it.\u2764</string>
+    <string name="do_not_show_this_again">Don\'t show this again</string>
+    <string name="continue_suicide_prevention_activity">Continue</string>
+
+    <string name="error_fetching_v_redd_it_video_cannot_get_redirect_url">Error fetching v.redd.it video: Cannot get the redirect url</string>
+    <string name="error_fetching_v_redd_it_video_cannot_get_post">Error fetching v.redd.it video: Cannot get the post</string>
+    <string name="error_fetching_v_redd_it_video_cannot_get_post_id">Error fetching v.redd.it video: Cannot get the post id</string>
+    <string name="error_fetching_v_redd_it_video_cannot_get_video_url">Error fetching v.redd.it video: Cannot get the video url</string>
+
+    <string name="always_on">Always On</string>
+    <string name="only_on_wifi">Only on Wifi</string>
+    <string name="never">Never</string>
+    <string name="normal">Normal</string>
+    <string name="extra_small">Extra Small</string>
+    <string name="extra_large">Extra Large</string>
+    <string name="enormously_large">Enormously Large</string>
+    <string name="default_in_array">Default</string>
+    <string name="off">Off</string>
+    <string name="only_on_cellular_data">Only on Cellular Data</string>
+    <string name="upvote">Upvote</string>
+    <string name="downvote">Downvote</string>
+
+    <string name="select">Select</string>
+    <string name="exclude_subreddit">Exclude this subreddit</string>
+    <string name="exclude_user">Exclude this user</string>
+    <string name="exclude_flair">Exclude this flair</string>
+    <string name="contain_flair">Contain this flair</string>
+    <string name="exclude_domain">Exclude this domain</string>
+    <string name="contain_domain">Contain this domain</string>
+
+    <string name="suggest_title">Suggest Title</string>
+    <string name="suggest_title_failed">Failed to suggest a title</string>
+
+    <string name="crash_reports_deleted">Crash reports have been deleted</string>
+
+    <string name="disable_over_18_forever_message">Once enabled, sensitive content will always be hidden, regardless of the sensitive content setting. This option is irreversible; the only way to re-enable the sensitive content is to clear the app data.\n\nDo you still want to enable it?</string>
+
+    <string name="reply">Reply</string>
+
+    <string name="uploaded_images">Uploaded Images</string>
+    <string name="uploaded_images_explanation">This is an experimental feature, and here are some things you need to know:\n
+        1. Uploaded images will not be shown in the text editor, and instead, a piece of text will be inserted as a block,
+        with a format similar to ![](XXXXX). XXXXX is the image id, and it should not be modified. To add a caption for
+        your image, simply type between the brackets. Example: ![This is a caption](XXXXX). Note that the caption will be treated
+        as plain text.\n
+        2. To write a superscript, please use ^(), and put the texts inside the parentheses, instead of only
+        using a single ^. For simplicity, click the superscript option in the formatting tools to insert a superscript.\n
+        3. This feature converts your markdown to rich text format and some formatting may be lost in the process.\n
+        4. Uploaded images may not be shown on the preview screen.\n
+        5. You cannot edit a submitted post with embedded images in it.\n
+        6. Please do not change your account using the account chooser on the editing screen. You should switch
+        your account in the navigation drawer on the main screen.</string>
+    <string name="select_image">Select an Image</string>
+    <string name="capture">Capture</string>
+    <string name="uploading_image">Uploading</string>
+    <string name="upload_image_success">Upload image successfully. Click the image button again to see the uploaded images.</string>
+    <string name="get_image_bitmap_failed">Unable to get the bitmap of the image</string>
+    <string name="upload_image_failed">Unable to upload the image</string>
+    <string name="select_giphy_gif">Select a Giphy GIF</string>
+    <string name="select_giphy_gif_explanation">This is an experimental feature, and here are some things you need to know:\n
+        1. Giphy gifs will not be shown in the text editor, and instead, a piece of text will be inserted as a block,
+        with a format similar to ![gif](XXXXX). XXXXX is the Giphy gif id, and it should not be modified.\n
+        2. You can only insert one Giphy gif per comment.\n
+        3. To write a superscript, please use ^(), and put the texts inside the parentheses, instead of only
+        using a single ^. For simplicity, click the superscript option in the formatting tools to insert a superscript.\n
+        4. This feature converts your markdown to rich text format and some formatting may be lost in the process.\n
+        5. Giphy gifs may not be shown on the preview screen.\n
+        6. Please do not change your account using the account chooser on the editing screen. You should switch
+        your account in the navigation drawer on the main screen.</string>
+
+    <string name="search_comments">Search Comments</string>
+
+    <string name="please_wait_image_is_uploading">An image is still being uploaded. Please wait.</string>
+
+    <string name="error_fetch_trending_search">Fetch trending searches failed.\nTap to retry.</string>
+    <string name="error_parse_trending_search">Parse trending searches failed.\nTap to retry.</string>
+    <string name="no_trending_search">No trending searches found.\nTap to retry.</string>
+
+    <string name="error_loading_wiki">Error loading wiki</string>
+    <string name="no_wiki">This subreddit has no wiki page</string>
+
+    <string name="material_you_notification_title">Applying Material You</string>
+
+    <string name="lock_screen_text">Whoa there!!!</string>
+    <string name="app_lock_timeout_immediately">Immediately</string>
+    <string name="app_lock_timeout_1_min">1 minute</string>
+    <string name="app_lock_timeout_2_mins">2 minutes</string>
+    <string name="app_lock_timeout_5_mins">5 minutes</string>
+    <string name="app_lock_timeout_10_mins">10 minutes</string>
+    <string name="app_lock_timeout_15_mins">15 minutes</string>
+    <string name="app_lock_timeout_20_mins">20 minutes</string>
+    <string name="app_lock_timeout_30_mins">30 minutes</string>
+    <string name="app_lock_timeout_1_hour">1 hour</string>
+    <string name="app_lock_timeout_2_hours">2 hours</string>
+    <string name="app_lock_timeout_3_hours">3 hours</string>
+    <string name="app_lock_timeout_4_hours">4 hours</string>
+    <string name="app_lock_timeout_5_hours">5 hours</string>
+    <string name="app_lock_timeout_6_hours">6 hours</string>
+    <string name="app_lock_timeout_12_hours">12 hours</string>
+    <string name="app_lock_timeout_24_hours">24 hours</string>
+
+    <!--EditProfileService Notification-->
+    <string name="submit_change_avatar">Changing Avatar</string>
+    <string name="submit_change_banner">Changing Banner</string>
+    <string name="submit_save_profile">Saving Profile</string>
+
+    <!--EditProfileActivity-->
+    <string name="action_edit_profile">Edit Profile</string>
+    <string name="remove_avatar">Remove Avatar</string>
+    <string name="remove_banner">Remove Banner</string>
+    <string name="display_name_text">Display Name</string>
+    <string name="display_name_hint">Show on your profile page</string>
+    <string name="display_name_description">This will be displayed to viewers of your profile page and does not change your username.</string>
+    <string name="about_you_text">About You</string>
+    <string name="about_you_hint">A little description of yourself</string>
+    <string name="message_remove_avatar_success">Remove avatar successfully</string>
+    <string name="message_remove_avatar_failed">Failed to remove avatar %s</string>
+    <string name="message_remove_banner_success">Remove banner successfully</string>
+    <string name="message_remove_banner_failed">Failed to remove banner %s</string>
+    <string name="message_change_avatar_success">Change avatar successfully</string>
+    <string name="message_change_avatar_failed">Failed to change avatar %s</string>
+    <string name="message_change_banner_success">Change banner successfully</string>
+    <string name="message_change_banner_failed">Failed to change banner %s</string>
+    <string name="message_save_profile_success">Save profile successfully</string>
+    <string name="message_save_profile_failed">Failed to save profile %s</string>
+
+    <string name="select_a_ttf_font">Select a ttf font file</string>
+    <string name="unable_to_get_font_file">Unable to get your font</string>
+    <string name="unable_to_load_font">Unable to load custom font</string>
+    <string name="unable_to_copy_font_file">Unable to copy your font</string>
+
+    <string name="reddit_gallery_item_caption_hint">Caption (max 180 characters)</string>
+    <string name="reddit_gallery_item_url_hint">Url</string>
+
+    <string name="user_agreement_dialog_title">User Agreement</string>
+    <string name="user_agreement_message">You need to agree to Reddit User Agreement (%1$s) and Infinity for Reddit\'s Privacy Policy (%2$s) before logging in.\n\nFrom now on, you will need a monthly subscription to access the Reddit API within Infinity for Reddit and this is because Reddit has started charging for API access since July 1st, 2023.</string>
+    <string name="warning_message_sensitive_content">Infinity neither promotes nor recommends sensitive content. Due to Reddit\'s policy, you are unlikely to encounter sensitive content within the app. You need to agree to Reddit User Agreement (%1$s) and Infinity for Reddit\'s Privacy Policy (%2$s) before changing these settings.</string>
+    <string name="agree">Agree</string>
+    <string name="do_not_agree">Don\'t Agree</string>
+
+    <string name="option_1_hint">Option 1 (Required)</string>
+    <string name="option_2_hint">Option 2 (Required)</string>
+    <string name="option_3_hint">Option 3</string>
+    <string name="option_4_hint">Option 4</string>
+    <string name="option_5_hint">Option 5</string>
+    <string name="option_6_hint">Option 6</string>
+
+    <string name="not_a_valid_number">Not a valid number</string>
+    <string name="not_a_valid_ip_or_hostname">Not a valid IP or host name</string>
+    <string name="not_a_valid_port">Not a valid port (0 - 65535)</string>
+
+    <string name="post_karma">Post Karma:</string>
+    <string name="comment_karma">Comment Karma:</string>
+    <string name="awarder_karma">Awarder Karma:</string>
+    <string name="awardee_karma">Awardee Karma:</string>
+
+    <string name="handle_link">Handle Link</string>
+    <string name="invalid_link">Invalid link</string>
+
+    <string name="error_unsupported_video">Media includes video tracks, but none are playable by this device</string>
+    <string name="error_unsupported_audio">Media includes audio tracks, but none are playable by this device</string>
+
+    <string name="exo_controls_volume_up_description">Volume Up</string>
+    <string name="exo_controls_volume_off_description">Volume Off</string>
+
+    <string name="invalid_regex">Invalid regex pattern</string>
+
+    <string name="load_more_posts_failed">Failed to load more posts.\nTap to retry.</string>
+    <string name="no_more_posts">No more posts</string>
+
+    <string name="image_index_in_gallery">%1$d/%2$d</string>
+
+    <string name="denied_notification_permission">Notification permission is not granted</string>
+    <string name="go_to_settings">Settings</string>
+
+    <string name="welcome_to_infinity">Welcome to Infinity for Reddit, your gateway to a whole new dimension of Reddit browsing!</string>
+    <string name="subscription_prompt">Before you dive into the countless possibilities this app offers,
+        I want to be upfront and transparent about a significant change I\'ve implemented to ensure the best possible service for you.
+        \n\nFrom now on, you will need a monthly subscription to access the Reddit API within Infinity for Reddit and
+        this is because Reddit has started charging for API access since July 1st, 2023.
+        \n\nAll the tiers work the same. If you want to support Infinity, you can subscribe to a higher tier.
+        Most of the money from the lowest tier goes to Reddit.
+    </string>
+    <string name="monthly">Monthly</string>
+    <string name="yearly">Yearly</string>
+    <string name="weekly">Weekly</string>
+    <string name="billing_error_billing_unavailable">Billing service unavailable on device.</string>
+    <string name="billing_error_developer_error">The developer made some errors. Not your fault.</string>
+    <string name="billing_error_error">Fatal error during the API action.</string>
+    <string name="billing_error_feature_not_supported">The requested feature is not supported by the Play Store on the current device.</string>
+    <string name="billing_error_item_already_owned">The purchase failed because the item is already owned.</string>
+    <string name="billing_error_item_unavailable">The requested product is not available for purchase.</string>
+    <string name="billing_error_network_error">A network error occurred during the operation.</string>
+    <string name="billing_error_service_disconnected">The app is not connected to the Play Store service via the Google Play Billing Library.</string>
+    <string name="billing_error_service_unavailable">The service is currently unavailable.</string>
+    <string name="billing_error_user_canceled">Transaction was canceled by the user.</string>
+    <string name="subscription_plan_description_monthly">Bronze</string>
+    <string name="subscription_plan_description_monthly_399">Silver</string>
+    <string name="subscription_plan_description_monthly_499">Gold - Perfect Choice!</string>
+    <string name="subscription_plan_description_monthly_699">Platinum</string>
+    <string name="subscription_plan_description_monthly_899">Diamond</string>
+    <string name="subscription_plan_description_monthly_999">Infinity</string>
+    <string name="acknowledge_purchase_failed">Cannot acknowledge purchase</string>
+    <string name="connect_to_billing_system_failed">Failed to connect to the billing system</string>
+    <string name="connecting_to_billing_system">Connecting to the billing system. Please wait.</string>
+    <string name="thank_you_for_subscription">Thank you for your subscription</string>
+    <string name="load_subscription_options">Load subscription options</string>
+    <string name="acknowledging_subscription">Acknowledging your subscription. Please wait.</string>
+    <string name="acknowledgement_purchase_failed_description">Oops, there was an error when acknowledging your purchase. If this problem persists for three days, you will automatically get a refund.\nDon\'t worry, you can still enjoy Infinity for Reddit.</string>
+    <string name="continue_to_app">Continue to app</string>
+    <string name="restore_subscription_purchase_details">Already paid for the subscription?</string>
+    <string name="restore_subscription_purchase">Restore subscription purchase</string>
+
+    <string name="important_info_title">Please re-login your account</string>
+    <string name="important_info">Infinity for Reddit with subscription uses a new API key from Reddit and you have to re-login to continue using the app.\n\nJust
+        open the navigation drawer and click your account header and select \"Add an account\" to login to Reddit using the same account again.
+        Otherwise, Infinity may not load posts at all. Sorry for the inconvenience.</string>
+    <string name="i_understand">I understand</string>
+
+    <string name="add_to_comment_filter">Add to Comment Filter</string>
+    <string name="cannot_edit_post_with_images">Editing posts with images is not allowed.</string>
+
+    <string name="local">Local</string>
+    <string name="online">Online</string>
+
+    <string name="image_and_gif">Image and GIF</string>
+    <string name="image_and_emote">Image and emote</string>
+    <string name="gif_and_emote">GIF and emote</string>
+    <string name="image_embedded_media">Image</string>
+    <string name="emote">Emote</string>
+    <string name="none">None</string>
+
+    <string name="comment_filter_display_mode">Display mode</string>
+    <string name="comment_filter_display_mode_remove_comments">Remove comments</string>
+    <string name="comment_filter_display_mode_fully_collapse_comments">Fully collapse comments</string>
+    <string name="comment_filter_name_explanation">The comment filter name should be unique.</string>
+    <string name="comment_filter_display_mode_explanation">Filtered out comments will be shown as the following selected option.</string>
+    <string name="comment_filter_exclude_strings_explanation">Comments will be filtered out if they contain the following keywords.</string>
+    <string name="comment_filter_exclude_users_explanation">Comments will be filtered out if they were submitted by the following users.</string>
+    <string name="comment_filter_min_vote_explanation">Comments that have a score lower than the following value will be filtered out (-1 means no restriction).</string>
+    <string name="comment_filter_max_vote_explanation">Comments that have a score higher than the following value will be filtered out (-1 means no restriction).</string>
+
+    <string name="content_description_banner_imageview">Banner Image</string>
+    <string name="content_description_create_comment_filter">Create comment filter</string>
+    <string name="content_description_add_comment_filter_usage">Apply comment filter to somewhere</string>
+    <string name="content_description_comment_filter_add_user">Add a user to comment filter</string>
+    <string name="content_description_create_custom_theme">Create custom theme</string>
+    <string name="content_description_create_post_filter">Create post filter</string>
+    <string name="content_description_add_post_filter_usage">Apply post filter to somewhere</string>
+    <string name="content_description_post_filter_add_subreddit">Add a subreddit to post filter</string>
+    <string name="content_description_post_filter_add_user">Add a user to post filter</string>
+    <string name="content_description_change_banner">Change banner</string>
+    <string name="content_description_change_avatar">Change avatar</string>
+    <string name="content_description_customize_post_filter">Customize post filter</string>
+    <string name="content_description_compose_message">Compose message</string>
+    <string name="content_description_alternative_login_method">Alternative login method</string>
+    <string name="content_description_capture_photo">Capture photo</string>
+    <string name="content_description_select_image">Select image</string>
+    <string name="content_description_selected_image">Selected image</string>
+    <string name="content_description_record_video">Record video</string>
+    <string name="content_description_select_video">Select video</string>
+    <string name="content_description_delete_texts">Delete texts</string>
+    <string name="content_description_handle_link">Handle link</string>
+    <string name="content_description_submit_post">Submit post</string>
+    <string name="content_description_refresh">Refresh</string>
+    <string name="content_description_change_sort_type">Change sort type</string>
+    <string name="content_description_change_post_layout">Change post layout</string>
+    <string name="content_description_search">Search</string>
+    <string name="content_description_go_to_subreddit">Go to subreddit</string>
+    <string name="content_description_go_to_user">Go to user</string>
+    <string name="content_description_random">Random</string>
+    <string name="content_description_filter_posts">Filter posts</string>
+    <string name="content_description_hide_read_posts">Hide read posts</string>
+    <string name="content_description_go_to_top">Go to top</string>
+    <string name="content_description_add_subreddit_or_user">Add subreddit or user</string>
+    <string name="content_description_video_indicator">Video indicator</string>
+    <string name="content_description_no_subscriptions_indicator">No subscriptions indicator</string>
+    <string name="content_description_create_multireddit">Create multireddit</string>
+    <string name="content_description_bottom_navigation_bar_button">Bottom navigation bar button</string>
+    <string name="content_description_fab">Floating action button</string>
+    <string name="content_description_download">Download</string>
+    <string name="content_description_share">Share</string>
+    <string name="content_description_set_as_wallpaper">Set as wallpaper</string>
+    <string name="content_description_previous_result">Go to previous result</string>
+    <string name="content_description_next_result">Go to next result</string>
+    <string name="content_description_close_search_panel">Close search panel</string>
+    <string name="content_description_send_message">Send message</string>
+    <string name="content_description_home">Home</string>
+    <string name="content_description_subscriptions">Subscriptions</string>
+    <string name="content_description_inbox">Inbox</string>
+    <string name="content_description_profile">Profile</string>
+    <string name="content_description_multireddits">Multireddits</string>
+    <string name="content_description_upvoted">Upvoted</string>
+    <string name="content_description_downvoted">Downvoted</string>
+    <string name="content_description_hidden">Hidden</string>
+    <string name="content_description_saved">Saved</string>
+
+    <string name="comment">Comment</string>
+    <string name="enable_reply_notifications">Receive reply notifications</string>
+    <string name="disable_reply_notifications">Disable reply notifications</string>
+    <string name="reply_notifications_enabled">Reply notifications enabled</string>
+    <string name="reply_notifications_disabled">Reply notifications disabled</string>
+    <string name="toggle_reply_notifications_failed">Toggle reply notifications failed</string>
+    <string name="cannot_find_comment">Cannot find comment</string>
+
+    <string name="download_image">Download Image</string>
+    <string name="download_gif">Download Gif</string>
+    <string name="download_video">Download Video</string>
+    <string name="download_all_gallery_images">Download All Gallery Images</string>
+
+    <string name="proxy_http">HTTP</string>
+    <string name="proxy_socks">SOCKS</string>
+    <string name="proxy_direct">Direct</string>
+
+    <string name="jump_to_parent_comment">Jump to Parent Comment</string>
+    <string name="long_press_post_non_media_area">Long Press on Post (Non-Media Area)</string>
+    <string name="long_press_post_media">Long Press on Post Media</string>
+    <string name="show_post_options">Show Post Options</string>
+    <string name="preview_in_fullscreen">Preview in Fullscreen</string>
+
+    <string name="moderation">Moderation</string>
+    <string name="approve">Approve</string>
+    <string name="approved">Approved</string>
+    <string name="approve_failed">Approve failed</string>
+    <string name="remove">Remove</string>
+    <string name="removed">Removed</string>
+    <string name="remove_failed">Remove failed</string>
+    <string name="mark_as_spam">Mark as spam</string>
+    <string name="marked_as_spam">Marked as spam</string>
+    <string name="mark_as_spam_failed">Mark as spam failed</string>
+    <string name="set_sticky_post">Set sticky post</string>
+    <string name="set_sticky_post_failed">Set sticky post failed</string>
+    <string name="unset_sticky_post">Unset sticky post</string>
+    <string name="unset_sticky_post_failed">Unset sticky post failed</string>
+    <string name="lock">Lock</string>
+    <string name="locked">Locked</string>
+    <string name="lock_failed">Lock failed</string>
+    <string name="unlocked">Unlocked</string>
+    <string name="unlock_failed">Unlock failed</string>
+    <string name="distinguish_as_mod">Distinguish as moderator</string>
+    <string name="undistinguish_as_mod">Undistinguish as moderator</string>
+    <string name="distinguished_as_mod">Distinguished as mod</string>
+    <string name="distinguish_as_mod_failed">Distinguish as moderator failed</string>
+    <string name="undistinguished_as_mod">Undistinguished as moderator</string>
+    <string name="undistinguish_as_mod_failed">Undistinguish as moderator failed</string>
+</resources>
