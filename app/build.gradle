@@ -144,7 +144,7 @@ dependencies {
     implementation 'net.lingala.zip4j:zip4j:2.11.5'
 
     // IO functionality
-    implementation 'commons-io:commons-io:2.16.1'
+    implementation 'commons-io:commons-io:2.20.0'
 
     // Crash reporting
     implementation 'com.github.FunkyMuse:Crashy:1.2.0'
