@@ -228,7 +228,7 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
         binding.commentEditTextEditCommentActivity.requestFocus();
         Utils.showKeyboard(this, new Handler(), binding.commentEditTextEditCommentActivity);
 
-        Giphy.INSTANCE.configure(this, APIUtils.GIPHY_GIF_API_KEY);
+        Giphy.INSTANCE.configure(this, APIUtils.sGiphyApiKey);
 
         editCommentActivityViewModel = new ViewModelProvider(
                 this,

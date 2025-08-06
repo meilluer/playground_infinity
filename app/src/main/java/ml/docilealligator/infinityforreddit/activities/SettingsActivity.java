@@ -38,6 +38,7 @@ import ml.docilealligator.infinityforreddit.settings.GesturesAndButtonsPreferenc
 import ml.docilealligator.infinityforreddit.settings.InterfacePreferenceFragment;
 import ml.docilealligator.infinityforreddit.settings.MainPreferenceFragment;
 import ml.docilealligator.infinityforreddit.settings.PostPreferenceFragment;
+import ml.docilealligator.infinityforreddit.settings.ApiKeysPreferenceFragment;
 
 public class SettingsActivity extends BaseActivity implements
         PreferenceFragmentCompat.OnPreferenceStartFragmentCallback {
@@ -122,6 +123,8 @@ public class SettingsActivity extends BaseActivity implements
                 setTitle(R.string.settings_category_post_title);
             } else if (fragment instanceof AdvancedPreferenceFragment) {
                 setTitle(R.string.settings_advanced_master_title);
+            } else if (fragment instanceof ApiKeysPreferenceFragment) {
+                setTitle(R.string.settings_api_keys_title);
             } else if (fragment instanceof MainPreferenceFragment) {
                 setTitle(R.string.settings_activity_label);
             }

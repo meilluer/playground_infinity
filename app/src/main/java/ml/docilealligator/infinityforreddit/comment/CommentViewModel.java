@@ -44,8 +44,8 @@ public class CommentViewModel extends ViewModel {
                 (new PagedList.Config.Builder())
                         .setEnablePlaceholders(false)
                         .setPageSize(100)
-                        .setPrefetchDistance(10)
-                        .setInitialLoadSizeHint(10)
+                        .setPrefetchDistance(20)
+                        .setInitialLoadSizeHint(200)
                         .build();
 
         comments = Transformations.switchMap(sortTypeLiveData, sort -> {

@@ -2629,7 +2629,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                         mRedgifsRetrofit.create(RedgifsAPI.class).getRedgifsData(
                                 APIUtils.getRedgifsOAuthHeader(mCurrentAccountSharedPreferences
                                         .getString(SharedPreferencesUtils.REDGIFS_ACCESS_TOKEN, "")),
-                                post.getRedgifsId(), APIUtils.USER_AGENT);
+                                post.getRedgifsId(), APIUtils.sUserAgent);
                 FetchRedgifsVideoLinks.fetchRedgifsVideoLinksInRecyclerViewAdapter(mExecutor, new Handler(),
                         fetchRedgifsOrStreamableVideoCall,
                         new FetchVideoLinkListener() {

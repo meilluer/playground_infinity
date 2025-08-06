@@ -253,7 +253,7 @@ public class LoginChromeCustomTabActivity extends BaseActivity {
 
             try {
                 Uri.Builder uriBuilder = Uri.parse(APIUtils.OAUTH_URL).buildUpon();
-                uriBuilder.appendQueryParameter(APIUtils.CLIENT_ID_KEY, APIUtils.CLIENT_ID);
+                uriBuilder.appendQueryParameter(APIUtils.CLIENT_ID_KEY, APIUtils.sRedditClientId);
                 uriBuilder.appendQueryParameter(APIUtils.RESPONSE_TYPE_KEY, APIUtils.RESPONSE_TYPE);
                 uriBuilder.appendQueryParameter(APIUtils.STATE_KEY, APIUtils.STATE);
                 uriBuilder.appendQueryParameter(APIUtils.REDIRECT_URI_KEY, APIUtils.REDIRECT_URI);

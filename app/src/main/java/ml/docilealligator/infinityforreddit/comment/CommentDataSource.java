@@ -210,7 +210,7 @@ public class CommentDataSource extends PageKeyedDataSource<String, Comment> {
             JSONObject data = new JSONObject(response).getJSONObject(JSONUtils.DATA_KEY);
             JSONArray commentsJSONArray = data.getJSONArray(JSONUtils.CHILDREN_KEY);
             String after = data.getString(JSONUtils.AFTER_KEY);
-            ArrayList<Comment> comments = new ArrayList<>();
+            ArrayList<Comment> comments = new ArrayList<>(commentsJSONArray.length());
             for (int i = 0; i < commentsJSONArray.length(); i++) {
                 try {
                     JSONObject commentJSON = commentsJSONArray.getJSONObject(i).getJSONObject(JSONUtils.DATA_KEY);

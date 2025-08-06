@@ -193,7 +193,7 @@ abstract class AppModule {
     @Provides
     static Config providesMediaConfig(Application application, SimpleCache simpleCache, @Named("media3")OkHttpClient okHttpClient) {
         return new Config.Builder(application)
-                .setDataSourceFactory(new OkHttpDataSource.Factory(okHttpClient).setUserAgent(APIUtils.USER_AGENT))
+                .setDataSourceFactory(new OkHttpDataSource.Factory(okHttpClient).setUserAgent(APIUtils.sUserAgent))
                 .setMediaSourceBuilder(MediaSourceBuilder.DEFAULT)
                 .setCache(simpleCache)
                 .build();

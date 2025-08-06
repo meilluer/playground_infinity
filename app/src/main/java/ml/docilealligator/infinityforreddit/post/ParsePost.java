@@ -313,6 +313,7 @@ public class ParsePost {
                         int postType = Post.VIDEO_TYPE;
                         String videoUrl = Html.fromHtml(redditVideoObject.getString(JSONUtils.HLS_URL_KEY)).toString();
                         String videoDownloadUrl = redditVideoObject.getString(JSONUtils.FALLBACK_URL_KEY);
+                        String videoDashUrl = redditVideoObject.getString(JSONUtils.DASH_URL_KEY);
 
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author, authorFlair,
                                 authorFlairHTML, postTimeMillis, title, permalink, score, postType, voteType,
@@ -321,6 +322,7 @@ public class ParsePost {
 
                         post.setVideoUrl(videoUrl);
                         post.setVideoDownloadUrl(videoDownloadUrl);
+                        post.setVideoDashUrl(videoDashUrl);
                     } else {
                         //No preview link post
                         int postType = Post.NO_PREVIEW_LINK_TYPE;
@@ -383,6 +385,7 @@ public class ParsePost {
                 int postType = Post.VIDEO_TYPE;
                 String videoUrl = Html.fromHtml(redditVideoObject.getString(JSONUtils.HLS_URL_KEY)).toString();
                 String videoDownloadUrl = redditVideoObject.getString(JSONUtils.FALLBACK_URL_KEY);
+                String videoDashUrl = redditVideoObject.getString(JSONUtils.DASH_URL_KEY);
 
                 post = new Post(id, fullName, subredditName, subredditNamePrefixed, author, authorFlair,
                         authorFlairHTML, postTimeMillis, title, permalink, score, postType, voteType,
@@ -392,6 +395,7 @@ public class ParsePost {
                 post.setPreviews(previews);
                 post.setVideoUrl(videoUrl);
                 post.setVideoDownloadUrl(videoDownloadUrl);
+                post.setVideoDashUrl(videoDashUrl);
             } else if (data.has(JSONUtils.PREVIEW_KEY)) {
                 if (data.getJSONObject(JSONUtils.PREVIEW_KEY).has(JSONUtils.REDDIT_VIDEO_PREVIEW_KEY)) {
                     int postType = Post.VIDEO_TYPE;

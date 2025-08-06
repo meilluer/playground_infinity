@@ -68,6 +68,7 @@ import io.noties.markwon.core.MarkwonTheme;
 import jp.wasabeef.glide.transformations.BlurTransformation;
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import ml.docilealligator.infinityforreddit.FetchVideoLinkListener;
+import ml.docilealligator.infinityforreddit.GeminiSummarizer;
 import ml.docilealligator.infinityforreddit.R;
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.SaveMemoryCenterInisdeDownsampleStrategy;
@@ -525,6 +526,18 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof PostDetailBaseViewHolder) {
+            if (holder instanceof PostDetailTextViewHolder) {
+                ((PostDetailTextViewHolder) holder).binding.geminiLogoItemPostDetailText.setOnClickListener(view -> {
+                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
+                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");
+                    new Thread(() -> {
+                        GeminiSummarizer.summarizeWithGemini(mPost.getSelfText());
+                        mActivity.runOnUiThread(() -> {
+                            ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(GeminiSummarizer.summaryResult);
+                        });
+                    }).start();
+                });
+            }
             ((PostDetailBaseViewHolder) holder).titleTextView.setText(mPost.getTitle());
             if (mPost.getSubredditNamePrefixed().startsWith("u/")) {
                 if (mPost.getAuthorIconUrl() == null) {
@@ -722,7 +735,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                             mRedgifsRetrofit.create(RedgifsAPI.class)
                                     .getRedgifsData(APIUtils.getRedgifsOAuthHeader(
                                             mCurrentAccountSharedPreferences.getString(SharedPreferencesUtils.REDGIFS_ACCESS_TOKEN, "")),
-                                            mPost.getRedgifsId(), APIUtils.USER_AGENT);
+                                            mPost.getRedgifsId(), APIUtils.sUserAgent);
                     FetchRedgifsVideoLinks.fetchRedgifsVideoLinksInRecyclerViewAdapter(mExecutor, new Handler(),
                             ((PostDetailBaseVideoAutoplayViewHolder) holder).fetchRedgifsOrStreamableVideoCall,
                             new FetchVideoLinkListener() {

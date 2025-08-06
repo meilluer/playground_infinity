@@ -372,7 +372,7 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
         binding.commentCommentEditText.requestFocus();
         Utils.showKeyboard(this, new Handler(), binding.commentCommentEditText);
 
-        Giphy.INSTANCE.configure(this, APIUtils.GIPHY_GIF_API_KEY);
+        Giphy.INSTANCE.configure(this, APIUtils.sGiphyApiKey);
 
         commentActivityViewModel = new ViewModelProvider(
                 this,
@@ -523,15 +523,8 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
             Snackbar sendingSnackbar = Snackbar.make(binding.commentCoordinatorLayout, R.string.sending_comment, Snackbar.LENGTH_INDEFINITE);
             sendingSnackbar.show();
 
-            Retrofit newAuthenticatorOauthRetrofit = mOauthRetrofit.newBuilder().client(new OkHttpClient.Builder().authenticator(new AnyAccountAccessTokenAuthenticator(mRetrofit, mRedditDataRoomDatabase, selectedAccount, mCurrentAccountSharedPreferences))
-                    .connectTimeout(30, TimeUnit.SECONDS)
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .writeTimeout(30, TimeUnit.SECONDS)
-                    .connectionPool(new ConnectionPool(0, 1, TimeUnit.NANOSECONDS))
-                    .build())
-                    .build();
             SendComment.sendComment(this, mExecutor, new Handler(), binding.commentCommentEditText.getText().toString(),
-                    parentFullname, parentDepth, uploadedImages, giphyGif, newAuthenticatorOauthRetrofit, selectedAccount,
+                    parentFullname, parentDepth, uploadedImages, giphyGif, mOauthRetrofit, selectedAccount,
                     new SendComment.SendCommentListener() {
                         @Override
                         public void sendCommentSuccess(Comment comment) {

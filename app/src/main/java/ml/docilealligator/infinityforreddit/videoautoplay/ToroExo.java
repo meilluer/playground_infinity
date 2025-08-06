@@ -212,6 +212,6 @@ public final class ToroExo {
 
     @SuppressWarnings("SameParameterValue")
     private static String getUserAgent() {
-        return APIUtils.USER_AGENT;
+        return APIUtils.sUserAgent;
     }
 }

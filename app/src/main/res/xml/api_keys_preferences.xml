@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <PreferenceCategory android:title="API Keys">
+
+        <EditTextPreference
+            android:key="reddit_api_key"
+            android:title="Reddit API Key"
+            android:summary="Enter your Reddit API Key"
+            android:persistent="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:key="giphy_api_key"
+            android:title="Giphy API Key"
+            android:summary="Enter your Giphy API Key"
+            android:persistent="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:key="user_agent"
+            android:title="User Agent"
+            android:summary="Enter your User Agent"
+            android:persistent="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
+            android:key="gemini_key"
+            android:title="Gemini Api"
+            android:summary="Enter your Gemmini Api key"
+            android:persistent="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

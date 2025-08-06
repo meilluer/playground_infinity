@@ -43,6 +43,7 @@ public class Post implements Parcelable {
     private String url;
     private String videoUrl;
     private String videoDownloadUrl;
+    private String videoDashUrl;
     @Nullable
     private String videoFallBackDirectUrl;
     private String redgifsId;
@@ -172,6 +173,7 @@ public class Post implements Parcelable {
         url = in.readString();
         videoUrl = in.readString();
         videoDownloadUrl = in.readString();
+        videoDashUrl = in.readString();
         videoFallBackDirectUrl = in.readString();
         redgifsId = in.readString();
         streamableShortCode = in.readString();
@@ -333,6 +335,14 @@ public class Post implements Parcelable {
 
     public void setVideoDownloadUrl(String videoDownloadUrl) {
         this.videoDownloadUrl = videoDownloadUrl;
+    }
+
+    public String getVideoDashUrl() {
+        return videoDashUrl;
+    }
+
+    public void setVideoDashUrl(String videoDashUrl) {
+        this.videoDashUrl = videoDashUrl;
     }
 
     @Nullable
@@ -508,6 +518,7 @@ public class Post implements Parcelable {
         dest.writeString(url);
         dest.writeString(videoUrl);
         dest.writeString(videoDownloadUrl);
+        dest.writeString(videoDashUrl);
         dest.writeString(videoFallBackDirectUrl);
         dest.writeString(redgifsId);
         dest.writeString(streamableShortCode);

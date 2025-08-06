@@ -417,6 +417,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+
         if (holder instanceof CommentBaseViewHolder) {
             Comment comment = getCurrentComment(position);
             if (comment != null) {
@@ -436,20 +437,22 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 }
 
                 if (comment.isSubmitter()) {
-                    ((CommentBaseViewHolder) holder).authorTextView.setTextColor(mSubmitterColor);
-                    Drawable submitterDrawable = Utils.getTintedDrawable(mActivity, R.drawable.ic_mic_14dp, mSubmitterColor);
-                    ((CommentBaseViewHolder) holder).authorTextView.setCompoundDrawablesWithIntrinsicBounds(
-                            submitterDrawable, null, null, null);
+                    ((CommentBaseViewHolder) holder).authorTextView.setBackgroundResource(R.drawable.bg_username_op);
+                    ((CommentBaseViewHolder) holder).authorTextView.setPadding(16, 8, 16, 8);
+                    ((CommentBaseViewHolder) holder).authorTextView.setTextColor(Color.WHITE);
+
                 } else if (comment.isModerator()) {
                     ((CommentBaseViewHolder) holder).authorTextView.setTextColor(mModeratorColor);
                     Drawable moderatorDrawable = Utils.getTintedDrawable(mActivity, R.drawable.ic_verified_user_14dp, mModeratorColor);
                     ((CommentBaseViewHolder) holder).authorTextView.setCompoundDrawablesWithIntrinsicBounds(
                             moderatorDrawable, null, null, null);
                 } else if (comment.getAuthor().equals(mAccountName)) {
-                    ((CommentBaseViewHolder) holder).authorTextView.setTextColor(mCurrentUserColor);
-                    Drawable currentUserDrawable = Utils.getTintedDrawable(mActivity, R.drawable.ic_current_user_14dp, mCurrentUserColor);
-                    ((CommentBaseViewHolder) holder).authorTextView.setCompoundDrawablesWithIntrinsicBounds(
-                            currentUserDrawable, null, null, null);
+                    ((CommentBaseViewHolder) holder).authorTextView.setBackgroundResource(R.drawable.bg_current_user);
+                    ((CommentBaseViewHolder) holder).authorTextView.setPadding(16, 8, 16, 8);
+                    ((CommentBaseViewHolder) holder).authorTextView.setTextColor(Color.WHITE);
+
+
+
                 }
 
                 if (mShowAuthorAvatar) {
@@ -1234,24 +1237,31 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     @Override
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         if (holder instanceof CommentBaseViewHolder) {
-            holder.itemView.setBackgroundColor(mCommentBackgroundColor);
-            ((CommentBaseViewHolder) holder).authorTextView.setTextColor(mUsernameColor);
-            ((CommentBaseViewHolder) holder).authorFlairTextView.setVisibility(View.GONE);
-            ((CommentBaseViewHolder) holder).authorTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
-            mGlide.clear(((CommentBaseViewHolder) holder).authorIconImageView);
-            ((CommentBaseViewHolder) holder).topScoreTextView.setTextColor(mSecondaryTextColor);
-            ((CommentBaseViewHolder) holder).expandButton.setVisibility(View.GONE);
-            ((CommentBaseViewHolder) holder).upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
-            ((CommentBaseViewHolder) holder).upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-            ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mCommentIconAndInfoColor);
-            ((CommentBaseViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
-            ((CommentBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-            ((CommentBaseViewHolder) holder).expandButton.setText("");
-            ((CommentBaseViewHolder) holder).replyButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-            RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
+            CommentBaseViewHolder cbh = (CommentBaseViewHolder) holder;
+
+            cbh.itemView.setBackgroundColor(mCommentBackgroundColor);
+            cbh.authorTextView.setTextColor(mUsernameColor);
+            cbh.authorTextView.setBackground(null);                // ✅ Clear OP/User background
+            cbh.authorTextView.setPadding(0, 0, 0, 0);              // ✅ Reset padding
+
+            cbh.authorFlairTextView.setVisibility(View.GONE);
+            cbh.authorTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
+            mGlide.clear(cbh.authorIconImageView);
+            cbh.topScoreTextView.setTextColor(mSecondaryTextColor);
+            cbh.expandButton.setVisibility(View.GONE);
+            cbh.upvoteButton.setIconResource(R.drawable.ic_upvote_24dp);
+            cbh.upvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+            cbh.scoreTextView.setTextColor(mCommentIconAndInfoColor);
+            cbh.downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
+            cbh.downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+            cbh.expandButton.setText("");
+            cbh.replyButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+
+            RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) cbh.itemView.getLayoutParams();
             params.setMargins(0, 0, 0, 0);
         }
     }
+
 
     @Override
     public int getItemCount() {

@@ -665,7 +665,7 @@ public class ViewVideoActivity extends AppCompatActivity implements CustomFontRe
 
         // Produces DataSource instances through which media data is loaded.
         dataSourceFactory = new CacheDataSource.Factory().setCache(mSimpleCache)
-                .setUpstreamDataSourceFactory(new OkHttpDataSource.Factory(mOkHttpClient).setUserAgent(APIUtils.USER_AGENT));
+                .setUpstreamDataSourceFactory(new OkHttpDataSource.Factory(mOkHttpClient).setUserAgent(APIUtils.sUserAgent));
         String redgifsId = null;
         if (videoType == VIDEO_TYPE_STREAMABLE) {
             if (savedInstanceState != null) {

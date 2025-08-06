@@ -59,6 +59,7 @@ public class PostViewModel extends ViewModel {
     private final MutableLiveData<SortType> sortTypeLiveData;
     private final MutableLiveData<PostFilter> postFilterLiveData;
     private final SortTypeAndPostFilterLiveData sortTypeAndPostFilterLiveData;
+    private final boolean isReadPostsShouldBeHidden;
 
     public final SingleLiveEvent<ModerationEvent> moderationEventLiveData = new SingleLiveEvent<>();
 
@@ -77,6 +78,7 @@ public class PostViewModel extends ViewModel {
         this.sortType = sortType;
         this.postFilter = postFilter;
         this.readPostsList = readPostsList;
+        this.isReadPostsShouldBeHidden = true;
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
@@ -118,6 +120,7 @@ public class PostViewModel extends ViewModel {
         this.postFilter = postFilter;
         this.readPostsList = readPostsList;
         this.name = subredditName;
+        this.isReadPostsShouldBeHidden = subredditName != null && (subredditName.equals("popular") || subredditName.equals("all"));
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
@@ -160,6 +163,7 @@ public class PostViewModel extends ViewModel {
         this.readPostsList = readPostsList;
         this.name = multiredditPath;
         this.query = query;
+        this.isReadPostsShouldBeHidden = false;
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
@@ -203,6 +207,7 @@ public class PostViewModel extends ViewModel {
         this.readPostsList = readPostsList;
         this.name = username;
         this.userWhere = userWhere;
+        this.isReadPostsShouldBeHidden = false;
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
@@ -247,6 +252,7 @@ public class PostViewModel extends ViewModel {
         this.name = subredditName;
         this.query = query;
         this.trendingSource = trendingSource;
+        this.isReadPostsShouldBeHidden = false;
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
@@ -273,7 +279,10 @@ public class PostViewModel extends ViewModel {
     }
 
     public LiveData<PagingData<Post>> getPosts() {
-        return postsWithReadPostsHidden;
+        if (isReadPostsShouldBeHidden) {
+            return postsWithReadPostsHidden;
+        }
+        return posts;
     }
 
     public void hideReadPosts() {

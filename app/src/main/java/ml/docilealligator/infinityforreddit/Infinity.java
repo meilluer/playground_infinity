@@ -93,6 +93,8 @@ public class Infinity extends Application implements LifecycleObserver {
 
         mAppComponent.inject(this);
 
+        ml.docilealligator.infinityforreddit.utils.APIUtils.init(this);
+
         appLock = mSecuritySharedPreferences.getBoolean(SharedPreferencesUtils.APP_LOCK, false);
         appLockTimeout = Long.parseLong(mSecuritySharedPreferences.getString(SharedPreferencesUtils.APP_LOCK_TIMEOUT, "600000"));
         isSecureMode = mSecuritySharedPreferences.getBoolean(SharedPreferencesUtils.SECURE_MODE, false);

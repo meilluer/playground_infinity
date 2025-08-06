@@ -32,7 +32,7 @@ public class FetchRedgifsVideoLinks {
                         .create(RedgifsAPI.class)
                         .getRedgifsData(
                                 APIUtils.getRedgifsOAuthHeader(currentAccountSharedPreferences.getString(SharedPreferencesUtils.REDGIFS_ACCESS_TOKEN, "")),
-                                redgifsId, APIUtils.USER_AGENT)
+                                redgifsId, APIUtils.sUserAgent)
                         .execute();
                 if (response.isSuccessful()) {
                     parseRedgifsVideoLinks(handler, response.body(), fetchVideoLinkListener);
@@ -56,7 +56,7 @@ public class FetchRedgifsVideoLinks {
                     .create(RedgifsAPI.class)
                     .getRedgifsData(
                             APIUtils.getRedgifsOAuthHeader(currentAccountSharedPreferences.getString(SharedPreferencesUtils.REDGIFS_ACCESS_TOKEN, "")),
-                            redgifsId, APIUtils.USER_AGENT)
+                            redgifsId, APIUtils.sUserAgent)
                     .execute();
             if (response.isSuccessful()) {
                 return parseRedgifsVideoLinks(response.body());

@@ -214,7 +214,7 @@ abstract class NetworkModule {
                 .addInterceptor(chain -> chain.proceed(
                         chain.request()
                                 .newBuilder()
-                                .header("User-Agent", APIUtils.USER_AGENT)
+                                .header("User-Agent", APIUtils.sUserAgent)
                                 .build()
                 ))
                 .addInterceptor(accessTokenAuthenticator)

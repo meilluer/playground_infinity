@@ -5,6 +5,12 @@ import android.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import androidx.preference.PreferenceManager;
+import android.content.Context;
+import android.content.SharedPreferences;
+import androidx.preference.PreferenceManager;
 import ml.docilealligator.infinityforreddit.BuildConfig;
 import ml.docilealligator.infinityforreddit.account.Account;
 import okhttp3.MediaType;
@@ -15,6 +21,15 @@ import okhttp3.RequestBody;
  */
 
 public class APIUtils {
+
+    public static void init(Context context) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+        sRedditClientId = preferences.getString("reddit_api_key", "NOe2iKrPPzwscA");
+        sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:" + BuildConfig.VERSION_NAME + " (by /u/Hostilenemy)");
+        sGiphyApiKey = preferences.getString("giphy_api_key", "");
+        gemini=preferences.getString("gemini_key","123");
+    }
+    public static String gemini="";
     public static final String OAUTH_URL = "https://www.reddit.com/api/v1/authorize.compact";
     public static final String OAUTH_API_BASE_URI = "https://oauth.reddit.com";
     public static final String API_BASE_URI = "https://www.reddit.com";
@@ -27,17 +42,17 @@ public class APIUtils {
 
     public static final String CLIENT_ID_KEY = "client_id";
     public static final String CLIENT_SECRET_KEY = "client_secret";
-    public static final String CLIENT_ID = "NOe2iKrPPzwscA";
+    public static String sRedditClientId;
     public static final String IMGUR_CLIENT_ID = "Client-ID cc671794e0ab397";
     public static final String REDGIFS_CLIENT_ID = "1828d0bcc93-15ac-bde6-0005-d2ecbe8daab3";
     public static final String REDGIFS_CLIENT_SECRET = "TJBlw7jRXW65NAGgFBtgZHu97WlzRXHYybK81sZ9dLM=";
-    public static final String GIPHY_GIF_API_KEY = "";
+    public static String sGiphyApiKey;
     public static final String RESPONSE_TYPE_KEY = "response_type";
     public static final String RESPONSE_TYPE = "code";
     public static final String STATE_KEY = "state";
     public static final String STATE = "23ro8xlxvzp4asqd";
     public static final String REDIRECT_URI_KEY = "redirect_uri";
-    public static final String REDIRECT_URI = "infinity://localhost";
+    public static final String REDIRECT_URI = "http://127.0.0.1";
     public static final String DURATION_KEY = "duration";
     public static final String DURATION = "permanent";
     public static final String SCOPE_KEY = "scope";
@@ -47,7 +62,7 @@ public class APIUtils {
     public static final String AUTHORIZATION_KEY = "Authorization";
     public static final String AUTHORIZATION_BASE = "bearer ";
     public static final String USER_AGENT_KEY = "User-Agent";
-    public static final String USER_AGENT = "android:ml.docilealligator.infinityforreddit:" + BuildConfig.VERSION_NAME + " (by /u/Hostilenemy)";
+    public static String sUserAgent;
     public static final String USERNAME_KEY = "username";
 
     public static final String GRANT_TYPE_KEY = "grant_type";
@@ -121,7 +136,7 @@ public class APIUtils {
 
     public static Map<String, String> getHttpBasicAuthHeader() {
         Map<String, String> params = new HashMap<>();
-        String credentials = String.format("%s:%s", APIUtils.CLIENT_ID, "");
+        String credentials = String.format("%s:%s", sRedditClientId, "");
         String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
         params.put(APIUtils.AUTHORIZATION_KEY, auth);
         return params;
@@ -130,7 +145,7 @@ public class APIUtils {
     public static Map<String, String> getOAuthHeader(String accessToken) {
         Map<String, String> params = new HashMap<>();
         params.put(APIUtils.AUTHORIZATION_KEY, APIUtils.AUTHORIZATION_BASE + accessToken);
-        params.put(APIUtils.USER_AGENT_KEY, APIUtils.USER_AGENT);
+        params.put(APIUtils.USER_AGENT_KEY, sUserAgent);
         return params;
     }
 
@@ -159,7 +174,7 @@ public class APIUtils {
         Map<String, String> params = new HashMap<>();
         params.put(APIUtils.ORIGIN_KEY, APIUtils.REVEDDIT_ORIGIN);
         params.put(APIUtils.REFERER_KEY, APIUtils.REVEDDIT_REFERER);
-        params.put(APIUtils.USER_AGENT_KEY, APIUtils.USER_AGENT);
+        params.put(APIUtils.USER_AGENT_KEY, sUserAgent);
         return params;
     }
 }

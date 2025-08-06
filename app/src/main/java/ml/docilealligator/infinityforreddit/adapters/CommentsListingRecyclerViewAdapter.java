@@ -316,6 +316,8 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
             ((CommentBaseViewHolder) holder).scoreTextView.setTextColor(mCommentIconAndInfoColor);
             ((CommentBaseViewHolder) holder).downvoteButton.setIconResource(R.drawable.ic_downvote_24dp);
             ((CommentBaseViewHolder) holder).downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+            ((CommentBaseViewHolder) holder).markwonAdapter.setMarkdown(mMarkwon, "");
+            ((CommentBaseViewHolder) holder).markwonAdapter.notifyDataSetChanged();
         }
     }
 
