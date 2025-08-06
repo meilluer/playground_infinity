@@ -108,7 +108,7 @@ dependencies {
 /**** Backend logic ****/
 
     // HTTP clients
-    def retrofitVersion = '2.11.0'
+    def retrofitVersion = '3.0.0'
     implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
     implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
     implementation "com.squareup.retrofit2:adapter-guava:$retrofitVersion"
