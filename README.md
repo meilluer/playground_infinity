@@ -22,4 +22,6 @@ Patreon: https://www.patreon.com/docile_alligator
 
 Bitcoin: bc1qxtkd5ap9na7uy8nr9qpt6jny6tdwaj4v43ddle
 
+original repo https://github.com/Docile-Alligator/Infinity-For-Reddit
+
 all files that were modified or created can be found at  https://github.com/meilluer/playground-for-infinity  
