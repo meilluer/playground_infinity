@@ -1,5 +1,7 @@
 infinity for reddit but with enhancements 
 
+THIS IS NOT AFFILIATED WITH ORIGINAL REPO, I AM VERY AMMATURE AT THIS STUFF SO USE AT YOUR OWN RISK 
+
 key changes made-
 
 1.you can select to load images and gifs in comments based on network type or forever
