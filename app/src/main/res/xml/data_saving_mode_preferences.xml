@@ -7,6 +7,12 @@
         app:summary="@string/settings_data_saving_mode_info_summary"
         app:enabled="false" />
 
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="false"
+        app:key="override_video_autoplay_in_data_saving_mode"
+/>
+
+
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
         app:defaultValue="0"
         app:key="data_saving_mode"

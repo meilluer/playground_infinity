@@ -2,6 +2,7 @@ package ml.docilealligator.infinityforreddit.adapters;
 
 import android.annotation.SuppressLint;
 import android.app.Dialog;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
@@ -147,6 +148,7 @@ import retrofit2.Retrofit;
 
 public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerView.ViewHolder> implements CacheManager {
     private static final int VIEW_TYPE_POST_CARD_VIDEO_AUTOPLAY_TYPE = 1;
+
     private static final int VIEW_TYPE_POST_CARD_WITH_PREVIEW_TYPE = 2;
     private static final int VIEW_TYPE_POST_CARD_GALLERY_TYPE = 3;
     private static final int VIEW_TYPE_POST_CARD_TEXT_TYPE = 4;
@@ -305,7 +307,10 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             mShowAbsoluteNumberOfVotes = sharedPreferences.getBoolean(SharedPreferencesUtils.SHOW_ABSOLUTE_NUMBER_OF_VOTES, true);
             String autoplayString = sharedPreferences.getString(SharedPreferencesUtils.VIDEO_AUTOPLAY, SharedPreferencesUtils.VIDEO_AUTOPLAY_VALUE_NEVER);
             int networkType = Utils.getConnectedNetwork(activity);
-            if (autoplayString.equals(SharedPreferencesUtils.VIDEO_AUTOPLAY_VALUE_ALWAYS_ON)) {
+            boolean overrideVideoAutoplay = sharedPreferences.getBoolean(SharedPreferencesUtils.OVERRIDE_VIDEO_AUTOPLAY_IN_DATA_SAVING_MODE, false);
+            if (overrideVideoAutoplay) {
+                mAutoplay = true;
+            } else if (autoplayString.equals(SharedPreferencesUtils.VIDEO_AUTOPLAY_VALUE_ALWAYS_ON)) {
                 mAutoplay = true;
             } else if (autoplayString.equals(SharedPreferencesUtils.VIDEO_AUTOPLAY_VALUE_ON_WIFI)) {
                 mAutoplay = networkType == Utils.NETWORK_TYPE_WIFI;
@@ -575,7 +580,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_POST_CARD_VIDEO_AUTOPLAY_TYPE) {
-            if (mDataSavingMode) {
+            if (mDataSavingMode && !mSharedPreferences.getBoolean(SharedPreferencesUtils.OVERRIDE_VIDEO_AUTOPLAY_IN_DATA_SAVING_MODE, false)) {
                 return new PostWithPreviewTypeViewHolder(ItemPostWithPreviewBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
             }
 
@@ -607,7 +612,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
         } else if (viewType == VIEW_TYPE_POST_GALLERY_GALLERY_TYPE) {
             return new PostGalleryGalleryTypeViewHolder(ItemPostGalleryGalleryTypeBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
         } else if (viewType == VIEW_TYPE_POST_CARD_2_VIDEO_AUTOPLAY_TYPE) {
-            if (mDataSavingMode) {
+            if (mDataSavingMode && !mSharedPreferences.getBoolean(SharedPreferencesUtils.OVERRIDE_VIDEO_AUTOPLAY_IN_DATA_SAVING_MODE, false)) {
                 return new PostCard2WithPreviewViewHolder(ItemPostCard2WithPreviewBinding.inflate(LayoutInflater.from(parent.getContext()), parent, false));
             }
 
@@ -2777,7 +2782,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
 
                                 if (!setDefaultResolutionAlready) {
                                     int desiredResolution = 0;
-                                    if (mDataSavingMode) {
+                                    if (mDataSavingMode && !mSharedPreferences.getBoolean(SharedPreferencesUtils.OVERRIDE_VIDEO_AUTOPLAY_IN_DATA_SAVING_MODE, false)) {
                                         if (mDataSavingModeDefaultResolution > 0) {
                                             desiredResolution = mDataSavingModeDefaultResolution;
                                         }
