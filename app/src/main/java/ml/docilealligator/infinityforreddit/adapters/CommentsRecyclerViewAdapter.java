@@ -438,7 +438,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                 if (comment.isSubmitter()) {
                     ((CommentBaseViewHolder) holder).authorTextView.setBackgroundResource(R.drawable.bg_username_op);
-                    ((CommentBaseViewHolder) holder).authorTextView.setPadding(16, 8, 16, 8);
+                    ((CommentBaseViewHolder) holder).authorTextView.setPadding(8, 2, 8, 2);
                     ((CommentBaseViewHolder) holder).authorTextView.setTextColor(Color.WHITE);
 
                 } else if (comment.isModerator()) {
@@ -448,7 +448,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                             moderatorDrawable, null, null, null);
                 } else if (comment.getAuthor().equals(mAccountName)) {
                     ((CommentBaseViewHolder) holder).authorTextView.setBackgroundResource(R.drawable.bg_current_user);
-                    ((CommentBaseViewHolder) holder).authorTextView.setPadding(16, 8, 16, 8);
+                    ((CommentBaseViewHolder) holder).authorTextView.setPadding(8, 2, 8, 2);
                     ((CommentBaseViewHolder) holder).authorTextView.setTextColor(Color.WHITE);
 
 
@@ -1241,8 +1241,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
             cbh.itemView.setBackgroundColor(mCommentBackgroundColor);
             cbh.authorTextView.setTextColor(mUsernameColor);
-            cbh.authorTextView.setBackground(null);                // ✅ Clear OP/User background
-            cbh.authorTextView.setPadding(0, 0, 0, 0);              // ✅ Reset padding
+            cbh.authorTextView.setBackground(null);
+            cbh.authorTextView.setPadding(0, 0, 0, 0);
 
             cbh.authorFlairTextView.setVisibility(View.GONE);
             cbh.authorTextView.setCompoundDrawablesWithIntrinsicBounds(null, null, null, null);
