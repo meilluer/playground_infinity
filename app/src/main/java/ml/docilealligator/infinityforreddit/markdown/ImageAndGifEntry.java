@@ -178,7 +178,11 @@ public class ImageAndGifEntry extends MarkwonAdapter.Entry<ImageAndGifBlock, Ima
 
         RequestBuilder<Drawable> imageRequestBuilder;
         if (dataSavingMode) {
-            if (disableImagePreview) {
+            boolean allowGifAutoplay = sharedPreferences.getBoolean("allow_gif_autoplay_in_comments_on_data_saving", false);
+            if (node.mediaMetadata.isGIF && allowGifAutoplay) {
+                imageRequestBuilder = glide.load(node.mediaMetadata.original.url).listener(holder.requestListener);
+                holder.binding.imageViewMarkdownImageAndGifBlock.setRatio((float) node.mediaMetadata.original.y / node.mediaMetadata.original.x);
+            } else if (disableImagePreview) {
                 showImageAsUrl(holder, node);
                 return;
             } else {

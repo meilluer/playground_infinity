@@ -10,6 +10,7 @@
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"
         app:key="override_video_autoplay_in_data_saving_mode"
+        android:title="@string/settings_override_video_autoplay_in_data_saving_mode_title"
 />
 
 
@@ -31,6 +32,11 @@
         app:key="only_disable_preview_in_video_and_gif_posts"
         android:title="@string/settings_only_disable_preview_in_video_and_gif_posts_title" />
 
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="false"
+        app:key="allow_gif_autoplay_in_comments_on_data_saving"
+        android:title="@string/settings_allow_gif_autoplay_in_comments_on_data_saving_title" />
+
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
         app:defaultValue="360"
         app:key="reddit_video_default_resolution"
@@ -51,11 +57,5 @@
         android:entries="@array/comment_image_link_replace_mode_entries"
         android:entryValues="@array/comment_image_link_replace_mode_values"
         android:defaultValue="both" />
-    <ListPreference
-        android:key="media_quality_mode"
-        android:title="Default media quality"
-        android:summary="Choose how image/video quality is selected"
-        android:entries="@array/media_quality_mode_entries"
-        android:entryValues="@array/media_quality_mode_values"
-        android:defaultValue="auto" />
+
 </PreferenceScreen>
