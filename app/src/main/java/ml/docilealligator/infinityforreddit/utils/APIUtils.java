@@ -11,7 +11,6 @@ import androidx.preference.PreferenceManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
-import ml.docilealligator.infinityforreddit.BuildConfig;
 import ml.docilealligator.infinityforreddit.account.Account;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -25,7 +24,7 @@ public class APIUtils {
     public static void init(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         sRedditClientId = preferences.getString("reddit_api_key", "NOe2iKrPPzwscA");
-        sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:" + BuildConfig.VERSION_NAME + " (by /u/Hostilenemy)");
+        sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:" + " (by /u/Hostilenemy)");
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
         gemini=preferences.getString("gemini_key","123");
     }
@@ -128,7 +127,7 @@ public class APIUtils {
     public static final String REVEDDIT_ORIGIN = "https://www.reveddit.com";
     public static final String REFERER_KEY = "Referer";
     public static final String REVEDDIT_REFERER = "https://www.reveddit.com/";
-
+    public static String USER_AGENT=sUserAgent;
     public static final String SPAM_KEY = "spam";
     public static final String HOW_KEY = "how";
     public static final String HOW_YES = "yes";

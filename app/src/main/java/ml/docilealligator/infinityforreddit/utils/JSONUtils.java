@@ -100,6 +100,8 @@ public class JSONUtils {
     public static final String ARCHIVED_KEY = "archived";
     public static final String LOCKED_KEY = "locked";
     public static final String SAVED_KEY = "saved";
+    public static final String O_EMBED_KEY = "oembed";
+    public static final String THUMBNAIL_URL_KEY = "thumbnail_url";
     public static final String REMOVED_KEY = "removed";
     public static final String REMOVED_BY_CATEGORY_KEY = "removed_by_category";
     public static final String TEXT_EDITABLE_KEY = "text_editable";
@@ -202,6 +204,10 @@ public class JSONUtils {
     public static final String AUTHOR_FULLNAME_KEY = "author_fullname";
     public static final String IS_MOD_KEY = "is_mod";
     public static final String CAN_MOD_POST_KEY = "can_mod_post";
+    public static final String APPROVED_KEY = "approved";
+    public static final String APPROVED_AT_UTC_KEY = "approved_at_utc";
+    public static final String APPROVED_BY_KEY = "approved_by";
+    public static final String SPAM_KEY = "spam";
 
     @Nullable
     public static Map<String, MediaMetadata> parseMediaMetadata(JSONObject data) {

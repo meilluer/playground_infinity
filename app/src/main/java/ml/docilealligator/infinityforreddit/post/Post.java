@@ -12,10 +12,6 @@ import java.util.Map;
 import ml.docilealligator.infinityforreddit.thing.MediaMetadata;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
 
-/**
- * Created by alex on 3/1/18.
- */
-
 public class Post implements Parcelable {
     public static final int NSFW_TYPE = -1;
     public static final int TEXT_TYPE = 0;
@@ -78,8 +74,12 @@ public class Post implements Parcelable {
     private Map<String, MediaMetadata> mediaMetadataMap;
     private ArrayList<Gallery> gallery = new ArrayList<>();
     private boolean canModPost;
+    private boolean approved;
+    private long approvedAtUTC;
+    private String approvedBy;
+    private boolean removed;
+    private boolean spam;
 
-    //Text and video posts
     public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
                 String author, String authorFlair, String authorFlairHTML, long postTimeMillis,
                 String title, String permalink, int score, int postType, int voteType, int nComments,
@@ -155,6 +155,93 @@ public class Post implements Parcelable {
         isRead = false;
     }
 
+    public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
+                String author, String authorFlair, String authorFlairHTML, long postTimeMillis,
+                String title, String permalink, int score, int postType, int voteType, int nComments,
+                int upvoteRatio, String flair, boolean hidden, boolean spoiler,
+                boolean nsfw, boolean stickied, boolean archived, boolean locked, boolean saved,
+                boolean isCrosspost, boolean canModPost, boolean approved, long approvedAtUTC, String approvedBy,
+                boolean removed, boolean spam, String distinguished, String suggestedSort) {
+        this.id = id;
+        this.fullName = fullName;
+        this.subredditName = subredditName;
+        this.subredditNamePrefixed = subredditNamePrefixed;
+        this.author = author;
+        this.authorNamePrefixed = "u/" + author;
+        this.authorFlair = authorFlair;
+        this.authorFlairHTML = authorFlairHTML;
+        this.postTimeMillis = postTimeMillis;
+        this.title = title;
+        this.permalink = APIUtils.API_BASE_URI + permalink;
+        this.score = score;
+        this.postType = postType;
+        this.voteType = voteType;
+        this.nComments = nComments;
+        this.upvoteRatio = upvoteRatio;
+        this.flair = flair;
+        this.hidden = hidden;
+        this.spoiler = spoiler;
+        this.nsfw = nsfw;
+        this.stickied = stickied;
+        this.archived = archived;
+        this.locked = locked;
+        this.saved = saved;
+        this.isCrosspost = isCrosspost;
+        this.canModPost = canModPost;
+        this.approved = approved;
+        this.approvedAtUTC = approvedAtUTC;
+        this.approvedBy = approvedBy;
+        this.removed = removed;
+        this.spam = spam;
+        this.distinguished = distinguished;
+        this.suggestedSort = suggestedSort;
+        isRead = false;
+    }
+
+    public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
+                String author, String authorFlair, String authorFlairHTML, long postTimeMillis, String title,
+                String url, String permalink, int score, int postType, int voteType, int nComments,
+                int upvoteRatio, String flair, boolean hidden, boolean spoiler,
+                boolean nsfw, boolean stickied, boolean archived, boolean locked, boolean saved,
+                boolean isCrosspost, boolean canModPost, boolean approved, long approvedAtUTC, String approvedBy,
+                boolean removed, boolean spam, String distinguished, String suggestedSort) {
+        this.id = id;
+        this.fullName = fullName;
+        this.subredditName = subredditName;
+        this.subredditNamePrefixed = subredditNamePrefixed;
+        this.author = author;
+        this.authorNamePrefixed = "u/" + author;
+        this.authorFlair = authorFlair;
+        this.authorFlairHTML = authorFlairHTML;
+        this.postTimeMillis = postTimeMillis;
+        this.title = title;
+        this.url = url;
+        this.permalink = APIUtils.API_BASE_URI + permalink;
+        this.score = score;
+        this.postType = postType;
+        this.voteType = voteType;
+        this.nComments = nComments;
+        this.upvoteRatio = upvoteRatio;
+        this.flair = flair;
+        this.hidden = hidden;
+        this.spoiler = spoiler;
+        this.nsfw = nsfw;
+        this.stickied = stickied;
+        this.archived = archived;
+        this.locked = locked;
+        this.saved = saved;
+        this.isCrosspost = isCrosspost;
+        this.canModPost = canModPost;
+        this.approved = approved;
+        this.approvedAtUTC = approvedAtUTC;
+        this.approvedBy = approvedBy;
+        this.removed = removed;
+        this.spam = spam;
+        this.distinguished = distinguished;
+        this.suggestedSort = suggestedSort;
+        isRead = false;
+    }
+
     protected Post(Parcel in) {
         id = in.readString();
         fullName = in.readString();
@@ -198,6 +285,11 @@ public class Post implements Parcelable {
         saved = in.readByte() != 0;
         isCrosspost = in.readByte() != 0;
         canModPost = in.readByte() != 0;
+        approved = in.readByte() != 0;
+        approvedAtUTC = in.readLong();
+        approvedBy = in.readString();
+        removed = in.readByte() != 0;
+        spam = in.readByte() != 0;
         isRead = in.readByte() != 0;
         crosspostParentId = in.readString();
         distinguished = in.readString();
@@ -394,6 +486,10 @@ public class Post implements Parcelable {
         this.isStreamable = isStreamable;
     }
 
+    public boolean isNormalVideo() {
+        return postType == Post.VIDEO_TYPE && !isImgur && !isRedgifs && !isStreamable;
+    }
+
     public boolean isLoadRedgifsOrStreamableVideoSuccess() {
         return loadRedgifsOrStreamableVideoSuccess;
     }
@@ -543,6 +639,11 @@ public class Post implements Parcelable {
         dest.writeByte((byte) (saved ? 1 : 0));
         dest.writeByte((byte) (isCrosspost ? 1 : 0));
         dest.writeByte((byte) (canModPost ? 1 : 0));
+        dest.writeByte((byte) (approved ? 1 : 0));
+        dest.writeLong(approvedAtUTC);
+        dest.writeString(approvedBy);
+        dest.writeByte((byte) (removed ? 1 : 0));
+        dest.writeByte((byte) (spam ? 1 : 0));
         dest.writeByte((byte) (isRead ? 1 : 0));
         dest.writeString(crosspostParentId);
         dest.writeString(distinguished);

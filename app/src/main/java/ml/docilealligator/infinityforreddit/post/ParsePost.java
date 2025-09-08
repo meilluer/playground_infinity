@@ -26,10 +26,6 @@ import ml.docilealligator.infinityforreddit.thing.MediaMetadata;
 import ml.docilealligator.infinityforreddit.utils.JSONUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 
-/**
- * Created by alex on 3/21/18.
- */
-
 public class ParsePost {
     @WorkerThread
     public static LinkedHashSet<Post> parsePostsSync(String response, int nPosts, PostFilter postFilter, @Nullable ReadPostsListInterface readPostsList) {
@@ -38,7 +34,6 @@ public class ParsePost {
             JSONObject jsonResponse = new JSONObject(response);
             JSONArray allPostsData = jsonResponse.getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
 
-            //Posts listing
             int numberOfPosts = (nPosts < 0 || nPosts > allPostsData.length()) ?
                     allPostsData.length() : nPosts;
 
@@ -181,9 +176,12 @@ public class ParsePost {
         boolean archived = data.getBoolean(JSONUtils.ARCHIVED_KEY);
         boolean locked = data.getBoolean(JSONUtils.LOCKED_KEY);
         boolean saved = data.getBoolean(JSONUtils.SAVED_KEY);
-        boolean deleted = !data.isNull(JSONUtils.REMOVED_BY_CATEGORY_KEY) && data.getString(JSONUtils.REMOVED_BY_CATEGORY_KEY).equals("deleted");
         boolean removed = !data.isNull(JSONUtils.REMOVED_BY_CATEGORY_KEY) && data.getString(JSONUtils.REMOVED_BY_CATEGORY_KEY).equals("moderator");
+        boolean spam = !data.isNull(JSONUtils.REMOVED_BY_CATEGORY_KEY) && data.getString(JSONUtils.REMOVED_BY_CATEGORY_KEY).equals("spam");
         boolean canModPost = data.getBoolean(JSONUtils.CAN_MOD_POST_KEY);
+        boolean approved = data.optBoolean(JSONUtils.APPROVED_KEY);
+        long approvedAtUTC = data.optLong(JSONUtils.APPROVED_AT_UTC_KEY);
+        String approvedBy = data.optString(JSONUtils.APPROVED_BY_KEY);
         StringBuilder postFlairHTMLBuilder = new StringBuilder();
         String flair = "";
         if (data.has(JSONUtils.LINK_FLAIR_RICHTEXT_KEY)) {
@@ -234,16 +232,14 @@ public class ParsePost {
 
         Map<String, MediaMetadata> mediaMetadataMap = JSONUtils.parseMediaMetadata(data);
         if (data.has(JSONUtils.CROSSPOST_PARENT_LIST)) {
-            //Cross post
-            //data.getJSONArray(JSONUtils.CROSSPOST_PARENT_LIST).getJSONObject(0) out of bounds????????????
             data = data.getJSONArray(JSONUtils.CROSSPOST_PARENT_LIST).getJSONObject(0);
             Post crosspostParent = parseBasicData(data);
             Post post = parseData(data, permalink, id, fullName, subredditName, subredditNamePrefixed,
                     author, authorFlair, authorFlairHTMLBuilder.toString(),
                     postTime, title, previews, mediaMetadataMap,
                     score, voteType, nComments, upvoteRatio, flair, hidden,
-                    spoiler, nsfw, stickied, archived, locked, saved, deleted, removed, true, canModPost,
-                    distinguished, suggestedSort);
+                    spoiler, nsfw, stickied, archived, locked, saved, removed, spam, true, canModPost,
+                    approved, approvedAtUTC, approvedBy, distinguished, suggestedSort);
             post.setCrosspostParentId(crosspostParent.getId());
             return post;
         } else {
@@ -251,8 +247,8 @@ public class ParsePost {
                     author, authorFlair, authorFlairHTMLBuilder.toString(),
                     postTime, title, previews, mediaMetadataMap,
                     score, voteType, nComments, upvoteRatio, flair, hidden,
-                    spoiler, nsfw, stickied, archived, locked, saved, deleted, removed, false, canModPost,
-                    distinguished, suggestedSort);
+                    spoiler, nsfw, stickied, archived, locked, saved, removed, spam, false, canModPost,
+                    approved, approvedAtUTC, approvedBy, distinguished, suggestedSort);
         }
     }
 
@@ -263,7 +259,8 @@ public class ParsePost {
                                   int score, int voteType, int nComments, int upvoteRatio, String flair,
                                   boolean hidden, boolean spoiler, boolean nsfw,
                                   boolean stickied, boolean archived, boolean locked, boolean saved,
-                                  boolean deleted, boolean removed, boolean isCrosspost, boolean canModPost,
+                                  boolean removed, boolean spam, boolean isCrosspost, boolean canModPost,
+                                  boolean approved, long approvedAtUTC, String approvedBy,
                                   String distinguished, String suggestedSort) throws JSONException {
         Post post;
 
@@ -274,26 +271,23 @@ public class ParsePost {
 
         if (!data.has(JSONUtils.PREVIEW_KEY) && previews.isEmpty()) {
             if (url.contains(permalink)) {
-                //Text post
                 int postType = Post.TEXT_TYPE;
                 post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                         authorFlair, authorFlairHTML, postTimeMillis, title, permalink, score, postType,
                         voteType, nComments, upvoteRatio, flair, hidden, spoiler, nsfw,
-                        stickied, archived, locked, saved, isCrosspost, canModPost, distinguished, suggestedSort);
+                        stickied, archived, locked, saved, isCrosspost, canModPost, approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
             } else {
                 if (path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".jpeg")) {
-                    //Image post
                     int postType = Post.IMAGE_TYPE;
 
                     post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                             authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                             postType, voteType, nComments, upvoteRatio, flair, hidden,
-                            spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost, distinguished,
+                            spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost, approved, approvedAtUTC, approvedBy, removed, spam, distinguished,
                             suggestedSort);
 
                     if (previews.isEmpty()) {
                         if ("i.redgifs.com".equals(uri.getAuthority())) {
-                            //No preview link (Not able to load redgifs image)
                             post.setPostType(Post.NO_PREVIEW_LINK_TYPE);
                         } else {
                             previews.add(new Post.Preview(url, 0, 0, "", ""));
@@ -304,11 +298,6 @@ public class ParsePost {
                     post.setPreviews(previews);
                 } else {
                     if (isVideo) {
-                        //No preview video post
-                        /*
-                            TODO a removed crosspost may not have media JSONObject. This happens in crosspost_parent_list
-                            e.g. https://www.reddit.com/r/hitmanimals/comments/1l6pv0m/mission_failed_agent_47/
-                         */
                         JSONObject redditVideoObject = data.getJSONObject(JSONUtils.MEDIA_KEY).getJSONObject(JSONUtils.REDDIT_VIDEO_KEY);
                         int postType = Post.VIDEO_TYPE;
                         String videoUrl = Html.fromHtml(redditVideoObject.getString(JSONUtils.HLS_URL_KEY)).toString();
@@ -318,19 +307,18 @@ public class ParsePost {
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author, authorFlair,
                                 authorFlairHTML, postTimeMillis, title, permalink, score, postType, voteType,
                                 nComments, upvoteRatio, flair, hidden, spoiler, nsfw, stickied,
-                                archived, locked, saved, isCrosspost, canModPost, distinguished, suggestedSort);
+                                archived, locked, saved, isCrosspost, canModPost, approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
 
                         post.setVideoUrl(videoUrl);
                         post.setVideoDownloadUrl(videoDownloadUrl);
                         post.setVideoDashUrl(videoDashUrl);
                     } else {
-                        //No preview link post
                         int postType = Post.NO_PREVIEW_LINK_TYPE;
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                                 authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                                 postType, voteType, nComments, upvoteRatio, flair, hidden,
                                 spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                                distinguished, suggestedSort);
+                                approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                         if (data.isNull(JSONUtils.SELFTEXT_KEY)) {
                             post.setSelfText("");
                         } else {
@@ -340,13 +328,6 @@ public class ParsePost {
                         String authority = uri.getAuthority();
 
                         if (authority != null) {
-                            /*if (authority.contains("redgifs.com")) {
-                                String redgifsId = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
-                                post.setPostType(Post.VIDEO_TYPE);
-                                post.setIsRedgifs(true);
-                                post.setVideoUrl(url);
-                                post.setRedgifsId(redgifsId);
-                            } else */
                             if (authority.equals("streamable.com")) {
                                 String shortCode = url.substring(url.lastIndexOf("/") + 1);
                                 post.setPostType(Post.VIDEO_TYPE);
@@ -380,7 +361,6 @@ public class ParsePost {
             }
 
             if (isVideo) {
-                //Video post
                 JSONObject redditVideoObject = data.getJSONObject(JSONUtils.MEDIA_KEY).getJSONObject(JSONUtils.REDDIT_VIDEO_KEY);
                 int postType = Post.VIDEO_TYPE;
                 String videoUrl = Html.fromHtml(redditVideoObject.getString(JSONUtils.HLS_URL_KEY)).toString();
@@ -390,7 +370,7 @@ public class ParsePost {
                 post = new Post(id, fullName, subredditName, subredditNamePrefixed, author, authorFlair,
                         authorFlairHTML, postTimeMillis, title, permalink, score, postType, voteType,
                         nComments, upvoteRatio, flair, hidden, spoiler, nsfw, stickied,
-                        archived, locked, saved, isCrosspost, canModPost, distinguished, suggestedSort);
+                        archived, locked, saved, isCrosspost, canModPost, approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
 
                 post.setPreviews(previews);
                 post.setVideoUrl(videoUrl);
@@ -400,7 +380,6 @@ public class ParsePost {
                 if (data.getJSONObject(JSONUtils.PREVIEW_KEY).has(JSONUtils.REDDIT_VIDEO_PREVIEW_KEY)) {
                     int postType = Post.VIDEO_TYPE;
                     String authority = uri.getAuthority();
-                    // The hls stream inside REDDIT_VIDEO_PREVIEW_KEY can sometimes lack an audio track
                     if (authority.contains("imgur.com") && (path.endsWith(".gifv") || path.endsWith(".mp4"))) {
                         if (path.endsWith(".gifv")) {
                             url = url.substring(0, url.length() - 5) + ".mp4";
@@ -409,13 +388,12 @@ public class ParsePost {
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author, authorFlair,
                                 authorFlairHTML, postTimeMillis, title, permalink, score, postType, voteType,
                                 nComments, upvoteRatio, flair, hidden, spoiler, nsfw, stickied,
-                                archived, locked, saved, isCrosspost, canModPost, distinguished, suggestedSort);
+                                archived, locked, saved, isCrosspost, canModPost, approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                         post.setPreviews(previews);
                         post.setVideoUrl(url);
                         post.setVideoDownloadUrl(url);
                         post.setIsImgur(true);
                     } else {
-                        //Gif video post (HLS) and maybe Redgifs
 
                         String videoUrl = Html.fromHtml(data.getJSONObject(JSONUtils.PREVIEW_KEY)
                                 .getJSONObject(JSONUtils.REDDIT_VIDEO_PREVIEW_KEY).getString(JSONUtils.HLS_URL_KEY)).toString();
@@ -425,7 +403,7 @@ public class ParsePost {
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author, authorFlair,
                                 authorFlairHTML, postTimeMillis, title, permalink, score, postType, voteType,
                                 nComments, upvoteRatio, flair, hidden, spoiler, nsfw, stickied,
-                                archived, locked, saved, isCrosspost, canModPost, distinguished, suggestedSort);
+                                archived, locked, saved, isCrosspost, canModPost, approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                         post.setPreviews(previews);
                         post.setVideoUrl(videoUrl);
                         post.setVideoDownloadUrl(videoDownloadUrl);
@@ -434,18 +412,16 @@ public class ParsePost {
                             .getJSONObject(JSONUtils.REDDIT_VIDEO_PREVIEW_KEY).getString(JSONUtils.FALLBACK_URL_KEY)).toString());
                 } else {
                     if (path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".jpeg")) {
-                        //Image post
                         int postType = Post.IMAGE_TYPE;
 
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                                 authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                                 postType, voteType, nComments, upvoteRatio, flair,
                                 hidden, spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                                distinguished, suggestedSort);
+                                approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
 
                         if (previews.isEmpty()) {
                             if ("i.redgifs.com".equals(uri.getAuthority())) {
-                                //No preview link (Not able to load redgifs image)
                                 post.setPostType(Post.NO_PREVIEW_LINK_TYPE);
                             } else {
                                 previews.add(new Post.Preview(url, 0, 0, "", ""));
@@ -455,13 +431,12 @@ public class ParsePost {
                         }
                         post.setPreviews(previews);
                     } else if (path.endsWith(".gif")) {
-                        //Gif post
                         int postType = Post.GIF_TYPE;
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                                 authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                                 postType, voteType, nComments, upvoteRatio, flair,
                                 hidden, spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                                distinguished, suggestedSort);
+                                approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
 
                         post.setPreviews(previews);
                         post.setVideoUrl(url);
@@ -476,7 +451,6 @@ public class ParsePost {
                             }
                         } catch (Exception ignore) {}
                     } else if (uri.getAuthority().contains("imgur.com") && (path.endsWith(".gifv") || path.endsWith(".mp4"))) {
-                        // Imgur gifv/mp4
                         int postType = Post.VIDEO_TYPE;
 
                         if (url.endsWith("gifv")) {
@@ -487,45 +461,41 @@ public class ParsePost {
                                 authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                                 postType, voteType, nComments, upvoteRatio, flair,
                                 hidden, spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                                distinguished, suggestedSort);
+                                approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                         post.setPreviews(previews);
                         post.setVideoUrl(url);
                         post.setVideoDownloadUrl(url);
                         post.setIsImgur(true);
                     } else if (path.endsWith(".mp4")) {
-                        //Video post
                         int postType = Post.VIDEO_TYPE;
 
                         post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                                 authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                                 postType, voteType, nComments, upvoteRatio, flair,
                                 hidden, spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                                distinguished, suggestedSort);
+                                approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                         post.setPreviews(previews);
                         post.setVideoUrl(url);
                         post.setVideoDownloadUrl(url);
                     } else {
                         if (url.contains(permalink)) {
-                            //Text post but with a preview
                             int postType = Post.TEXT_TYPE;
 
                             post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                                     authorFlair, authorFlairHTML, postTimeMillis, title, permalink, score,
                                     postType, voteType, nComments, upvoteRatio, flair,
                                     hidden, spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                                    distinguished, suggestedSort);
+                                    approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
 
-                            //Need attention
                             post.setPreviews(previews);
                         } else {
-                            //Link post
                             int postType = Post.LINK_TYPE;
 
                             post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                                     authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                                     postType, voteType, nComments, upvoteRatio, flair,
                                     hidden, spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                                    distinguished, suggestedSort);
+                                    approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                             if (data.isNull(JSONUtils.SELFTEXT_KEY)) {
                                 post.setSelfText("");
                             } else {
@@ -537,13 +507,6 @@ public class ParsePost {
                             String authority = uri.getAuthority();
 
                             if (authority != null) {
-                                /*if (authority.contains("redgifs.com")) {
-                                    String redgifsId = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
-                                    post.setPostType(Post.VIDEO_TYPE);
-                                    post.setIsRedgifs(true);
-                                    post.setVideoUrl(url);
-                                    post.setRedgifsId(redgifsId);
-                                } else*/
                                 if (authority.equals("streamable.com")) {
                                     String shortCode = url.substring(url.lastIndexOf("/") + 1);
                                     post.setPostType(Post.VIDEO_TYPE);
@@ -557,18 +520,16 @@ public class ParsePost {
                 }
             } else {
                 if (path.endsWith(".jpg") || path.endsWith(".png") || path.endsWith(".jpeg")) {
-                    //Image post
                     int postType = Post.IMAGE_TYPE;
 
                     post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                             authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                             postType, voteType, nComments, upvoteRatio, flair, hidden,
                             spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                            distinguished, suggestedSort);
+                            approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
 
                     if (previews.isEmpty()) {
                         if ("i.redgifs.com".equals(uri.getAuthority())) {
-                            //No preview link (Not able to load redgifs image)
                             post.setPostType(Post.NO_PREVIEW_LINK_TYPE);
                         } else {
                             previews.add(new Post.Preview(url, 0, 0, "", ""));
@@ -578,27 +539,24 @@ public class ParsePost {
                     }
                     post.setPreviews(previews);
                 } else if (path.endsWith(".mp4")) {
-                    //Video post
                     int postType = Post.VIDEO_TYPE;
 
                     post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                             authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                             postType, voteType, nComments, upvoteRatio, flair, hidden,
                             spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                            distinguished, suggestedSort);
+                            approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                     post.setPreviews(previews);
                     post.setVideoUrl(url);
                     post.setVideoDownloadUrl(url);
                 } else {
-                    //CP No Preview Link post
                     int postType = Post.NO_PREVIEW_LINK_TYPE;
 
                     post = new Post(id, fullName, subredditName, subredditNamePrefixed, author,
                             authorFlair, authorFlairHTML, postTimeMillis, title, url, permalink, score,
                             postType, voteType, nComments, upvoteRatio, flair, hidden,
                             spoiler, nsfw, stickied, archived, locked, saved, isCrosspost, canModPost,
-                            distinguished, suggestedSort);
-                    //Need attention
+                            approved, approvedAtUTC, approvedBy, removed, spam, distinguished, suggestedSort);
                     if (data.isNull(JSONUtils.SELFTEXT_KEY)) {
                         post.setSelfText("");
                     } else {
@@ -608,13 +566,6 @@ public class ParsePost {
                     String authority = uri.getAuthority();
 
                     if (authority != null) {
-                        /*if (authority.contains("redgifs.com")) {
-                            String redgifsId = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
-                            post.setPostType(Post.VIDEO_TYPE);
-                            post.setIsRedgifs(true);
-                            post.setVideoUrl(url);
-                            post.setRedgifsId(redgifsId);
-                        } else*/
                         if (authority.equals("streamable.com")) {
                             String shortCode = url.substring(url.lastIndexOf("/") + 1);
                             post.setPostType(Post.VIDEO_TYPE);
@@ -631,15 +582,6 @@ public class ParsePost {
             try {
                 String authority = uri.getAuthority();
                 if (authority != null) {
-                    /*if (authority.contains("redgifs.com")) {
-                        String redgifsId = url.substring(url.lastIndexOf("/") + 1);
-                        if (redgifsId.contains("-")) {
-                            redgifsId = redgifsId.substring(0, redgifsId.indexOf('-'));
-                        }
-                        post.setIsRedgifs(true);
-                        post.setVideoUrl(url);
-                        post.setRedgifsId(redgifsId.toLowerCase());
-                    } else*/
                     if (authority.equals("streamable.com")) {
                         String shortCode = url.substring(url.lastIndexOf("/") + 1);
                         post.setPostType(Post.VIDEO_TYPE);
@@ -648,7 +590,7 @@ public class ParsePost {
                         post.setStreamableShortCode(shortCode);
                     }
                 }
-            } catch (IllegalArgumentException ignore) { }
+            } catch (IllegalArgumentException ignore) { } // Ignore if authority is null or not streamable.com
         } else if (post.getPostType() == Post.LINK_TYPE || post.getPostType() == Post.NO_PREVIEW_LINK_TYPE) {
             if (!data.isNull(JSONUtils.GALLERY_DATA_KEY)) {
                 JSONArray galleryIdsArray = data.getJSONObject(JSONUtils.GALLERY_DATA_KEY).getJSONArray(JSONUtils.ITEMS_KEY);
@@ -688,8 +630,6 @@ public class ParsePost {
                     
                     Post.Gallery postGalleryItem = new Post.Gallery(mimeType, galleryItemUrl, "", subredditName + "-" + galleryId + "." + mimeType.substring(mimeType.lastIndexOf("/") + 1), galleryItemCaption, galleryItemCaptionUrl);
 
-                    // For issue #558
-                    // Construct a fallback image url
                     if (!TextUtils.isEmpty(galleryItemUrl) && !TextUtils.isEmpty(mimeType) && (mimeType.contains("jpg") || mimeType.contains("png"))) {
                         postGalleryItem.setFallbackUrl("https://i.redd.it/" + galleryId + "." +  mimeType.substring(mimeType.lastIndexOf("/") + 1));
                         postGalleryItem.setHasFallback(true);
@@ -707,13 +647,6 @@ public class ParsePost {
                 String authority = uri.getAuthority();
 
                 if (authority != null) {
-                    /*if (authority.contains("redgifs.com")) {
-                        String redgifsId = url.substring(url.lastIndexOf("/") + 1).toLowerCase();
-                        post.setPostType(Post.VIDEO_TYPE);
-                        post.setIsRedgifs(true);
-                        post.setVideoUrl(url);
-                        post.setRedgifsId(redgifsId);
-                    } else*/
                     if (authority.equals("streamable.com")) {
                         String shortCode = url.substring(url.lastIndexOf("/") + 1);
                         post.setPostType(Post.VIDEO_TYPE);
@@ -741,7 +674,7 @@ public class ParsePost {
                         selfTextPlain = selfTextPlain.substring(0, 250);
                     }
                     if (!selfText.equals("")) {
-                        Pattern p = Pattern.compile(">!.+!<");
+                        Pattern p = Pattern.compile(">!.+!< ");
                         Matcher m = p.matcher(selfText.substring(0, Math.min(selfText.length(), 400)));
                         if (m.find()) {
                             post.setSelfTextPlainTrimmed("");

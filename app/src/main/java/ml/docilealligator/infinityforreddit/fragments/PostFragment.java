@@ -1250,11 +1250,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         }
     }
 
-    @Override
-    public void markPostAsRead(Post post) {
-        int readPostsLimit = ReadPostsUtils.GetReadPostsLimit(activity.accountName, mPostHistorySharedPreferences);
-        InsertReadPost.insertReadPost(mRedditDataRoomDatabase, mExecutor, activity.accountName, post.getId(), readPostsLimit);
-    }
+
 
     @Subscribe
     public void onChangeDefaultPostLayoutEvent(ChangeDefaultPostLayoutEvent changeDefaultPostLayoutEvent) {
