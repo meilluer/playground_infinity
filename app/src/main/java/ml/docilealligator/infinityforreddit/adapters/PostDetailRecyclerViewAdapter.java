@@ -1072,10 +1072,14 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 } else if (post.isStreamable()) {
                     intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_STREAMABLE);
                     intent.putExtra(ViewVideoActivity.EXTRA_STREAMABLE_SHORT_CODE, post.getStreamableShortCode());
-                    if (post.isLoadRedgifsOrStreamableVideoSuccess()) {
+
+                     intent.setData(Uri.parse(post.getVideoUrl()));
+                    intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_DOWNLOAD_URL, post.getVideoDownloadUrl());
+/*if (post.isLoadRedgifsOrStreamableVideoSuccess()) {
                         intent.setData(Uri.parse(post.getVideoUrl()));
                         intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_DOWNLOAD_URL, post.getVideoDownloadUrl());
                     }
+                    }*/
                 } else {
                     intent.setData(Uri.parse(post.getVideoUrl()));
                     intent.putExtra(ViewVideoActivity.EXTRA_SUBREDDIT, post.getSubredditName());
@@ -1085,7 +1089,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 intent.putExtra(ViewVideoActivity.EXTRA_POST, post);
                 if (videoProgress > 0) {
                     intent.putExtra(ViewVideoActivity.EXTRA_PROGRESS_SECONDS, videoProgress);
-                }
+                } else if (post.getVideoProgress() > 0) intent.putExtra(ViewVideoActivity.EXTRA_PROGRESS_SECONDS, post.getVideoProgress());
                 intent.putExtra(ViewVideoActivity.EXTRA_IS_NSFW, post.isNSFW());
                 mActivity.startActivity(intent);
             } else if (post.getPostType() == Post.IMAGE_TYPE) {

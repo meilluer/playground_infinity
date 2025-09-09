@@ -653,6 +653,11 @@ public class ParsePost {
                         post.setIsStreamable(true);
                         post.setVideoUrl(url);
                         post.setStreamableShortCode(shortCode);
+                    } else if (authority.equals("i.redd.it") || authority.equals("v.redd.it")) {
+                        // In case reddit API returns a i.redd.it or v.redd.it URL in a link post
+                        // It is better to treat it as a no-preview link post so that it can be opened
+                        // by LinkResolverActivity
+                        post.setPostType(Post.NO_PREVIEW_LINK_TYPE);
                     }
                 }
             }

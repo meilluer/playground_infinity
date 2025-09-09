@@ -157,7 +157,7 @@ public class LinkResolverActivity extends AppCompatActivity {
                     List<String> segments = uri.getPathSegments();
 
                     if (authority != null) {
-                        if (authority.equals("reddit-uploaded-media.s3-accelerate.amazonaws.com")) {
+                        if (authority.equals("reddit-uploaded-media.s3-accelerate.amazonaws.com") || authority.equals("i.redd.it")) {
                             String unescapedUrl = uri.toString().replace("%2F", "/");
                             int lastSlashIndex = unescapedUrl.lastIndexOf("/");
                             if (lastSlashIndex < 0 || lastSlashIndex == unescapedUrl.length() - 1) {

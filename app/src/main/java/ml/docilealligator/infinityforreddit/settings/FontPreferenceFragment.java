@@ -37,6 +37,7 @@ import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 
 public class FontPreferenceFragment extends CustomFontPreferenceFragmentCompat {
 
+
     private static final int CUSTOM_FONT_FAMILY_REQUEST_CODE = 20;
     private static final int CUSTOM_TITLE_FONT_FAMILY_REQUEST_CODE = 21;
     private static final int CUSTOM_CONTENT_FONT_FAMILY_REQUEST_CODE = 22;

@@ -7,6 +7,11 @@ import ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPre
 
 public class ApiKeysPreferenceFragment extends CustomFontPreferenceFragmentCompat {
 
+    public int getPreferenceResourceId() {
+        return R.xml.api_keys_preferences;
+    }
+
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.api_keys_preferences, rootKey);

@@ -79,6 +79,7 @@ public class Post implements Parcelable {
     private String approvedBy;
     private boolean removed;
     private boolean spam;
+    private long videoProgress;
 
     public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
                 String author, String authorFlair, String authorFlairHTML, long postTimeMillis,
@@ -115,6 +116,7 @@ public class Post implements Parcelable {
         this.distinguished = distinguished;
         this.suggestedSort = suggestedSort;
         isRead = false;
+        videoProgress = 0;
     }
 
     public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
@@ -153,6 +155,7 @@ public class Post implements Parcelable {
         this.distinguished = distinguished;
         this.suggestedSort = suggestedSort;
         isRead = false;
+        videoProgress = 0;
     }
 
     public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
@@ -196,6 +199,7 @@ public class Post implements Parcelable {
         this.distinguished = distinguished;
         this.suggestedSort = suggestedSort;
         isRead = false;
+        videoProgress = 0;
     }
 
     public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
@@ -240,6 +244,7 @@ public class Post implements Parcelable {
         this.distinguished = distinguished;
         this.suggestedSort = suggestedSort;
         isRead = false;
+        videoProgress = 0;
     }
 
     protected Post(Parcel in) {
@@ -298,6 +303,7 @@ public class Post implements Parcelable {
         previews = in.createTypedArrayList(Preview.CREATOR);
         mediaMetadataMap = (Map<String, MediaMetadata>) in.readValue(getClass().getClassLoader());
         gallery = in.createTypedArrayList(Gallery.CREATOR);
+        videoProgress = in.readLong();
     }
 
     public static final Creator<Post> CREATOR = new Creator<Post>() {
@@ -652,6 +658,7 @@ public class Post implements Parcelable {
         dest.writeTypedList(previews);
         dest.writeValue(mediaMetadataMap);
         dest.writeTypedList(gallery);
+        dest.writeLong(videoProgress);
     }
 
     public boolean isStickied() {
@@ -737,6 +744,14 @@ public class Post implements Parcelable {
 
     public void setMp4Variant(String mp4Variant) {
         this.mp4Variant = mp4Variant;
+    }
+
+    public long getVideoProgress() {
+        return videoProgress;
+    }
+
+    public void setVideoProgress(long videoProgress) {
+        this.videoProgress = videoProgress;
     }
 
     @Override

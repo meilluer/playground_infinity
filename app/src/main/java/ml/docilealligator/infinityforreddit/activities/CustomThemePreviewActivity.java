@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -32,6 +33,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentPagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
+import com.bumptech.glide.Glide;
 import com.google.android.material.appbar.AppBarLayout;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.tabs.TabLayout;
@@ -390,6 +392,15 @@ public class CustomThemePreviewActivity extends AppCompatActivity implements Cus
         binding.multiRedditBottomAppBarThemePreviewActivity.setColorFilter(bottomAppBarIconColor, android.graphics.PorterDuff.Mode.SRC_IN);
         binding.messageBottomAppBarThemePreviewActivity.setColorFilter(bottomAppBarIconColor, android.graphics.PorterDuff.Mode.SRC_IN);
         binding.profileBottomAppBarThemePreviewActivity.setColorFilter(bottomAppBarIconColor, android.graphics.PorterDuff.Mode.SRC_IN);
+        ImageView profileImageView = binding.profileBottomAppBarThemePreviewActivity;
+        String profileImageUrl = "https://www.redditstatic.com/avatars/avatar_default_02_A5A4A4.png"; // Placeholder URL, replace with actual user profile image URL if available
+
+        Glide.with(this)
+            .load(profileImageUrl)
+            .placeholder(R.drawable.ic_account_circle_day_night_24dp) // Use the existing drawable as placeholder
+            .error(R.drawable.ic_account_circle_day_night_24dp) // Use the existing drawable for error
+            .circleCrop()
+            .into(profileImageView);
         applyTabLayoutTheme(binding.tabLayoutThemePreviewActivity);
         applyFABTheme(binding.fabThemePreviewActivity);
         unsubscribedColor = customTheme.unsubscribed;

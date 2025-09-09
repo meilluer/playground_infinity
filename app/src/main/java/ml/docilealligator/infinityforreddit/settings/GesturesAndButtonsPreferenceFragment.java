@@ -25,6 +25,7 @@ import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
  */
 public class GesturesAndButtonsPreferenceFragment extends CustomFontPreferenceFragmentCompat {
 
+
     @Inject
     @Named("default")
     SharedPreferences sharedPreferences;

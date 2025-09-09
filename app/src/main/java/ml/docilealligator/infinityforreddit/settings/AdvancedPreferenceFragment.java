@@ -45,6 +45,7 @@ import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
  */
 public class AdvancedPreferenceFragment extends CustomFontPreferenceFragmentCompat {
 
+
     private static final int SELECT_BACKUP_SETTINGS_DIRECTORY_REQUEST_CODE = 1;
     private static final int SELECT_RESTORE_SETTINGS_DIRECTORY_REQUEST_CODE = 2;
     @Inject

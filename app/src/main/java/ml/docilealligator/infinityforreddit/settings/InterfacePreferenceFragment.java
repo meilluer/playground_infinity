@@ -17,6 +17,7 @@ import ml.docilealligator.infinityforreddit.events.RecreateActivityEvent;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 
 public class InterfacePreferenceFragment extends CustomFontPreferenceFragmentCompat {
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.interface_preferences, rootKey);

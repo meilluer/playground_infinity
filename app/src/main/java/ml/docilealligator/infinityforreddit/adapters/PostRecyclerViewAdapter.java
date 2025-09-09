@@ -2629,6 +2629,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                 public void onScrubStop(TimeBar timeBar, long position, boolean canceled) {
                     if (!canceled) {
                         savePlaybackInfo(getPlayerOrder(), getCurrentPlaybackInfo());
+                        getPost().setVideoProgress(position);
                     }
                 }
             });
