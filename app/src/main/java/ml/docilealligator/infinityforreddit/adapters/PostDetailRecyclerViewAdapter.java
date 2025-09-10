@@ -120,6 +120,7 @@ import ml.docilealligator.infinityforreddit.thing.SaveThing;
 import ml.docilealligator.infinityforreddit.thing.StreamableVideo;
 import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
+import ml.docilealligator.infinityforreddit.utils.HeadphoneManager;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import ml.docilealligator.infinityforreddit.videoautoplay.CacheManager;
@@ -226,6 +227,8 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     private final ExoCreator mExoCreator;
     private boolean canStartActivity = true;
     private boolean canPlayVideo = true;
+    private HeadphoneManager headphoneManager;
+    private boolean mUnmuteAutoplayWithHeadphones;
 
     public PostDetailRecyclerViewAdapter(@NonNull BaseActivity activity, ViewPostDetailFragment fragment,
                                          Executor executor, CustomThemeWrapper customThemeWrapper,
@@ -340,6 +343,8 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         mCommentColor = customThemeWrapper.getCommentColor();
 
         mExoCreator = exoCreator;
+        headphoneManager = HeadphoneManager.getInstance(activity);
+        mUnmuteAutoplayWithHeadphones = sharedPreferences.getBoolean(SharedPreferencesUtils.UNMUTE_AUTOPLAY_WITH_HEADPHONES, true);
 
         MarkwonPlugin miscPlugin = new AbstractMarkwonPlugin() {
             @Override
@@ -727,7 +732,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     ((PostDetailBaseVideoAutoplayViewHolder) holder).aspectRatioFrameLayout.setAspectRatio(1);
                 }
                 if (!((PostDetailBaseVideoAutoplayViewHolder) holder).isManuallyPaused) {
-                    ((PostDetailBaseVideoAutoplayViewHolder) holder).setVolume((mMuteAutoplayingVideos || (mPost.isNSFW() && mMuteNSFWVideo)) ? 0f : 1f);
+                    ((PostDetailBaseVideoAutoplayViewHolder) holder).setVolume((mMuteAutoplayingVideos || (mPost.isNSFW() && mMuteNSFWVideo)) && !(mUnmuteAutoplayWithHeadphones && headphoneManager.areHeadphonesConnected()) ? 0f : 1f);
                 }
 
                 if (mPost.isRedgifs() && !mPost.isLoadRedgifsOrStreamableVideoSuccess()) {

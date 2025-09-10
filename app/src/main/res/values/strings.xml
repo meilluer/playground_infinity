@@ -387,6 +387,7 @@
     <string name="settigns_video_title">Video</string>
     <string name="settings_video_autoplay_title">Video Autoplay</string>
     <string name="settings_mute_autoplaying_videos_title">Mute Autoplaying Videos</string>
+    <string name="settings_unmute_autoplay_with_headphones_title">Unmute Autoplay with Headphones</string>
     <string name="settings_autoplay_nsfw_videos_title">Autoplay Sensitive Videos</string>
     <string name="settings_start_autoplay_visible_area_offset_portrait_title">Autoplay Videos Visible Area Offset (Portrait)</string>
     <string name="settings_start_autoplay_visible_area_offset_portrait_summary">Start autoplaying videos when %1$d%% of them are visible</string>
@@ -1571,4 +1572,5 @@
     <string name="undistinguish_as_mod_failed">Undistinguish as moderator failed</string>
     <string name="share_video">Share Video</string>
     <string name="saved_subreddits">Saved Subreddits</string>
+    <string name="subreddit_removed">Subreddit removed</string>
 </resources>

@@ -45,6 +45,7 @@ import ml.docilealligator.infinityforreddit.events.ToggleSecureModeEvent;
 import ml.docilealligator.infinityforreddit.font.ContentFontFamily;
 import ml.docilealligator.infinityforreddit.font.FontFamily;
 import ml.docilealligator.infinityforreddit.font.TitleFontFamily;
+import ml.docilealligator.infinityforreddit.utils.HeadphoneManager;
 import ml.docilealligator.infinityforreddit.utils.MaterialYouUtils;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
@@ -55,6 +56,7 @@ public class Infinity extends Application implements LifecycleObserver {
     public Typeface contentTypeface;
     private AppComponent mAppComponent;
     private NetworkWifiStatusReceiver mNetworkWifiStatusReceiver;
+    private HeadphoneManager headphoneManager;
     private boolean appLock;
     private long appLockTimeout;
     private boolean canStartLockScreenActivity = false;
@@ -94,6 +96,8 @@ public class Infinity extends Application implements LifecycleObserver {
         mAppComponent.inject(this);
 
         ml.docilealligator.infinityforreddit.utils.APIUtils.init(this);
+
+        headphoneManager = HeadphoneManager.getInstance(this);
 
         appLock = mSecuritySharedPreferences.getBoolean(SharedPreferencesUtils.APP_LOCK, false);
         appLockTimeout = Long.parseLong(mSecuritySharedPreferences.getString(SharedPreferencesUtils.APP_LOCK_TIMEOUT, "600000"));
@@ -251,5 +255,13 @@ public class Infinity extends Application implements LifecycleObserver {
     public void onChangeAppLockEvent(ChangeAppLockEvent changeAppLockEvent) {
         appLock = changeAppLockEvent.appLock;
         appLockTimeout = changeAppLockEvent.appLockTimeout;
+    }
+
+    @Override
+    public void onTerminate() {
+        super.onTerminate();
+        if (headphoneManager != null) {
+            headphoneManager.unregisterReceiver();
+        }
     }
 }

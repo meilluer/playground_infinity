@@ -71,6 +71,11 @@
         app:title="@string/settings_mute_autoplaying_videos_title" />
 
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="true"
+        app:key="unmute_autoplay_with_headphones"
+        app:title="@string/settings_unmute_autoplay_with_headphones_title" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"
         app:key="remember_muting_option_in_post_feed"
         app:title="@string/settings_remember_muting_option_in_post_feed" />

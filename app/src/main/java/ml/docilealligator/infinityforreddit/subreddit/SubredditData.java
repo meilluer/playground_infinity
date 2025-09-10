@@ -97,4 +97,18 @@ public class SubredditData {
     public void setSelected(boolean selected) {
         isSelected = selected;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SubredditData that = (SubredditData) o;
+        return id.equals(that.id) &&
+                name.equals(that.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(id, name);
+    }
 }

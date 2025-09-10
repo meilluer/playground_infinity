@@ -233,6 +233,7 @@ public class SharedPreferencesUtils {
     public static final String LONG_PRESS_POST_VALUE_NONE = "0";
     public static final String LONG_PRESS_POST_VALUE_SHOW_POST_OPTIONS = "1";
     public static final String LONG_PRESS_POST_VALUE_PREVIEW_IN_FULLSCREEN = "2";
+    public static final String UNMUTE_AUTOPLAY_WITH_HEADPHONES = "unmute_autoplay_with_headphones";
 
     public static String getPostDetailFabPortraitX(@Nullable Display display) {
         if (display == null) {

@@ -128,6 +128,7 @@ import ml.docilealligator.infinityforreddit.thing.SaveThing;
 import ml.docilealligator.infinityforreddit.thing.StreamableVideo;
 import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
+import ml.docilealligator.infinityforreddit.utils.HeadphoneManager;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import ml.docilealligator.infinityforreddit.videoautoplay.CacheManager;
@@ -273,6 +274,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
     private Callback mCallback;
     private boolean canPlayVideo = true;
     private RecyclerView.RecycledViewPool mGalleryRecycledViewPool;
+    private HeadphoneManager headphoneManager;
+    private boolean mUnmuteAutoplayWithHeadphones;
 
     // postHistorySharedPreferences will be null when being used in HistoryPostFragment.
     public PostRecyclerViewAdapter(BaseActivity activity, PostFragmentBase fragment, Executor executor, Retrofit oauthRetrofit,
@@ -405,6 +408,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             mLocale = locale;
             mExoCreator = exoCreator;
             mCallback = callback;
+            headphoneManager = HeadphoneManager.getInstance(activity);
+            mUnmuteAutoplayWithHeadphones = sharedPreferences.getBoolean(SharedPreferencesUtils.UNMUTE_AUTOPLAY_WITH_HEADPHONES, true);
 
             mGalleryRecycledViewPool = new RecyclerView.RecycledViewPool();
         }
@@ -881,7 +886,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     }
                     if (!((PostBaseVideoAutoplayViewHolder) holder).toroPlayer.isManuallyPaused) {
                         if (mFragment.getMasterMutingOption() == null) {
-                            ((PostBaseVideoAutoplayViewHolder) holder).toroPlayer.setVolume(mMuteAutoplayingVideos || (post.isNSFW() && mMuteNSFWVideo) ? 0f : 1f);
+                            ((PostBaseVideoAutoplayViewHolder) holder).toroPlayer.setVolume((mMuteAutoplayingVideos || (post.isNSFW() && mMuteNSFWVideo)) && !(mUnmuteAutoplayWithHeadphones && headphoneManager.areHeadphonesConnected()) ? 0f : 1f);
                         } else {
                             ((PostBaseVideoAutoplayViewHolder) holder).toroPlayer.setVolume(mFragment.getMasterMutingOption() ? 0f : 1f);
                         }

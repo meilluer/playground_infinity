@@ -36,6 +36,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executor;
 
@@ -70,7 +71,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class SearchActivity extends BaseActivity {
+public class SearchActivity extends BaseActivity implements SavedSubredditsRecyclerViewAdapter.ItemLongClickListener {
 
     public static final String EXTRA_QUERY = "EQ";
     public static final String EXTRA_SEARCH_IN_SUBREDDIT_OR_USER_NAME = "ESISOUN";
@@ -222,7 +223,7 @@ public class SearchActivity extends BaseActivity {
             finish();
         });
 
-        savedSubredditsAdapter = new SavedSubredditsRecyclerViewAdapter(this, mCustomThemeWrapper);
+        savedSubredditsAdapter = new SavedSubredditsRecyclerViewAdapter(this, mCustomThemeWrapper, this);
 
         if (accountName.equals(Account.ANONYMOUS_ACCOUNT) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             binding.searchEditTextSearchActivity.setImeOptions(binding.searchEditTextSearchActivity.getImeOptions() | EditorInfoCompat.IME_FLAG_NO_PERSONALIZED_LEARNING);
@@ -581,6 +582,7 @@ public class SearchActivity extends BaseActivity {
 
         // Display saved subreddits
         List<SubredditData> savedSubreddits = new ArrayList<>(savedSubredditsManager.getSavedSubreddits());
+        Collections.sort(savedSubreddits, (s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName()));
         if (!savedSubreddits.isEmpty()) {
             binding.savedSubredditsTextView.setVisibility(View.VISIBLE);
             binding.savedSubredditsRecyclerViewSearchActivity.setVisibility(View.VISIBLE);
@@ -659,5 +661,27 @@ public class SearchActivity extends BaseActivity {
     @Subscribe
     public void onAccountSwitchEvent(SwitchAccountEvent event) {
         finish();
+    }
+
+    @Override
+    public void onItemLongClick(SubredditData subredditData) {
+        savedSubredditsManager.removeSubreddit(subredditData);
+        List<SubredditData> savedSubreddits = new ArrayList<>(savedSubredditsManager.getSavedSubreddits());
+        Collections.sort(savedSubreddits, (s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName()));
+        savedSubredditsAdapter.setSubreddits(savedSubreddits);
+
+        Snackbar.make(binding.getRoot(), R.string.subreddit_removed, Snackbar.LENGTH_LONG)
+                .setAction(R.string.undo, v -> {
+                    savedSubredditsManager.saveSubreddit(subredditData);
+                    List<SubredditData> newSavedSubreddits = new ArrayList<>(savedSubredditsManager.getSavedSubreddits());
+                    Collections.sort(newSavedSubreddits, (s1, s2) -> s1.getName().compareToIgnoreCase(s2.getName()));
+                    savedSubredditsAdapter.setSubreddits(newSavedSubreddits);
+                })
+                .show();
+
+        if (savedSubreddits.isEmpty()) {
+            binding.savedSubredditsTextView.setVisibility(View.GONE);
+            binding.savedSubredditsRecyclerViewSearchActivity.setVisibility(View.GONE);
+        }
     }
 }
