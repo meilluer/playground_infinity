@@ -16,6 +16,8 @@ import com.google.android.material.checkbox.MaterialCheckBox;
 
 import java.util.List;
 
+import ml.docilealligator.infinityforreddit.subreddit.SavedSubredditsManager;
+
 import jp.wasabeef.glide.transformations.RoundedCornersTransformation;
 import ml.docilealligator.infinityforreddit.R;
 import ml.docilealligator.infinityforreddit.activities.BaseActivity;
@@ -29,6 +31,7 @@ public class SubredditAutocompleteRecyclerViewAdapter extends RecyclerView.Adapt
     private final RequestManager glide;
     private final CustomThemeWrapper customThemeWrapper;
     private final ItemOnClickListener itemOnClickListener;
+    private final SavedSubredditsManager savedSubredditsManager;
 
     public SubredditAutocompleteRecyclerViewAdapter(BaseActivity activity, CustomThemeWrapper customThemeWrapper,
                                                     ItemOnClickListener itemOnClickListener) {
@@ -36,6 +39,7 @@ public class SubredditAutocompleteRecyclerViewAdapter extends RecyclerView.Adapt
         glide = Glide.with(activity);
         this.customThemeWrapper = customThemeWrapper;
         this.itemOnClickListener = itemOnClickListener;
+        this.savedSubredditsManager = new SavedSubredditsManager(activity);
     }
 
     @NonNull
@@ -103,7 +107,9 @@ public class SubredditAutocompleteRecyclerViewAdapter extends RecyclerView.Adapt
             }
 
             itemView.setOnClickListener(view -> {
-                itemOnClickListener.onClick(subreddits.get(getBindingAdapterPosition()));
+                SubredditData subredditData = subreddits.get(getBindingAdapterPosition());
+                savedSubredditsManager.saveSubreddit(subredditData);
+                itemOnClickListener.onClick(subredditData);
             });
         }
     }

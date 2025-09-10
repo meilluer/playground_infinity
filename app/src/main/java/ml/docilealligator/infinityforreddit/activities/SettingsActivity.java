@@ -1,5 +1,6 @@
 package ml.docilealligator.infinityforreddit.activities;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
@@ -50,6 +51,7 @@ import ml.docilealligator.infinityforreddit.settings.MainPreferenceFragment;
 import ml.docilealligator.infinityforreddit.settings.PostPreferenceFragment;
 import ml.docilealligator.infinityforreddit.settings.SettingsSearchFragment;
 import ml.docilealligator.infinityforreddit.settings.ApiKeysPreferenceFragment;
+import ml.docilealligator.infinityforreddit.activities.SavedSubredditsActivity;
 import ml.docilealligator.infinityforreddit.settings.DataSavingModePreferenceFragment;
 import ml.docilealligator.infinityforreddit.settings.VideoPreferenceFragment;
 import ml.docilealligator.infinityforreddit.settings.TimeFormatPreferenceFragment;
@@ -185,6 +187,10 @@ public class SettingsActivity extends BaseActivity implements
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             onBackPressed();
+            return true;
+        } else if (item.getItemId() == R.id.action_saved_subreddits) {
+            Intent intent = new Intent(this, SavedSubredditsActivity.class);
+            startActivity(intent);
             return true;
         }
         return false;

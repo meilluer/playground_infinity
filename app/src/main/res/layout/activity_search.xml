@@ -132,6 +132,25 @@
                 android:layout_height="1dp"
                 android:visibility="gone" />
 
+            <TextView
+                android:id="@+id/saved_subreddits_text_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:text="@string/saved_subreddits"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="?attr/font_large"
+                android:visibility="gone"
+                android:fontFamily="?attr/font_family_bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/saved_subreddits_recycler_view_search_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager" />
+
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/recent_search_query_recycler_view_search_activity"
                 android:layout_width="match_parent"

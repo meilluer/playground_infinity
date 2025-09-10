@@ -41,6 +41,7 @@ import ml.docilealligator.infinityforreddit.activities.PostTextActivity;
 import ml.docilealligator.infinityforreddit.activities.PostVideoActivity;
 import ml.docilealligator.infinityforreddit.activities.ReportActivity;
 import ml.docilealligator.infinityforreddit.activities.RulesActivity;
+import ml.docilealligator.infinityforreddit.activities.SavedSubredditsActivity;
 import ml.docilealligator.infinityforreddit.activities.SearchActivity;
 import ml.docilealligator.infinityforreddit.activities.SearchResultActivity;
 import ml.docilealligator.infinityforreddit.activities.SearchSubredditsResultActivity;
@@ -317,6 +318,8 @@ public interface AppComponent {
     void inject(PostOptionsBottomSheetFragment postOptionsBottomSheetFragment);
 
     void inject(ProxyPreferenceFragment proxyPreferenceFragment);
+
+    void inject(SavedSubredditsActivity savedSubredditsActivity);
 
     @Component.Factory
     interface Factory {

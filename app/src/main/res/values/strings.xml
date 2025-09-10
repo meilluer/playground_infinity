@@ -1570,4 +1570,5 @@
     <string name="undistinguished_as_mod">Undistinguished as moderator</string>
     <string name="undistinguish_as_mod_failed">Undistinguish as moderator failed</string>
     <string name="share_video">Share Video</string>
+    <string name="saved_subreddits">Saved Subreddits</string>
 </resources>

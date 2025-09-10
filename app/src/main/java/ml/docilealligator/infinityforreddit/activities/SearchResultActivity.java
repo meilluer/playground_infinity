@@ -92,7 +92,7 @@ public class SearchResultActivity extends BaseActivity implements SortTypeSelect
     public static final String EXTRA_SEARCH_IN_THING_TYPE = "ESITT";
     public static final String EXTRA_SHOULD_RETURN_SUBREDDIT_AND_USER_NAME = "ESRSAUN";
 
-    private static final String INSERT_SEARCH_QUERY_SUCCESS_STATE = "ISQSS";
+    
 
     @Inject
     @Named("oauth")
@@ -128,7 +128,7 @@ public class SearchResultActivity extends BaseActivity implements SortTypeSelect
     private MultiReddit mSearchInMultiReddit;
     @SelectThingReturnKey.THING_TYPE
     private int mSearchInThingType;
-    private boolean mInsertSearchQuerySuccess;
+    
     private boolean mReturnSubredditAndUserName;
     private FragmentManager fragmentManager;
     private SectionsPagerAdapter sectionsPagerAdapter;
@@ -230,9 +230,7 @@ public class SearchResultActivity extends BaseActivity implements SortTypeSelect
 
         fragmentManager = getSupportFragmentManager();
 
-        if (savedInstanceState != null) {
-            mInsertSearchQuerySuccess = savedInstanceState.getBoolean(INSERT_SEARCH_QUERY_SUCCESS_STATE);
-        }
+        
         bindView(savedInstanceState);
     }
 
@@ -428,11 +426,7 @@ public class SearchResultActivity extends BaseActivity implements SortTypeSelect
             return true;
         });
 
-        if (!accountName.equals(Account.ANONYMOUS_ACCOUNT) && mSharedPreferences.getBoolean(SharedPreferencesUtils.ENABLE_SEARCH_HISTORY, true) && !mInsertSearchQuerySuccess && mQuery != null) {
-            InsertRecentSearchQuery.insertRecentSearchQueryListener(executor, new Handler(getMainLooper()),
-                    mRedditDataRoomDatabase, accountName, mQuery, mSearchInSubredditOrUserName, mSearchInMultiReddit,
-                    mSearchInThingType, () -> mInsertSearchQuerySuccess = true);
-        }
+        
     }
 
     private void displaySortTypeBottomSheetFragment() {
@@ -494,7 +488,7 @@ public class SearchResultActivity extends BaseActivity implements SortTypeSelect
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean(INSERT_SEARCH_QUERY_SUCCESS_STATE, mInsertSearchQuerySuccess);
+        
     }
 
     @Override
