@@ -17,6 +17,7 @@ public class SubredditListingDataSourceFactory extends DataSource.Factory {
     private final Handler handler;
     private final Retrofit retrofit;
     private final String query;
+    private String flair;
     private SortType sortType;
     @Nullable
     private final String accessToken;
@@ -27,12 +28,13 @@ public class SubredditListingDataSourceFactory extends DataSource.Factory {
     private SubredditListingDataSource subredditListingDataSource;
     private final MutableLiveData<SubredditListingDataSource> subredditListingDataSourceMutableLiveData;
 
-    SubredditListingDataSourceFactory(Executor executor, Handler handler, Retrofit retrofit, String query, SortType sortType,
+    SubredditListingDataSourceFactory(Executor executor, Handler handler, Retrofit retrofit, String query, String flair, SortType sortType,
                                       @Nullable String accessToken, @NonNull String accountName, boolean nsfw) {
         this.executor = executor;
         this.handler = handler;
         this.retrofit = retrofit;
         this.query = query;
+        this.flair = flair;
         this.sortType = sortType;
         this.accessToken = accessToken;
         this.accountName = accountName;
@@ -43,7 +45,7 @@ public class SubredditListingDataSourceFactory extends DataSource.Factory {
     @NonNull
     @Override
     public DataSource create() {
-        subredditListingDataSource = new SubredditListingDataSource(executor, handler, retrofit, query, sortType,
+        subredditListingDataSource = new SubredditListingDataSource(executor, handler, retrofit, query, flair, sortType,
                 accessToken, accountName, nsfw);
         subredditListingDataSourceMutableLiveData.postValue(subredditListingDataSource);
         return subredditListingDataSource;
@@ -59,5 +61,9 @@ public class SubredditListingDataSourceFactory extends DataSource.Factory {
 
     void changeSortType(SortType sortType) {
         this.sortType = sortType;
+    }
+
+    void changeFlair(String flair) {
+        this.flair = flair;
     }
 }

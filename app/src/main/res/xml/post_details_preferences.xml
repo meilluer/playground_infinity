@@ -50,4 +50,9 @@
         app:title="@string/settings_embedded_media_type_title"
         app:useSimpleSummaryProvider="true" />
 
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="false"
+        app:key="save_post_scroll_position"
+        app:title="@string/settings_save_post_scroll_position" />
+
 </PreferenceScreen>

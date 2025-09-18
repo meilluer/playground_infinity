@@ -91,7 +91,7 @@ public class Infinity extends Application implements LifecycleObserver {
         super.onCreate();
 
         mAppComponent = DaggerAppComponent.factory()
-                .create(this);
+                .create(this, new Handler(Looper.getMainLooper()));
 
         mAppComponent.inject(this);
 

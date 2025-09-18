@@ -19,6 +19,7 @@ public class SubredditListingDataSource extends PageKeyedDataSource<String, Subr
     private final Executor executor;
     private final Retrofit retrofit;
     private final String query;
+    private final String flair;
     private final SortType sortType;
     @Nullable
     private final String accessToken;
@@ -34,11 +35,12 @@ public class SubredditListingDataSource extends PageKeyedDataSource<String, Subr
     private LoadParams<String> params;
     private LoadCallback<String, SubredditData> callback;
 
-    SubredditListingDataSource(Executor executor, Handler handler, Retrofit retrofit, String query, SortType sortType,
+    SubredditListingDataSource(Executor executor, Handler handler, Retrofit retrofit, String query, String flair, SortType sortType,
                                @Nullable String accessToken, @NonNull String accountName, boolean nsfw) {
         this.executor = executor;
         this.retrofit = retrofit;
         this.query = query;
+        this.flair = flair;
         this.sortType = sortType;
         this.accessToken = accessToken;
         this.accountName = accountName;
@@ -65,7 +67,11 @@ public class SubredditListingDataSource extends PageKeyedDataSource<String, Subr
     public void loadInitial(@NonNull LoadInitialParams<String> params, @NonNull LoadInitialCallback<String, SubredditData> callback) {
         initialLoadStateLiveData.postValue(NetworkState.LOADING);
 
-        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, query, null,
+        String finalQuery = query;
+        if (flair != null && !flair.isEmpty()) {
+            finalQuery = query + " flair:\"" + flair + "\"";
+        }
+        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, finalQuery, null,
                 sortType.getType(), accessToken, accountName, nsfw,
                 new FetchSubredditData.FetchSubredditListingDataListener() {
                     @Override
@@ -101,7 +107,11 @@ public class SubredditListingDataSource extends PageKeyedDataSource<String, Subr
             return;
         }
 
-        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, query, params.key,
+        String finalQuery = query;
+        if (flair != null && !flair.isEmpty()) {
+            finalQuery = query + " flair:\"" + flair + "\"";
+        }
+        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, finalQuery, params.key,
                 sortType.getType(), accessToken, accountName, nsfw,
                 new FetchSubredditData.FetchSubredditListingDataListener() {
                     @Override

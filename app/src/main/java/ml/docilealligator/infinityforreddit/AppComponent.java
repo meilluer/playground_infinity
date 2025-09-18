@@ -1,6 +1,7 @@
 package ml.docilealligator.infinityforreddit;
 
 import android.app.Application;
+import android.os.Handler;
 
 import javax.inject.Singleton;
 
@@ -323,6 +324,6 @@ public interface AppComponent {
 
     @Component.Factory
     interface Factory {
-        AppComponent create(@BindsInstance Application application);
+        AppComponent create(@BindsInstance Application application, @BindsInstance Handler handler);
     }
 }

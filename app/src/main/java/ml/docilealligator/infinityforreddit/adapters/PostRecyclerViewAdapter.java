@@ -23,6 +23,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -2548,6 +2549,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
         ImageView muteButton;
         ImageView fullscreenButton;
         ImageView playPauseButton;
+        ProgressBar videoLoadingProgressBar;
         @Nullable
         Container container;
         @Nullable
@@ -2564,7 +2566,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                                  GifImageView previewImageView, ImageView errorLoadingRedgifsImageView,
                                  PlayerView videoPlayer, ImageView videoQualityButton, ImageView muteButton, ImageView fullscreenButton,
                                  ImageView playPauseButton, DefaultTimeBar progressBar,
-                                 Drawable playDrawable, Drawable pauseDrawable) {
+                                 Drawable playDrawable, Drawable pauseDrawable, ProgressBar videoLoadingProgressBar) {
             this.itemView = itemView;
             this.aspectRatioFrameLayout = aspectRatioFrameLayout;
             this.previewImageView = previewImageView;
@@ -2576,6 +2578,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             this.playPauseButton = playPauseButton;
             this.playDrawable = playDrawable;
             this.pauseDrawable = pauseDrawable;
+            this.videoLoadingProgressBar = videoLoadingProgressBar;
 
             aspectRatioFrameLayout.setOnClickListener(null);
 
@@ -2755,6 +2758,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             if (mediaUri == null) {
                 return;
             }
+            if (videoLoadingProgressBar != null) {
+                videoLoadingProgressBar.setVisibility(View.VISIBLE);
+            }
             if (helper == null) {
                 helper = new ExoPlayerViewHelper(this, mediaUri, null, mExoCreator);
                 helper.addEventListener(new Playable.DefaultEventListener() {
@@ -2765,6 +2771,18 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                                 Player.EVENT_PLAYBACK_STATE_CHANGED,
                                 Player.EVENT_PLAYBACK_SUPPRESSION_REASON_CHANGED)) {
                             playPauseButton.setImageDrawable(Util.shouldShowPlayButton(player) ? playDrawable : pauseDrawable);
+                        }
+
+                        if (events.contains(Player.EVENT_PLAYBACK_STATE_CHANGED)) {
+                            if (player.getPlaybackState() == Player.STATE_BUFFERING) {
+                                if (videoLoadingProgressBar != null) {
+                                    videoLoadingProgressBar.setVisibility(View.VISIBLE);
+                                }
+                            } else {
+                                if (videoLoadingProgressBar != null) {
+                                    videoLoadingProgressBar.setVisibility(View.GONE);
+                                }
+                            }
                         }
                     }
 
@@ -2788,12 +2806,14 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
 
                                 if (!setDefaultResolutionAlready) {
                                     int desiredResolution = 0;
-                                    if (mDataSavingMode && !mSharedPreferences.getBoolean(SharedPreferencesUtils.OVERRIDE_VIDEO_AUTOPLAY_IN_DATA_SAVING_MODE, false)) {
+                                    if (mDataSavingMode) {
                                         if (mDataSavingModeDefaultResolution > 0) {
                                             desiredResolution = mDataSavingModeDefaultResolution;
                                         }
-                                    } else if (mNonDataSavingModeDefaultResolution > 0) {
-                                        desiredResolution = mNonDataSavingModeDefaultResolution;
+                                    } else {
+                                        if (mNonDataSavingModeDefaultResolution > 0) {
+                                            desiredResolution = mNonDataSavingModeDefaultResolution;
+                                        }
                                     }
 
                                     if (desiredResolution > 0) {
@@ -2872,10 +2892,16 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     public void onRenderedFirstFrame() {
                         mGlide.clear(previewImageView);
                         previewImageView.setVisibility(View.GONE);
+                        if (videoLoadingProgressBar != null) {
+                            videoLoadingProgressBar.setVisibility(View.GONE);
+                        }
                     }
 
                     @Override
                     public void onPlayerError(@NonNull PlaybackException error) {
+                        if (videoLoadingProgressBar != null) {
+                            videoLoadingProgressBar.setVisibility(View.GONE);
+                        }
                         Post post = getPost();
                         if (post.getVideoFallBackDirectUrl() == null || post.getVideoFallBackDirectUrl().equals(mediaUri.toString())) {
                             errorLoadingRedgifsImageView.setVisibility(View.VISIBLE);
@@ -3193,7 +3219,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     errorLoadingRedgifsImageView, videoPlayer, videoQualityButton, muteButton, fullscreenButton, playPauseButton,
                     progressBar,
                     AppCompatResources.getDrawable(mActivity, R.drawable.ic_play_arrow_24dp),
-                    AppCompatResources.getDrawable(mActivity, R.drawable.ic_pause_24dp)) {
+                    AppCompatResources.getDrawable(mActivity, R.drawable.ic_pause_24dp),
+                    rootView.findViewById(R.id.video_loading_progress_bar)) {
                 @Override
                 public int getPlayerOrder() {
                     return getBindingAdapterPosition();

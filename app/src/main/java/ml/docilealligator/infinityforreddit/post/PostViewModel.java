@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.util.Pair;
+import kotlin.Triple;
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -43,6 +44,7 @@ public class PostViewModel extends ViewModel {
     private final String accountName;
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences postFeedScrolledPositionSharedPreferences;
+    private PostPagingSource postPagingSource;
     private String name;
     private String query;
     private String trendingSource;
@@ -58,7 +60,8 @@ public class PostViewModel extends ViewModel {
 
     private final MutableLiveData<SortType> sortTypeLiveData;
     private final MutableLiveData<PostFilter> postFilterLiveData;
-    private final SortTypeAndPostFilterLiveData sortTypeAndPostFilterLiveData;
+    private final MutableLiveData<String> flairLiveData;
+    private final SortTypeAndPostFilterAndFlairLiveData sortTypeAndPostFilterAndFlairLiveData;
     private final boolean isReadPostsShouldBeHidden;
 
     public final SingleLiveEvent<ModerationEvent> moderationEventLiveData = new SingleLiveEvent<>();
@@ -82,14 +85,15 @@ public class PostViewModel extends ViewModel {
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
+        flairLiveData = new MutableLiveData<>();
 
-        sortTypeAndPostFilterLiveData = new SortTypeAndPostFilterLiveData(sortTypeLiveData, postFilterLiveData);
+        sortTypeAndPostFilterAndFlairLiveData = new SortTypeAndPostFilterAndFlairLiveData(sortTypeLiveData, postFilterLiveData, flairLiveData);
 
         Pager<String, Post> pager = new Pager<>(new PagingConfig(100, 4, false, 10), this::returnPagingSoruce);
 
-        posts = Transformations.switchMap(sortTypeAndPostFilterLiveData, sortAndPostFilter -> {
-            changeSortTypeAndPostFilter(
-                    sortTypeLiveData.getValue(), postFilterLiveData.getValue());
+        posts = Transformations.switchMap(sortTypeAndPostFilterAndFlairLiveData, sortAndPostFilter -> {
+            changeSortTypeAndPostFilterAndFlair(
+                    sortTypeLiveData.getValue(), postFilterLiveData.getValue(), flairLiveData.getValue());
             return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager), ViewModelKt.getViewModelScope(this));
         });
 
@@ -124,14 +128,15 @@ public class PostViewModel extends ViewModel {
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
+        flairLiveData = new MutableLiveData<>();
 
-        sortTypeAndPostFilterLiveData = new SortTypeAndPostFilterLiveData(sortTypeLiveData, postFilterLiveData);
+        sortTypeAndPostFilterAndFlairLiveData = new SortTypeAndPostFilterAndFlairLiveData(sortTypeLiveData, postFilterLiveData, flairLiveData);
 
         Pager<String, Post> pager = new Pager<>(new PagingConfig(100, 4, false, 10), this::returnPagingSoruce);
 
-        posts = Transformations.switchMap(sortTypeAndPostFilterLiveData, sortAndPostFilter -> {
-            changeSortTypeAndPostFilter(
-                    sortTypeLiveData.getValue(), postFilterLiveData.getValue());
+        posts = Transformations.switchMap(sortTypeAndPostFilterAndFlairLiveData, sortAndPostFilter -> {
+            changeSortTypeAndPostFilterAndFlair(
+                    sortTypeLiveData.getValue(), postFilterLiveData.getValue(), flairLiveData.getValue());
             return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager), ViewModelKt.getViewModelScope(this));
         });
 
@@ -167,14 +172,15 @@ public class PostViewModel extends ViewModel {
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
+        flairLiveData = new MutableLiveData<>();
 
-        sortTypeAndPostFilterLiveData = new SortTypeAndPostFilterLiveData(sortTypeLiveData, postFilterLiveData);
+        sortTypeAndPostFilterAndFlairLiveData = new SortTypeAndPostFilterAndFlairLiveData(sortTypeLiveData, postFilterLiveData, flairLiveData);
 
         Pager<String, Post> pager = new Pager<>(new PagingConfig(100, 4, false, 10), this::returnPagingSoruce);
 
-        posts = Transformations.switchMap(sortTypeAndPostFilterLiveData, sortAndPostFilter -> {
-            changeSortTypeAndPostFilter(
-                    sortTypeLiveData.getValue(), postFilterLiveData.getValue());
+        posts = Transformations.switchMap(sortTypeAndPostFilterAndFlairLiveData, sortAndPostFilter -> {
+            changeSortTypeAndPostFilterAndFlair(
+                    sortTypeLiveData.getValue(), postFilterLiveData.getValue(), flairLiveData.getValue());
             return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager), ViewModelKt.getViewModelScope(this));
         });
 
@@ -211,14 +217,15 @@ public class PostViewModel extends ViewModel {
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
+        flairLiveData = new MutableLiveData<>();
 
-        sortTypeAndPostFilterLiveData = new SortTypeAndPostFilterLiveData(sortTypeLiveData, postFilterLiveData);
+        sortTypeAndPostFilterAndFlairLiveData = new SortTypeAndPostFilterAndFlairLiveData(sortTypeLiveData, postFilterLiveData, flairLiveData);
 
         Pager<String, Post> pager = new Pager<>(new PagingConfig(100, 4, false, 10), this::returnPagingSoruce);
 
-        posts = Transformations.switchMap(sortTypeAndPostFilterLiveData, sortAndPostFilter -> {
-            changeSortTypeAndPostFilter(
-                    sortTypeLiveData.getValue(), postFilterLiveData.getValue());
+        posts = Transformations.switchMap(sortTypeAndPostFilterAndFlairLiveData, sortAndPostFilter -> {
+            changeSortTypeAndPostFilterAndFlair(
+                    sortTypeLiveData.getValue(), postFilterLiveData.getValue(), flairLiveData.getValue());
             return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager), ViewModelKt.getViewModelScope(this));
         });
 
@@ -256,14 +263,15 @@ public class PostViewModel extends ViewModel {
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
         postFilterLiveData = new MutableLiveData<>(postFilter);
+        flairLiveData = new MutableLiveData<>();
 
-        sortTypeAndPostFilterLiveData = new SortTypeAndPostFilterLiveData(sortTypeLiveData, postFilterLiveData);
+        sortTypeAndPostFilterAndFlairLiveData = new SortTypeAndPostFilterAndFlairLiveData(sortTypeLiveData, postFilterLiveData, flairLiveData);
 
         Pager<String, Post> pager = new Pager<>(new PagingConfig(100, 4, false, 10), this::returnPagingSoruce);
 
-        posts = Transformations.switchMap(sortTypeAndPostFilterLiveData, sortAndPostFilter -> {
-            changeSortTypeAndPostFilter(
-                    sortTypeLiveData.getValue(), postFilterLiveData.getValue());
+        posts = Transformations.switchMap(sortTypeAndPostFilterAndFlairLiveData, sortAndPostFilter -> {
+            changeSortTypeAndPostFilterAndFlair(
+                    sortTypeLiveData.getValue(), postFilterLiveData.getValue(), flairLiveData.getValue());
             return PagingLiveData.cachedIn(PagingLiveData.getLiveData(pager), ViewModelKt.getViewModelScope(this));
         });
 
@@ -290,38 +298,45 @@ public class PostViewModel extends ViewModel {
     }
 
     public PostPagingSource returnPagingSoruce() {
-        PostPagingSource paging3PagingSource;
         switch (postType) {
             case PostPagingSource.TYPE_FRONT_PAGE:
-                paging3PagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
+                postPagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
                         sharedPreferences, postFeedScrolledPositionSharedPreferences, postType, sortType,
-                        postFilter, readPostsList);
+                        flairLiveData.getValue(), postFilter, readPostsList);
                 break;
             case PostPagingSource.TYPE_SUBREDDIT:
             case PostPagingSource.TYPE_ANONYMOUS_FRONT_PAGE:
             case PostPagingSource.TYPE_ANONYMOUS_MULTIREDDIT:
-                paging3PagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
+                postPagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
                         sharedPreferences, postFeedScrolledPositionSharedPreferences, name, postType,
-                        sortType, postFilter, readPostsList);
+                        sortType, flairLiveData.getValue(), postFilter, readPostsList);
                 break;
             case PostPagingSource.TYPE_MULTI_REDDIT:
-                paging3PagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
+                postPagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
                         sharedPreferences, postFeedScrolledPositionSharedPreferences, name, query, postType,
-                        sortType, postFilter, readPostsList);
+                        sortType, flairLiveData.getValue(), postFilter, readPostsList);
                 break;
             case PostPagingSource.TYPE_SEARCH:
-                paging3PagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
+                postPagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
                         sharedPreferences, postFeedScrolledPositionSharedPreferences, name, query, trendingSource,
-                        postType, sortType, postFilter, readPostsList);
+                        postType, sortType, flairLiveData.getValue(), postFilter, readPostsList);
                 break;
             default:
                 //User
-                paging3PagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
+                postPagingSource = new PostPagingSource(executor, retrofit, accessToken, accountName,
                         sharedPreferences, postFeedScrolledPositionSharedPreferences, name, postType,
-                        sortType, postFilter, userWhere, readPostsList);
+                        sortType, flairLiveData.getValue(), postFilter, userWhere, readPostsList);
                 break;
         }
-        return paging3PagingSource;
+        return postPagingSource;
+    }
+
+    private void changeSortTypeAndPostFilterAndFlair(SortType sortType, PostFilter postFilter, String flair) {
+        this.sortType = sortType;
+        this.postFilter = postFilter;
+        if (this.postPagingSource != null) {
+            this.postPagingSource.setFlair(flair);
+        }
     }
 
     private void changeSortTypeAndPostFilter(SortType sortType, PostFilter postFilter) {
@@ -335,6 +350,18 @@ public class PostViewModel extends ViewModel {
 
     public void changePostFilter(PostFilter postFilter) {
         postFilterLiveData.postValue(postFilter);
+    }
+
+    public void changeFlair(String flair) {
+        flairLiveData.postValue(flair);
+    }
+
+    private static class SortTypeAndPostFilterAndFlairLiveData extends MediatorLiveData<Triple<PostFilter, SortType, String>> {
+        public SortTypeAndPostFilterAndFlairLiveData(LiveData<SortType> sortTypeLiveData, LiveData<PostFilter> postFilterLiveData, LiveData<String> flairLiveData) {
+            addSource(sortTypeLiveData, sortType -> setValue(new Triple<>(postFilterLiveData.getValue(), sortType, flairLiveData.getValue())));
+            addSource(postFilterLiveData, postFilter -> setValue(new Triple<>(postFilter, sortTypeLiveData.getValue(), flairLiveData.getValue())));
+            addSource(flairLiveData, flair -> setValue(new Triple<>(postFilterLiveData.getValue(), sortTypeLiveData.getValue(), flair)));
+        }
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {

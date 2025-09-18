@@ -26,10 +26,13 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.transition.AutoTransition;
 import androidx.transition.TransitionManager;
 
+import com.google.android.material.chip.Chip;
+
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.Random;
 
@@ -70,6 +73,8 @@ import ml.docilealligator.infinityforreddit.readpost.InsertReadPost;
 import ml.docilealligator.infinityforreddit.readpost.ReadPostsList;
 import ml.docilealligator.infinityforreddit.readpost.ReadPostsListInterface;
 import ml.docilealligator.infinityforreddit.readpost.ReadPostsUtils;
+import ml.docilealligator.infinityforreddit.subreddit.FetchFlairs;
+import ml.docilealligator.infinityforreddit.subreddit.Flair;
 import ml.docilealligator.infinityforreddit.thing.SortType;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
@@ -140,6 +145,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
     private PostFilter postFilter;
     private ReadPostsListInterface readPostsList;
     private FragmentPostBinding binding;
+    private final Handler mHandler = new Handler();
 
     public PostFragment() {
         // Required empty public constructor
@@ -314,6 +320,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                 sortTime = mSortTypeSharedPreferences.getString(SharedPreferencesUtils.SORT_TIME_SUBREDDIT_POST_BASE + subredditName,
                         mSharedPreferences.getString(SharedPreferencesUtils.SUBREDDIT_DEFAULT_SORT_TIME, SortType.Time.ALL.name()));
             }
+            fetchFlairs(subredditName);
             boolean displaySubredditName = subredditName != null && (subredditName.equals("popular") || subredditName.equals("all"));
             postLayout = mPostLayoutSharedPreferences.getInt(SharedPreferencesUtils.POST_LAYOUT_SUBREDDIT_POST_BASE + subredditName, defaultPostLayout);
 
@@ -1170,6 +1177,44 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
             mAdapter.setPostLayout(postLayout);
             refreshAdapter();
         }
+    }
+
+    private String selectedFlair;
+
+    private void fetchFlairs(String subredditName) {
+        FetchFlairs.fetchFlairsInSubreddit(mExecutor, mHandler, mOauthRetrofit, activity.accessToken, subredditName, new FetchFlairs.FetchFlairsInSubredditListener() {
+            @Override
+            public void fetchSuccessful(List<Flair> flairs) {
+                if (flairs != null && !flairs.isEmpty()) {
+                    binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.VISIBLE);
+                    com.google.android.material.chip.ChipGroup chipGroup = binding.getRoot().findViewById(R.id.flair_chip_group);
+                    chipGroup.removeAllViews();
+                    for (Flair flair : flairs) {
+                        Chip chip = new Chip(activity);
+                        chip.setText(flair.getText());
+                        chip.setOnClickListener(v -> {
+                            if (selectedFlair != null && selectedFlair.equals(flair.getText())) {
+                                selectedFlair = null;
+                                mPostViewModel.changeFlair(null);
+                                chip.setChecked(false);
+                            } else {
+                                selectedFlair = flair.getText();
+                                mPostViewModel.changeFlair(flair.getText());
+                                chip.setChecked(true);
+                            }
+                        });
+                        chipGroup.addView(chip);
+                    }
+                } else {
+                    binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void fetchFailed() {
+                binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override

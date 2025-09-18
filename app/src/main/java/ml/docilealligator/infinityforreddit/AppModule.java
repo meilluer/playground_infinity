@@ -3,6 +3,8 @@ package ml.docilealligator.infinityforreddit;
 import android.app.Application;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
 
 import androidx.annotation.OptIn;
 import androidx.media3.common.util.UnstableApi;

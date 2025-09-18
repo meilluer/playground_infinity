@@ -35,10 +35,10 @@ public class NavigationWrapper {
     public FloatingActionButton floatingActionButton;
 
     private CustomThemeWrapper customThemeWrapper;
-    private int option1 = -1;
-    private int option2 = -1;
-    private int option3 = -1;
-    private int option4 = -1;
+    public int option1 = -1;
+    public int option2 = -1;
+    public int option3 = -1;
+    public int option4 = -1;
 
     private int inboxCount;
 

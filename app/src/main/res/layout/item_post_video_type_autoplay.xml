@@ -218,6 +218,13 @@
                 android:src="@drawable/ic_error_white_36dp"
                 android:visibility="gone" />
 
+            <ProgressBar
+                android:id="@+id/video_loading_progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
         </androidx.media3.ui.AspectRatioFrameLayout>
 
         <androidx.constraintlayout.widget.ConstraintLayout

@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.graphics.Insets;
 import androidx.core.view.OnApplyWindowInsetsListener;
 import androidx.core.view.ViewCompat;
@@ -21,6 +22,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.chip.Chip;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +43,8 @@ import ml.docilealligator.infinityforreddit.adapters.SubredditListingRecyclerVie
 import ml.docilealligator.infinityforreddit.customtheme.CustomThemeWrapper;
 import ml.docilealligator.infinityforreddit.customviews.LinearLayoutManagerBugFixed;
 import ml.docilealligator.infinityforreddit.databinding.FragmentSubredditListingBinding;
+import ml.docilealligator.infinityforreddit.subreddit.FetchFlairs;
+import ml.docilealligator.infinityforreddit.subreddit.Flair;
 import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
 import ml.docilealligator.infinityforreddit.subreddit.SubredditListingViewModel;
 import ml.docilealligator.infinityforreddit.thing.SelectThingReturnKey;
@@ -80,6 +84,8 @@ public class SubredditListingFragment extends Fragment implements FragmentCommun
     CustomThemeWrapper mCustomThemeWrapper;
     @Inject
     Executor mExecutor;
+    @Inject
+    Handler mHandler;
     private LinearLayoutManagerBugFixed mLinearLayoutManager;
     private SubredditListingRecyclerViewAdapter mAdapter;
     private BaseActivity mActivity;
@@ -208,7 +214,47 @@ public class SubredditListingFragment extends Fragment implements FragmentCommun
 
         binding.swipeRefreshLayoutSubredditListingFragment.setOnRefreshListener(() -> mSubredditListingViewModel.refresh());
 
+        fetchFlairs(query);
+
         return binding.getRoot();
+    }
+
+    private String selectedFlair;
+
+    private void fetchFlairs(String subredditName) {
+        FetchFlairs.fetchFlairsInSubreddit(mExecutor, mHandler, mOauthRetrofit, mActivity.accessToken, subredditName, new FetchFlairs.FetchFlairsInSubredditListener() {
+            @Override
+            public void fetchSuccessful(List<Flair> flairs) {
+                if (flairs != null && !flairs.isEmpty()) {
+                    binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.VISIBLE);
+                    com.google.android.material.chip.ChipGroup chipGroup = binding.getRoot().findViewById(R.id.flair_chip_group);
+                    chipGroup.removeAllViews();
+                    for (Flair flair : flairs) {
+                        Chip chip = new Chip(mActivity);
+                        chip.setText(flair.getText());
+                        chip.setOnClickListener(v -> {
+                            if (selectedFlair != null && selectedFlair.equals(flair.getText())) {
+                                selectedFlair = null;
+                                mSubredditListingViewModel.changeFlair(null);
+                                chip.setChecked(false);
+                            } else {
+                                selectedFlair = flair.getText();
+                                mSubredditListingViewModel.changeFlair(flair.getText());
+                                chip.setChecked(true);
+                            }
+                        });
+                        chipGroup.addView(chip);
+                    }
+                } else {
+                    binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void fetchFailed() {
+                binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+            }
+        });
     }
 
     @Override

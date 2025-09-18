@@ -5,10 +5,12 @@ import android.os.Handler;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.Transformations;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.core.util.Pair;
 import androidx.paging.LivePagedListBuilder;
 import androidx.paging.PagedList;
 
@@ -25,11 +27,12 @@ public class SubredditListingViewModel extends ViewModel {
     private final LiveData<Boolean> hasSubredditLiveData;
     private final LiveData<PagedList<SubredditData>> subreddits;
     private final MutableLiveData<SortType> sortTypeLiveData;
+    private final MutableLiveData<String> flairLiveData;
 
     public SubredditListingViewModel(Executor executor, Handler handler, Retrofit retrofit, String query, SortType sortType,
                                      @Nullable String accessToken, @NonNull String accountName, boolean nsfw) {
         subredditListingDataSourceFactory = new SubredditListingDataSourceFactory(executor, handler, retrofit, query,
-                sortType, accessToken, accountName, nsfw);
+                null, sortType, accessToken, accountName, nsfw);
 
         initialLoadingState = Transformations.switchMap(subredditListingDataSourceFactory.getSubredditListingDataSourceMutableLiveData(),
                 SubredditListingDataSource::getInitialLoadStateLiveData);
@@ -39,6 +42,7 @@ public class SubredditListingViewModel extends ViewModel {
                 SubredditListingDataSource::hasSubredditLiveData);
 
         sortTypeLiveData = new MutableLiveData<>(sortType);
+        flairLiveData = new MutableLiveData<>();
 
         PagedList.Config pagedListConfig =
                 (new PagedList.Config.Builder())
@@ -46,8 +50,14 @@ public class SubredditListingViewModel extends ViewModel {
                         .setPageSize(25)
                         .build();
 
-        subreddits = Transformations.switchMap(sortTypeLiveData, sort -> {
-            subredditListingDataSourceFactory.changeSortType(sortTypeLiveData.getValue());
+        subreddits = Transformations.switchMap(new MediatorLiveData<Pair<SortType, String>>() {
+            {
+                addSource(sortTypeLiveData, sortType -> setValue(Pair.create(sortType, flairLiveData.getValue())));
+                addSource(flairLiveData, flair -> setValue(Pair.create(sortTypeLiveData.getValue(), flair)));
+            }
+        }, input -> {
+            subredditListingDataSourceFactory.changeSortType(input.first);
+            subredditListingDataSourceFactory.changeFlair(input.second);
             return new LivePagedListBuilder(subredditListingDataSourceFactory, pagedListConfig).build();
         });
     }
@@ -78,6 +88,10 @@ public class SubredditListingViewModel extends ViewModel {
 
     public void changeSortType(SortType sortType) {
         sortTypeLiveData.postValue(sortType);
+    }
+
+    public void changeFlair(String flair) {
+        flairLiveData.postValue(flair);
     }
 
     public static class Factory extends ViewModelProvider.NewInstanceFactory {
