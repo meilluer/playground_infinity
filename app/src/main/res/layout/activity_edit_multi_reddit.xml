@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/coordinator_layout_edit_multi_reddit_activity"
+    tools:context=".activities.CreateMultiRedditActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout_edit_multi_reddit_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar_layout_edit_multi_reddit_activity"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:titleEnabled="false"
+            app:toolbarId="@+id/toolbar_edit_multi_reddit_activity">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_edit_multi_reddit_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:navigationIcon="?attr/homeAsUpIndicator" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <com.google.android.material.loadingindicator.LoadingIndicator
+        android:id="@+id/progress_bar_edit_multi_reddit_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center" />
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nested_scroll_view_edit_multi_reddit_activity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
+            android:id="@+id/linear_layout_edit_multi_reddit_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/multi_reddit_name_edit_text_edit_multi_reddit_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:hint="@string/multi_reddit_name_hint"
+                android:inputType="textMultiLine"
+                android:textSize="?attr/font_default"
+                android:background="#00000000"
+                android:textColor="?attr/primaryTextColor"
+                android:fontFamily="?attr/font_family"
+                android:maxLength="50" />
+
+            <View
+                android:id="@+id/divider_1_edit_multi_reddit_activity"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <EditText
+                android:id="@+id/description_edit_text_edit_multi_reddit_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:hint="@string/multi_reddit_description_hint"
+                android:inputType="textMultiLine"
+                android:textSize="?attr/font_default"
+                android:background="#00000000"
+                android:textColor="?attr/primaryTextColor" />
+
+            <View
+                android:id="@+id/divider_2_edit_multi_reddit_activity"
+                android:layout_width="match_parent"
+                android:layout_height="1dp" />
+
+            <LinearLayout
+                android:id="@+id/visibility_wrapper_linear_layout_edit_multi_reddit_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground">
+
+                <TextView
+                    android:id="@+id/visibility_text_view_edit_multi_reddit_activity"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/private_multi_reddit"
+                    android:textSize="?attr/font_default"
+                    android:textColor="?attr/primaryTextColor" />
+
+                <Switch
+                    android:id="@+id/visibility_switch_edit_multi_reddit_activity"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="true" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/select_subreddit_text_view_edit_multi_reddit_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:text="@string/select_subreddits_and_users"
+                android:textSize="?attr/font_default"
+                android:textColor="?attr/primaryTextColor"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="?attr/selectableItemBackground" />
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

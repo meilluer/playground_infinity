@@ -1,0 +1,209 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+}
+
+android {
+    compileSdk 35
+    defaultConfig {
+        applicationId "ml.docilealligator.infinityforreddit"
+        minSdk 21
+        targetSdk 35
+        versionCode 194
+        versionName "8.0.0-beta1"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [eventBusIndex: 'ml.docilealligator.infinityforreddit.EventBusIndex']
+            }
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        minifiedRelease {
+            initWith buildTypes.release
+            zipAlignEnabled true
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            applicationIdSuffix '.debug'
+            versionNameSuffix ' (DEBUG)'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
+    }
+
+    lint {
+        disable 'MissingTranslation'
+    }
+
+    bundle {
+        language {
+            enableSplit = false
+        }
+    }
+
+    buildFeatures {
+        buildConfig = true
+        viewBinding = true
+    }
+    namespace 'ml.docilealligator.infinityforreddit'
+    kotlinOptions {
+        jvmTarget = '11'
+    }
+}
+
+dependencies {
+/** AndroidX **/
+    implementation 'androidx.appcompat:appcompat:1.7.0'
+    implementation 'androidx.biometric:biometric:1.2.0-alpha05'
+    implementation 'androidx.browser:browser:1.8.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.activity:activity:1.10.1'
+    implementation 'androidx.fragment:fragment:1.8.8'
+    implementation 'androidx.core:core-ktx:1.16.0'
+    def lifecycleVersion = "2.7.0"
+    implementation "androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-livedata:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-process:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-runtime:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-viewmodel:$lifecycleVersion"
+
+    def pagingVersion = '3.3.0'
+    implementation "androidx.paging:paging-runtime:$pagingVersion"
+    implementation "androidx.paging:paging-guava:$pagingVersion"
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.preference:preference-ktx:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+    def roomVersion = "2.6.1"
+    implementation "androidx.room:room-runtime:$roomVersion"
+    annotationProcessor "androidx.room:room-compiler:$roomVersion"
+    implementation "androidx.room:room-guava:$roomVersion"
+    implementation "androidx.room:room-ktx:$roomVersion"
+    implementation 'androidx.viewpager2:viewpager2:1.1.0'
+    implementation 'androidx.work:work-runtime:2.7.1'
+    implementation 'androidx.work:work-runtime:2.7.1'
+    implementation 'com.google.android.material:material:1.14.0-alpha01'
+    implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.2.0-beta01"
+
+/** ExoPlayer **/
+    def media3_version = "1.4.0-alpha02"
+    implementation "androidx.media3:media3-exoplayer:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-dash:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-hls:$media3_version"
+    implementation "androidx.media3:media3-ui:$media3_version"
+    implementation "androidx.media3:media3-exoplayer-smoothstreaming:$media3_version"
+    implementation "androidx.media3:media3-datasource-okhttp:$media3_version"
+
+/** Third-party **/
+
+/**** Backend logic ****/
+
+    // HTTP clients
+    def retrofitVersion = '2.11.0'
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-guava:$retrofitVersion"
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+
+    // Dependency injection
+    def daggerVersion = '2.51.1'
+    implementation "com.google.dagger:dagger:$daggerVersion"
+    annotationProcessor "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    // Binding
+    compileOnly 'com.android.databinding:viewbinding:8.5.1'
+
+    // Events
+    def eventbusVersion = "3.3.1"
+    implementation "org.greenrobot:eventbus:$eventbusVersion"
+    annotationProcessor "org.greenrobot:eventbus-annotation-processor:$eventbusVersion"
+
+    // TransactionTooLargeException avoidance
+    implementation 'com.github.livefront:bridge:v2.0.2'
+
+    // Bundle-saving without boilerplate
+    // NOTE: Deprecated
+    def stateVersion = "1.4.1"
+    implementation "com.evernote:android-state:$stateVersion"
+    annotationProcessor "com.evernote:android-state-processor:$stateVersion"
+
+    // Object to JSON
+    // NOTE: Replace with Squareup's Moshi?
+    implementation 'com.google.code.gson:gson:2.11.0'
+
+    // Java library for zip files and streams
+    implementation 'net.lingala.zip4j:zip4j:2.11.5'
+
+    // IO functionality
+    implementation 'commons-io:commons-io:2.16.1'
+
+    // Crash reporting
+    implementation 'com.github.FunkyMuse:Crashy:1.2.0'
+
+
+/**** User Interface (frontend) ****/
+
+    //Image loading
+    def glideVersion = "5.0.5"
+    implementation "com.github.bumptech.glide:glide:$glideVersion"
+    annotationProcessor "com.github.bumptech.glide:compiler:$glideVersion"
+    implementation 'jp.wasabeef:glide-transformations:4.3.0'
+    implementation 'com.github.santalu:aspect-ratio-imageview:1.0.9'
+    implementation 'pl.droidsonroids.gif:android-gif-drawable:1.2.29'
+    def bivVersion = "1.8.1"
+    implementation "com.github.piasy:BigImageViewer:$bivVersion"
+    implementation "com.github.piasy:GlideImageLoader:$bivVersion"
+
+    // Markdown
+    def markwonVersion = "4.6.2"
+    implementation "io.noties.markwon:core:$markwonVersion"
+    implementation "io.noties.markwon:ext-strikethrough:$markwonVersion"
+    implementation "io.noties.markwon:linkify:$markwonVersion"
+    implementation "io.noties.markwon:recycler-table:$markwonVersion"
+    implementation "io.noties.markwon:simple-ext:$markwonVersion"
+    implementation "io.noties.markwon:inline-parser:$markwonVersion"
+    implementation "io.noties.markwon:image-glide:$markwonVersion"
+    implementation 'com.atlassian.commonmark:commonmark-ext-gfm-tables:0.14.0'
+    implementation 'me.saket:better-link-movement-method:2.2.0'
+
+    // Animations
+    implementation 'com.airbnb.android:lottie:6.4.1'
+
+    // Loading ProgressBar
+    implementation 'com.lsjwzh:materialloadingprogressbar:0.5.8-RELEASE'
+
+    // Customizable TextView
+    implementation files("Modules/customtextview-2.1.aar")
+
+    // Dismiss gesturing
+    implementation 'app.futured.hauler:hauler:5.0.0'
+
+    // FlowLayout (auto-spacing)
+    implementation 'com.nex3z:flow-layout:1.3.3'
+
+    // RecyclerView fast scrolling
+    implementation 'me.zhanghai.android.fastscroll:library:1.3.0'
+
+    implementation 'com.otaliastudios:zoomlayout:1.9.0'
+
+    implementation 'androidx.core:core-splashscreen:1.0.1'
+
+    implementation 'com.giphy.sdk:ui:2.3.15'
+
+    implementation 'com.github.alexzhirkevich:custom-qr-generator:2.0.0-alpha01'
+
+
+/**** Builds and flavors ****/
+    // debugImplementation because LeakCanary should only run in debug builds.
+    //debugImplementation 'com.squareup.leakcanary:leakcanary-android:x.y'
+}

@@ -1,0 +1,127 @@
+package ml.docilealligator.infinityforreddit.subreddit;
+
+import android.os.Handler;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MediatorLiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.Transformations;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.core.util.Pair;
+import androidx.paging.LivePagedListBuilder;
+import androidx.paging.PagedList;
+
+import java.util.concurrent.Executor;
+
+import ml.docilealligator.infinityforreddit.NetworkState;
+import ml.docilealligator.infinityforreddit.thing.SortType;
+import retrofit2.Retrofit;
+
+public class SubredditListingViewModel extends ViewModel {
+    private final SubredditListingDataSourceFactory subredditListingDataSourceFactory;
+    private final LiveData<NetworkState> paginationNetworkState;
+    private final LiveData<NetworkState> initialLoadingState;
+    private final LiveData<Boolean> hasSubredditLiveData;
+    private final LiveData<PagedList<SubredditData>> subreddits;
+    private final MutableLiveData<SortType> sortTypeLiveData;
+    private final MutableLiveData<String> flairLiveData;
+
+    public SubredditListingViewModel(Executor executor, Handler handler, Retrofit retrofit, String query, SortType sortType,
+                                     @Nullable String accessToken, @NonNull String accountName, boolean nsfw) {
+        subredditListingDataSourceFactory = new SubredditListingDataSourceFactory(executor, handler, retrofit, query,
+                null, sortType, accessToken, accountName, nsfw);
+
+        initialLoadingState = Transformations.switchMap(subredditListingDataSourceFactory.getSubredditListingDataSourceMutableLiveData(),
+                SubredditListingDataSource::getInitialLoadStateLiveData);
+        paginationNetworkState = Transformations.switchMap(subredditListingDataSourceFactory.getSubredditListingDataSourceMutableLiveData(),
+                SubredditListingDataSource::getPaginationNetworkStateLiveData);
+        hasSubredditLiveData = Transformations.switchMap(subredditListingDataSourceFactory.getSubredditListingDataSourceMutableLiveData(),
+                SubredditListingDataSource::hasSubredditLiveData);
+
+        sortTypeLiveData = new MutableLiveData<>(sortType);
+        flairLiveData = new MutableLiveData<>();
+
+        PagedList.Config pagedListConfig =
+                (new PagedList.Config.Builder())
+                        .setEnablePlaceholders(false)
+                        .setPageSize(25)
+                        .build();
+
+        subreddits = Transformations.switchMap(new MediatorLiveData<Pair<SortType, String>>() {
+            {
+                addSource(sortTypeLiveData, sortType -> setValue(Pair.create(sortType, flairLiveData.getValue())));
+                addSource(flairLiveData, flair -> setValue(Pair.create(sortTypeLiveData.getValue(), flair)));
+            }
+        }, input -> {
+            subredditListingDataSourceFactory.changeSortType(input.first);
+            subredditListingDataSourceFactory.changeFlair(input.second);
+            return new LivePagedListBuilder(subredditListingDataSourceFactory, pagedListConfig).build();
+        });
+    }
+
+    public LiveData<PagedList<SubredditData>> getSubreddits() {
+        return subreddits;
+    }
+
+    public LiveData<NetworkState> getPaginationNetworkState() {
+        return paginationNetworkState;
+    }
+
+    public LiveData<NetworkState> getInitialLoadingState() {
+        return initialLoadingState;
+    }
+
+    public LiveData<Boolean> hasSubredditLiveData() {
+        return hasSubredditLiveData;
+    }
+
+    public void refresh() {
+        subredditListingDataSourceFactory.getSubredditListingDataSource().invalidate();
+    }
+
+    public void retryLoadingMore() {
+        subredditListingDataSourceFactory.getSubredditListingDataSource().retryLoadingMore();
+    }
+
+    public void changeSortType(SortType sortType) {
+        sortTypeLiveData.postValue(sortType);
+    }
+
+    public void changeFlair(String flair) {
+        flairLiveData.postValue(flair);
+    }
+
+    public static class Factory extends ViewModelProvider.NewInstanceFactory {
+        private final Executor executor;
+        private final Handler handler;
+        private final Retrofit retrofit;
+        private final String query;
+        private final SortType sortType;
+        @Nullable
+        private final String accessToken;
+        @NonNull
+        private final String accountName;
+        private final boolean nsfw;
+
+        public Factory(Executor executor, Handler handler, Retrofit retrofit, String query, SortType sortType,
+                       @Nullable String accessToken, @NonNull String accountName, boolean nsfw) {
+            this.executor = executor;
+            this.handler = handler;
+            this.retrofit = retrofit;
+            this.query = query;
+            this.sortType = sortType;
+            this.accessToken = accessToken;
+            this.accountName = accountName;
+            this.nsfw = nsfw;
+        }
+
+        @NonNull
+        @Override
+        public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+            return (T) new SubredditListingViewModel(executor, handler, retrofit, query, sortType, accessToken,accountName, nsfw);
+        }
+    }
+}

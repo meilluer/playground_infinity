@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="isTablet">false</bool>
+
+    <declare-styleable name="FontStyle">
+        <attr name="font_default" format="dimension"/>
+        <attr name="font_10" format="dimension"/>
+        <attr name="font_12" format="dimension"/>
+        <attr name="font_16" format="dimension"/>
+        <attr name="font_18" format="dimension"/>
+        <attr name="font_20" format="dimension"/>
+        <attr name="font_large" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="TitleFontStyle">
+        <attr name="title_font_default" format="dimension"/>
+        <attr name="title_font_12" format="dimension"/>
+        <attr name="title_font_16" format="dimension"/>
+        <attr name="title_font_18" format="dimension"/>
+        <attr name="title_font_20" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="ContentFontStyle">
+        <attr name="content_font_default" format="dimension"/>
+        <attr name="content_font_12" format="dimension"/>
+        <attr name="content_font_16" format="dimension"/>
+        <attr name="content_font_18" format="dimension"/>
+        <attr name="content_font_20" format="dimension"/>
+    </declare-styleable>
+
+    <declare-styleable name="FontFamily">
+        <attr name="font_family" format="reference"/>
+        <attr name="font_family_bold" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="TitleFontFamily">
+        <attr name="title_font_family" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="ContentFontFamily">
+        <attr name="content_font_family" format="reference"/>
+    </declare-styleable>
+
+    <declare-styleable name="Theme">
+        <attr name="colorPrimary" format="color"/>
+        <attr name="colorPrimaryDark" format="color"/>
+        <attr name="colorAccent" format="color"/>
+        <attr name="colorPrimaryLightTheme" format="color"/>
+        <attr name="primaryTextColor" format="color"/>
+        <attr name="secondaryTextColor" format="color"/>
+        <attr name="backgroundColor" format="color"/>
+        <attr name="cardViewBackgroundColor" format="color"/>
+    </declare-styleable>
+
+    <declare-styleable name="SliderPreference">
+        <attr name="sliderMin" format="integer" />
+        <attr name="sliderMax" format="integer" />
+        <attr name="sliderStepSize" format="integer" />
+    </declare-styleable>
+
+    <declare-styleable name="CustomFontPreference">
+        <attr name="top" format="boolean" />
+        <attr name="bottom" format="boolean" />
+    </declare-styleable>
+</resources>

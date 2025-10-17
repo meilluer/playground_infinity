@@ -1,0 +1,553 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.Material3.DayNight">
+        <item name="colorPrimary">?attr/colorPrimary</item>
+        <item name="colorPrimaryDark">?attr/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:navigationBarColor">@android:color/black</item>
+        <item name="android:textColorPrimary">@android:color/white</item>
+        <item name="font_family_bold">@font/balsamiq_sans_bold_version</item>
+    </style>
+
+    <style name="AppTheme.Launcher" parent="@style/AppTheme.NoActionBarWithTransparentStatusBar">
+        <item name="android:windowBackground">@drawable/splash_screen</item>
+    </style>
+
+    <style name="AppTheme.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="AppTheme.NoActionBarWithTransparentStatusBar" parent="AppTheme.NoActionBar">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.Slidable" parent="AppTheme.NoActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
+
+    <style name="AppTheme.SlidableWithActionBar">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowBackground">#00000000</item>
+        <item name="android:fontFamily">?attr/font_family</item>
+    </style>
+
+    <style name="AppTheme.Draggable" parent="AppTheme">
+        <item name="android:colorBackgroundCacheHint">@null</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowIsFloating">false</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowBackground">@android:color/black</item>
+        <item name="android:fontFamily">?attr/font_family</item>
+    </style>
+
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.DayNight.ActionBar">
+        <item name="android:fontFamily">?attr/font_family</item>
+    </style>
+
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.DayNight" />
+
+    <style name="MaterialAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <!-- android:background for dialogs causes a bug where selection toolbar is oversized -->
+        <item name="android:backgroundTint">?attr/cardViewBackgroundColor</item>
+        <item name="colorBackgroundFloating">?attr/cardViewBackgroundColor</item>
+        <item name="android:textSize">?attr/font_default</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialogTitleTextStyle
+        </item>
+        <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialogBodyTextStyle</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MaterialAlertDialogPositiveButtonStyle
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/MaterialAlertDialogNegativeButtonStyle
+        </item>
+    </style>
+
+    <style name="CopyTextMaterialAlertDialogTheme">
+        <item name="android:textSize">?attr/font_default</item>
+        <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialogTitleTextStyle
+        </item>
+        <item name="buttonBarPositiveButtonStyle">@style/MaterialAlertDialogPositiveButtonStyle
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/MaterialAlertDialogNegativeButtonStyle
+        </item>
+    </style>
+
+    <style name="MaterialAlertDialogPositiveButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/colorAccent</item>
+    </style>
+
+    <style name="MaterialAlertDialogNegativeButtonStyle" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">?attr/primaryTextColor</item>
+    </style>
+
+    <style name="MaterialAlertDialogTitleTextStyle" parent="MaterialAlertDialog.Material3.Title.Text">
+        <item name="android:textSize">?attr/font_20</item>
+    </style>
+
+    <style name="MaterialAlertDialogBodyTextStyle">
+        <item name="android:textSize">?attr/font_default</item>
+    </style>
+
+    <style name="PreferenceActivityTheme" parent="AppTheme.NoActionBar">
+        <item name="android:textAppearanceListItem">@style/PreferenceTitleTextStyle</item>
+        <item name="android:textAppearanceListItemSecondary">@style/PreferenceSubtitleTextStyle
+        </item>
+        <item name="android:textColorPrimary">?attr/primaryTextColor</item>
+        <item name="buttonBarPositiveButtonStyle">@style/MaterialAlertDialogPositiveButtonStyle
+        </item>
+        <item name="buttonBarNegativeButtonStyle">@style/MaterialAlertDialogNegativeButtonStyle
+        </item>
+        <item name="alertDialogTheme">@style/ListPreferenceStyle</item>
+    </style>
+
+    <style name="PreferenceTitleTextStyle">
+        <item name="android:textSize">?attr/font_16</item>
+        <item name="android:textColor">?attr/primaryTextColor</item>
+        <item name="android:fontFamily">?attr/font_family</item>
+    </style>
+
+    <style name="PreferenceSubtitleTextStyle">
+        <item name="android:textSize">?attr/font_default</item>
+        <item name="android:fontFamily">?attr/font_family</item>
+    </style>
+
+    <style name="ListPreferenceStyle" parent="ThemeOverlay.AppCompat.Dialog.Alert">
+        <!-- android:background for dialogs causes a bug where selection toolbar is oversized -->
+        <item name="android:backgroundTint">?attr/cardViewBackgroundColor</item>
+        <item name="colorBackgroundFloating">?attr/cardViewBackgroundColor</item>
+    </style>
+    
+    <style name="Widget.App.CheckBox.Dark" parent="Widget.Material3.CompoundButton.CheckBox">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.CheckBox.Dark</item>
+    </style>
+
+    <style name="ThemeOverlay.App.CheckBox.Dark" parent="">
+        <item name="colorOnSurface">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/primaryTextColor</item>
+    </style>
+
+    <style name="Widget.App.Switch.Dark" parent="Widget.Material3.CompoundButton.Switch">
+        <item name="materialThemeOverlay">@style/ThemeOverlay.App.Switch.Dark</item>
+    </style>
+
+    <style name="ThemeOverlay.App.Switch.Dark" parent="">
+        <item name="colorOnSurface">@color/colorPrimary</item>
+        <item name="colorPrimary">@color/primaryTextColor</item>
+    </style>
+
+    <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">#00000000</item>
+    </style>
+    
+    <style name="FontStyle" />
+
+        <style name="FontStyle.XSmall">
+        <item name="font_default">10sp</item>
+        <item name="font_10">8sp</item>
+        <item name="font_12">10sp</item>
+        <item name="font_16">12sp</item>
+        <item name="font_18">14sp</item>
+        <item name="font_20">16sp</item>
+        <item name="font_large">14sp</item>
+    </style>
+
+    <style name="FontStyle.Small">
+        <item name="font_default">12sp</item>
+        <item name="font_10">10sp</item>
+        <item name="font_12">12sp</item>
+        <item name="font_16">14sp</item>
+        <item name="font_18">16sp</item>
+        <item name="font_20">18sp</item>
+        <item name="font_large">16sp</item>
+    </style>
+
+    <style name="FontStyle.Normal">
+        <item name="font_default">14sp</item>
+        <item name="font_10">10sp</item>
+        <item name="font_12">12sp</item>
+        <item name="font_16">16sp</item>
+        <item name="font_18">18sp</item>
+        <item name="font_20">20sp</item>
+        <item name="font_large">18sp</item>
+    </style>
+
+    <style name="FontStyle.Large">
+        <item name="font_default">16sp</item>
+        <item name="font_10">12sp</item>
+        <item name="font_12">14sp</item>
+        <item name="font_16">18sp</item>
+        <item name="font_18">20sp</item>
+        <item name="font_20">22sp</item>
+        <item name="font_large">20sp</item>
+    </style>
+
+    <style name="FontStyle.XLarge">
+        <item name="font_default">18sp</item>
+        <item name="font_10">14sp</item>
+        <item name="font_12">16sp</item>
+        <item name="font_16">20sp</item>
+        <item name="font_18">22sp</item>
+        <item name="font_20">24sp</item>
+        <item name="font_large">22sp</item>
+    </style>
+
+    <style name="TitleFontStyle" />
+
+    <style name="TitleFontStyle.XSmall">
+        <item name="title_font_default">10sp</item>
+        <item name="title_font_12">10sp</item>
+        <item name="title_font_16">12sp</item>
+        <item name="title_font_18">14sp</item>
+        <item name="title_font_20">16sp</item>
+    </style>
+
+    <style name="TitleFontStyle.Small">
+        <item name="title_font_default">12sp</item>
+        <item name="title_font_12">12sp</item>
+        <item name="title_font_16">14sp</item>
+        <item name="title_font_18">16sp</item>
+        <item name="title_font_20">18sp</item>
+    </style>
+
+    <style name="TitleFontStyle.Normal">
+        <item name="title_font_default">14sp</item>
+        <item name="title_font_12">12sp</item>
+        <item name="title_font_16">16sp</item>
+        <item name="title_font_18">18sp</item>
+        <item name="title_font_20">20sp</item>
+    </style>
+
+    <style name="TitleFontStyle.Large">
+        <item name="font_default">16sp</item>
+        <item name="title_font_12">14sp</item>
+        <item name="title_font_16">18sp</item>
+        <item name="title_font_18">20sp</item>
+        <item name="title_font_20">22sp</item>
+    </style>
+
+    <style name="TitleFontStyle.XLarge">
+        <item name="title_font_default">18sp</item>
+        <item name="title_font_12">16sp</item>
+        <item name="title_font_16">20sp</item>
+        <item name="title_font_18">22sp</item>
+        <item name="title_font_20">24sp</item>
+    </style>
+
+    <style name="ContentFontStyle" />
+
+    <style name="ContentFontStyle.XSmall">
+        <item name="content_font_default">10sp</item>
+        <item name="content_font_12">10sp</item>
+        <item name="content_font_16">12sp</item>
+        <item name="content_font_18">14sp</item>
+        <item name="content_font_20">16sp</item>
+    </style>
+
+    <style name="ContentFontStyle.Small">
+        <item name="content_font_default">12sp</item>
+        <item name="content_font_12">12sp</item>
+        <item name="content_font_16">14sp</item>
+        <item name="content_font_18">16sp</item>
+        <item name="content_font_20">18sp</item>
+    </style>
+
+    <style name="ContentFontStyle.Normal">
+        <item name="content_font_default">14sp</item>
+        <item name="content_font_12">12sp</item>
+        <item name="content_font_16">16sp</item>
+        <item name="content_font_18">18sp</item>
+        <item name="content_font_20">20sp</item>
+    </style>
+
+    <style name="ContentFontStyle.Large">
+        <item name="content_font_default">16sp</item>
+        <item name="content_font_12">14sp</item>
+        <item name="content_font_16">18sp</item>
+        <item name="content_font_18">20sp</item>
+        <item name="content_font_20">22sp</item>
+    </style>
+
+    <style name="ContentFontStyle.XLarge">
+        <item name="content_font_default">18sp</item>
+        <item name="content_font_12">16sp</item>
+        <item name="content_font_16">20sp</item>
+        <item name="content_font_18">22sp</item>
+        <item name="content_font_20">24sp</item>
+    </style>
+
+    <style name="ContentFontStyle.XXLarge">
+        <item name="content_font_default">20sp</item>
+        <item name="content_font_12">18sp</item>
+        <item name="content_font_16">22sp</item>
+        <item name="content_font_18">24sp</item>
+        <item name="content_font_20">26sp</item>
+    </style>
+
+    <style name="FontFamily" />
+
+    <style name="FontFamily.Default">
+        <item name="font_family">@null</item>
+        <item name="font_family_bold">@font/balsamiq_sans_bold_version</item>
+    </style>
+
+    <style name="FontFamily.BalsamiqSans">
+        <item name="font_family">@font/balsamiq_sans</item>
+    </style>
+
+    <style name="FontFamily.BalsamiqSansBold">
+        <item name="font_family">@font/balsamiq_sans_bold_version</item>
+    </style>
+
+    <style name="FontFamily.NotoSans">
+        <item name="font_family">@font/noto_sans</item>
+    </style>
+
+    <style name="FontFamily.NotoSansBold">
+        <item name="font_family">@font/noto_sans_bold_version</item>
+    </style>
+
+    <style name="FontFamily.RobotoCondensed">
+        <item name="font_family">@font/roboto_condensed</item>
+    </style>
+
+    <style name="FontFamily.RobotoCondensedBold">
+        <item name="font_family">@font/roboto_condensed_bold_version</item>
+    </style>
+
+    <style name="FontFamily.HarmoniaSans">
+        <item name="font_family">@font/harmonia_sans</item>
+    </style>
+
+    <style name="FontFamily.HarmoniaSansBold">
+        <item name="font_family">@font/harmonia_sans_bold</item>
+    </style>
+
+    <style name="FontFamily.Inter">
+        <item name="font_family">@font/inter</item>
+    </style>
+
+    <style name="FontFamily.InterBold">
+        <item name="font_family">@font/inter_bold</item>
+    </style>
+
+    <style name="FontFamily.Manrope">
+        <item name="font_family">@font/manrope</item>
+    </style>
+
+    <style name="FontFamily.ManropeBold">
+        <item name="font_family">@font/manrope_bold</item>
+    </style>
+
+    <style name="FontFamily.Sriracha">
+        <item name="font_family">@font/sriracha_regular</item>
+    </style>
+
+    <style name="FontFamily.AtkinsonHyperlegible">
+        <item name="font_family">@font/atkinson_hyperlegible</item>
+    </style>
+
+    <style name="FontFamily.AtkinsonHyperlegibleBold">
+        <item name="font_family">@font/atkinson_hyperlegible_bold_version</item>
+    </style>
+
+    <style name="TitleFontFamily" />
+
+    <style name="TitleFontFamily.Default">
+        <item name="title_font_family">@null</item>
+    </style>
+
+    <style name="TitleFontFamily.BalsamiqSans">
+        <item name="title_font_family">@font/balsamiq_sans</item>
+    </style>
+
+    <style name="TitleFontFamily.BalsamiqSansBold">
+        <item name="title_font_family">@font/balsamiq_sans_bold_version</item>
+    </style>
+
+    <style name="TitleFontFamily.NotoSans">
+        <item name="title_font_family">@font/noto_sans</item>
+    </style>
+
+    <style name="TitleFontFamily.NotoSansBold">
+        <item name="title_font_family">@font/noto_sans_bold_version</item>
+    </style>
+
+    <style name="TitleFontFamily.RobotoCondensed">
+        <item name="title_font_family">@font/roboto_condensed</item>
+    </style>
+
+    <style name="TitleFontFamily.RobotoCondensedBold">
+        <item name="title_font_family">@font/roboto_condensed_bold_version</item>
+    </style>
+
+    <style name="TitleFontFamily.HarmoniaSans">
+        <item name="title_font_family">@font/harmonia_sans</item>
+    </style>
+
+    <style name="TitleFontFamily.HarmoniaSansBold">
+        <item name="title_font_family">@font/harmonia_sans_bold</item>
+    </style>
+
+    <style name="TitleFontFamily.Inter">
+        <item name="title_font_family">@font/inter</item>
+    </style>
+
+    <style name="TitleFontFamily.InterBold">
+        <item name="title_font_family">@font/inter_bold</item>
+    </style>
+
+    <style name="TitleFontFamily.Manrope">
+        <item name="title_font_family">@font/manrope</item>
+    </style>
+
+    <style name="TitleFontFamily.ManropeBold">
+        <item name="title_font_family">@font/manrope_bold</item>
+    </style>
+
+    <style name="TitleFontFamily.Sriracha">
+        <item name="title_font_family">@font/sriracha_regular</item>
+    </style>
+
+    <style name="TitleFontFamily.AtkinsonHyperlegible">
+        <item name="title_font_family">@font/atkinson_hyperlegible</item>
+    </style>
+
+    <style name="TitleFontFamily.AtkinsonHyperlegibleBold">
+        <item name="title_font_family">@font/atkinson_hyperlegible_bold_version</item>
+    </style>
+
+    <style name="ContentFontFamily" />
+
+    <style name="ContentFontFamily.Default">
+        <item name="content_font_family">@null</item>
+    </style>
+
+    <style name="ContentFontFamily.BalsamiqSans">
+        <item name="content_font_family">@font/balsamiq_sans</item>
+    </style>
+
+    <style name="ContentFontFamily.BalsamiqSansBold">
+        <item name="content_font_family">@font/balsamiq_sans_bold_version</item>
+    </style>
+
+    <style name="ContentFontFamily.NotoSans">
+        <item name="content_font_family">@font/noto_sans</item>
+    </style>
+
+    <style name="ContentFontFamily.NotoSansBold">
+        <item name="content_font_family">@font/noto_sans_bold_version</item>
+    </style>
+
+    <style name="ContentFontFamily.RobotoCondensed">
+        <item name="content_font_family">@font/roboto_condensed</item>
+    </style>
+
+    <style name="ContentFontFamily.RobotoCondensedBold">
+        <item name="content_font_family">@font/roboto_condensed_bold_version</item>
+    </style>
+
+    <style name="ContentFontFamily.HarmoniaSans">
+        <item name="content_font_family">@font/harmonia_sans</item>
+    </style>
+
+    <style name="ContentFontFamily.HarmoniaSansBold">
+        <item name="content_font_family">@font/harmonia_sans_bold</item>
+    </style>
+
+    <style name="ContentFontFamily.Inter">
+        <item name="content_font_family">@font/inter</item>
+    </style>
+
+    <style name="ContentFontFamily.InterBold">
+        <item name="content_font_family">@font/inter_bold</item>
+    </style>
+
+    <style name="ContentFontFamily.Manrope">
+        <item name="content_font_family">@font/manrope</item>
+    </style>
+
+    <style name="ContentFontFamily.ManropeBold">
+        <item name="content_font_family">@font/manrope_bold</item>
+    </style>
+
+    <style name="ContentFontFamily.Sriracha">
+        <item name="content_font_family">@font/sriracha_regular</item>
+    </style>
+
+    <style name="ContentFontFamily.AtkinsonHyperlegible">
+        <item name="content_font_family">@font/atkinson_hyperlegible</item>
+    </style>
+
+    <style name="ContentFontFamily.AtkinsonHyperlegibleBold">
+        <item name="content_font_family">@font/atkinson_hyperlegible_bold_version</item>
+    </style>
+
+    <style name="Theme" />
+
+    <style name="Theme.Normal">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryLightTheme">@color/colorPrimary</item>
+        <item name="primaryTextColor">#000000</item>
+        <item name="secondaryTextColor">#8A000000</item>
+        <item name="backgroundColor">@color/backgroundColor</item>
+        <item name="cardViewBackgroundColor">#FFFFFF</item>
+    </style>
+
+    <style name="Theme.Normal.NormalDark">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryLightTheme">#0336FF</item>
+        <item name="primaryTextColor">#FFFFFF</item>
+        <item name="secondaryTextColor">#B3FFFFFF</item>
+        <item name="backgroundColor">@color/backgroundColor</item>
+        <item name="cardViewBackgroundColor">#242424</item>
+        <item name="checkboxStyle">@style/Widget.App.CheckBox.Dark</item>
+        <item name="switchStyle">@style/Widget.App.Switch.Dark</item>        
+    </style>
+
+    <style name="Theme.Normal.AmoledDark">
+        <item name="colorPrimary">#000000</item>
+        <item name="colorPrimaryDark">#000000</item>
+        <item name="colorAccent">@color/colorAccent</item>
+        <item name="colorPrimaryLightTheme">#0336FF</item>
+        <item name="primaryTextColor">#FFFFFF</item>
+        <item name="secondaryTextColor">#B3FFFFFF</item>
+        <item name="backgroundColor">#000000</item>
+        <item name="cardViewBackgroundColor">#000000</item>
+        <item name="checkboxStyle">@style/Widget.App.CheckBox.Dark</item>
+        <item name="switchStyle">@style/Widget.App.Switch.Dark</item>        
+    </style>
+
+    <style name="ToroMediaButton">
+        <item name="android:background">@null</item>
+        <item name="android:layout_width">65dp</item>
+        <item name="android:layout_height">48dp</item>
+    </style>
+
+    <style name="ToroMediaButton.Play">
+        <item name="android:src">@drawable/ic_play_arrow_24dp</item>
+        <item name="android:contentDescription">@string/exo_controls_play_description</item>
+    </style>
+
+    <style name="ToroMediaButton.Pause">
+        <item name="android:src">@drawable/ic_pause_24dp</item>
+        <item name="android:contentDescription">@string/exo_controls_pause_description</item>
+    </style>
+
+    <style name="ToroMediaButton.VolumeUp">
+        <item name="android:src">@drawable/ic_volume_up_32dp</item>
+        <item name="android:contentDescription">@string/exo_controls_volume_up_description</item>
+    </style>
+
+    <style name="ToroMediaButton.VolumeOff">
+        <item name="android:src">@drawable/ic_volume_off_32dp</item>
+        <item name="android:contentDescription">@string/exo_controls_volume_off_description</item>
+    </style>
+
+</resources>

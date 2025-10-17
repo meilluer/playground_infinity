@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:application=".Activity.ViewSubredditDetailActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout_view_subreddit_detail_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar_layout_view_subreddit_detail_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:titleEnabled="false"
+            app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+            app:toolbarId="@+id/toolbar">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <pl.droidsonroids.gif.GifImageView
+                    android:id="@+id/banner_image_view_view_subreddit_detail_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="160dp"
+                    android:contentDescription="@string/content_description_banner_imageview"
+                    android:scaleType="centerCrop" />
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/toolbar_constraint_layout_view_subreddit_detail_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp">
+
+                    <pl.droidsonroids.gif.GifImageView
+                        android:id="@+id/icon_gif_image_view_view_subreddit_detail_activity"
+                        android:layout_width="72dp"
+                        android:layout_height="72dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toTopOf="@id/subscriber_count_text_view_view_subreddit_detail_activity" />
+
+                    <TextView
+                        android:id="@+id/subreddit_name_text_view_view_subreddit_detail_activity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        android:paddingTop="8dp"
+                        android:fontFamily="?attr/font_family"
+                        android:textSize="?attr/font_18"
+                        app:layout_constraintVertical_chainStyle="packed"
+                        app:layout_constraintStart_toEndOf="@id/icon_gif_image_view_view_subreddit_detail_activity"
+                        app:layout_constraintTop_toTopOf="@id/icon_gif_image_view_view_subreddit_detail_activity"
+                        app:layout_constraintBottom_toTopOf="@id/subscribe_subreddit_chip_view_subreddit_detail_activity" />
+
+                    <com.google.android.material.chip.Chip
+                        android:id="@+id/subscribe_subreddit_chip_view_subreddit_detail_activity"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="16dp"
+                        app:chipStrokeColor="#00000000"
+                        app:layout_constraintStart_toEndOf="@id/icon_gif_image_view_view_subreddit_detail_activity"
+                        app:layout_constraintTop_toBottomOf="@id/subreddit_name_text_view_view_subreddit_detail_activity"
+                        app:layout_constraintBottom_toBottomOf="@id/icon_gif_image_view_view_subreddit_detail_activity" />
+
+                    <TextView
+                        android:id="@+id/subscriber_count_text_view_view_subreddit_detail_activity"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="?attr/font_family"
+                        android:textSize="?attr/font_default"
+                        app:layout_constraintEnd_toStartOf="@id/barrier"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/barrier5"
+                        app:layout_constraintHorizontal_bias="0" />
+
+                    <TextView
+                        android:id="@+id/online_subscriber_count_text_view_view_subreddit_detail_activity"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="?attr/font_family"
+                        android:textSize="?attr/font_default"
+                        app:layout_constraintEnd_toStartOf="@id/barrier"
+                        app:layout_constraintHorizontal_bias="0"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/subscriber_count_text_view_view_subreddit_detail_activity" />
+
+                    <TextView
+                        android:id="@+id/since_text_view_view_subreddit_detail_activity"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="?attr/font_family"
+                        android:text="@string/since"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/barrier5" />
+
+                    <TextView
+                        android:id="@+id/creation_time_text_view_view_subreddit_detail_activity"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="?attr/font_family"
+                        android:gravity="end"
+                        android:textSize="?attr/font_default"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toBottomOf="@id/since_text_view_view_subreddit_detail_activity" />
+
+                    <TextView
+                        android:id="@+id/description_text_view_view_subreddit_detail_activity"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        android:fontFamily="?attr/font_family"
+                        android:textSize="?attr/font_default"
+                        android:visibility="gone"
+                        app:layout_constraintTop_toBottomOf="@id/barrier6"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        tools:visibility="visible" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/barrier"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="start"
+                        app:constraint_referenced_ids="creation_time_text_view_view_subreddit_detail_activity, since_text_view_view_subreddit_detail_activity" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/barrier5"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="icon_gif_image_view_view_subreddit_detail_activity,subscribe_subreddit_chip_view_subreddit_detail_activity" />
+
+                    <androidx.constraintlayout.widget.Barrier
+                        android:id="@+id/barrier6"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        app:barrierDirection="bottom"
+                        app:constraint_referenced_ids="creation_time_text_view_view_subreddit_detail_activity,online_subscriber_count_text_view_view_subreddit_detail_activity" />
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+            </LinearLayout>
+
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:navigationIcon="?attr/homeAsUpIndicator" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tab_layout_view_subreddit_detail_activity"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabIndicatorHeight="3dp"
+            app:tabRippleColor="?attr/colorControlHighlight"
+            app:tabUnboundedRipple="false" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager_view_subreddit_detail_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <include
+        layout="@layout/bottom_app_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_view_subreddit_detail_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/fab_margin"
+        android:visibility="gone"
+        app:layout_anchor="@id/bottom_app_bar_bottom_app_bar"
+        android:contentDescription="@null" />
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
