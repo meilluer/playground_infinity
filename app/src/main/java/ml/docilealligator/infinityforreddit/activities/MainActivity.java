@@ -214,6 +214,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     private int fabOption;
     private int inboxCount;
     private ActivityMainBinding binding;
+    private Handler mHandler;
 
     @ExperimentalBadgeUtils
     @Override
@@ -227,6 +228,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         setHasDrawerLayout();
 
         super.onCreate(savedInstanceState);
+
+        mHandler = new Handler();
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -1247,7 +1250,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         if (adapter != null) {
             adapter.setInboxCount(inboxCount);
         }
-        navigationWrapper.setInboxCount(this, inboxCount);
+        mHandler.post(() -> navigationWrapper.setInboxCount(this, inboxCount));
     }
 
     @Override

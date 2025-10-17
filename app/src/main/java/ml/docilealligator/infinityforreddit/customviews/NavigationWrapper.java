@@ -41,6 +41,7 @@ public class NavigationWrapper {
     public int option4 = -1;
 
     private int inboxCount;
+    private BadgeDrawable badgeDrawable;
 
     public NavigationWrapper(BottomAppBar bottomAppBar, LinearLayout linearLayoutBottomAppBar,
                              ImageView option1BottomAppBar, ImageView option2BottomAppBar,
@@ -245,30 +246,32 @@ public class NavigationWrapper {
 
         if (option1 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option1 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
-                BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option1BottomAppBar), option1BottomAppBar);
+                updateBadge(context, this.inboxCount, option1BottomAppBar);
             }
         } else if (option2 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option2 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
-                BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option2BottomAppBar), option2BottomAppBar);
+                updateBadge(context, this.inboxCount, option2BottomAppBar);
             }
         } else if (option3 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option3 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
-                BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option3BottomAppBar), option3BottomAppBar);
+                updateBadge(context, this.inboxCount, option3BottomAppBar);
             }
         } else if (option4 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option4 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
-                BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option4BottomAppBar), option4BottomAppBar);
+                updateBadge(context, this.inboxCount, option4BottomAppBar);
             }
         }
     }
 
-    private BadgeDrawable getBadgeDrawable(Context context, int inboxCount, View anchorView) {
-        BadgeDrawable badgeDrawable = BadgeDrawable.create(context);
+    private void updateBadge(Context context, int inboxCount, View anchorView) {
+        if (badgeDrawable == null) {
+            badgeDrawable = BadgeDrawable.create(context);
+            badgeDrawable.setBackgroundColor(customThemeWrapper.getColorAccent());
+            badgeDrawable.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
+            badgeDrawable.setHorizontalOffset(anchorView.getWidth() / 2);
+            BadgeUtils.attachBadgeDrawable(badgeDrawable, anchorView);
+        }
         badgeDrawable.setNumber(inboxCount);
-        badgeDrawable.setBackgroundColor(customThemeWrapper.getColorAccent());
-        badgeDrawable.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
-        badgeDrawable.setHorizontalOffset(anchorView.getWidth() / 2);
         badgeDrawable.setVisible(inboxCount > 0);
-        return badgeDrawable;
     }
 }
