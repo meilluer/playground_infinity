@@ -1227,7 +1227,14 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
             finish();
             return true;
         } else if (itemId == R.id.action_speaker_view_subreddit_detail_activity) {
-            Toast.makeText(this, "Speaker icon clicked", Toast.LENGTH_SHORT).show();
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("text/plain");
+            shareIntent.putExtra(Intent.EXTRA_TEXT, "https://www.reddit.com/r/" + subredditName);
+            if (shareIntent.resolveActivity(getPackageManager()) != null) {
+                startActivity(Intent.createChooser(shareIntent, getString(R.string.share)));
+            } else {
+                Toast.makeText(this, R.string.no_app, Toast.LENGTH_SHORT).show();
+            }
             return true;
         } else if (itemId == R.id.action_sort_view_subreddit_detail_activity) {
             displaySortTypeBottomSheetFragment();

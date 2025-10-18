@@ -6,8 +6,8 @@
     <item
         android:id="@+id/action_speaker_view_subreddit_detail_activity"
         android:orderInCategory="1"
-        android:title="@string/action_speaker"
-        android:icon="@drawable/ic_volume_up_32dp"
+        android:title="@string/action_share"
+        android:icon="@drawable/ic_share_day_night_24dp"
         app:showAsAction="ifRoom" />
 
     <item
