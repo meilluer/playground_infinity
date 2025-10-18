@@ -82,6 +82,7 @@
     <string name="action_edit_multi_reddit">Edit MultiReddit</string>
     <string name="action_delete_multi_reddit">Delete Multireddit</string>
     <string name="action_share">Share</string>
+    <string name="action_speaker">Speaker</string>
     <string name="action_preview">Preview</string>
     <string name="action_report">Report</string>
     <string name="action_crosspost">Crosspost</string>

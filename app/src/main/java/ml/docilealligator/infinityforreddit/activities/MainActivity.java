@@ -490,17 +490,14 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
                             setNotification(workManager, notificationInterval, timeUnit, enableNotification);
 
-                            bindView();
                         });
             } else {
                 setNotification(workManager, notificationInterval, timeUnit, enableNotification);
 
-                bindView();
             }
         } else {
             setNotification(workManager, notificationInterval, timeUnit, enableNotification);
 
-            bindView();
         }
     }
 
@@ -1222,6 +1219,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                             accountName = userData.getName();
                             mFetchUserInfoSuccess = true;
                             EventBus.getDefault().post(new ChangeInboxCountEvent(inboxCount));
+                            bindView();
                         }
 
                         @Override
@@ -1244,6 +1242,16 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                     });*/
         }
     }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        inboxCount = mCurrentAccountSharedPreferences.getInt(SharedPreferencesUtils.INBOX_COUNT, 0);
+        setInboxCount();
+        mFetchUserInfoSuccess = false;
+        loadUserData();
+    }
+
 
     @ExperimentalBadgeUtils
     private void setInboxCount() {

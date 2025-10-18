@@ -247,18 +247,26 @@ public class NavigationWrapper {
         if (option1 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option1 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
                 updateBadge(context, this.inboxCount, option1BottomAppBar);
+            } else {
+                navigationRailView.getOrCreateBadge(R.id.navigation_rail_option_1).setNumber(this.inboxCount);
             }
         } else if (option2 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option2 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
                 updateBadge(context, this.inboxCount, option2BottomAppBar);
+            } else {
+                navigationRailView.getOrCreateBadge(R.id.navigation_rail_option_2).setNumber(this.inboxCount);
             }
         } else if (option3 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option3 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
                 updateBadge(context, this.inboxCount, option3BottomAppBar);
+            } else {
+                navigationRailView.getOrCreateBadge(R.id.navigation_rail_option_3).setNumber(this.inboxCount);
             }
         } else if (option4 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option4 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
             if (navigationRailView == null) {
                 updateBadge(context, this.inboxCount, option4BottomAppBar);
+            } else {
+                navigationRailView.getOrCreateBadge(R.id.navigation_rail_option_4).setNumber(this.inboxCount);
             }
         }
     }
@@ -268,10 +276,10 @@ public class NavigationWrapper {
             badgeDrawable = BadgeDrawable.create(context);
             badgeDrawable.setBackgroundColor(customThemeWrapper.getColorAccent());
             badgeDrawable.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
-            badgeDrawable.setHorizontalOffset(anchorView.getWidth() / 2);
-            BadgeUtils.attachBadgeDrawable(badgeDrawable, anchorView);
+            anchorView.post(() -> BadgeUtils.attachBadgeDrawable(badgeDrawable, anchorView));
         }
         badgeDrawable.setNumber(inboxCount);
+        badgeDrawable.setHorizontalOffset(anchorView.getWidth() / 2);
         badgeDrawable.setVisible(inboxCount > 0);
     }
 }

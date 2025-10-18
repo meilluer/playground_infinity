@@ -10,7 +10,7 @@ android {
         minSdk 21
         targetSdk 35
         versionCode 194
-        versionName "8.0.0-beta1"
+        versionName "8.0.5.4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
@@ -30,10 +30,7 @@ android {
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
-        debug {
-            applicationIdSuffix '.debug'
-            versionNameSuffix ' (DEBUG)'
-        }
+
     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_11
