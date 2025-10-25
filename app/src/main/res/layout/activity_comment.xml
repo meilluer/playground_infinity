@@ -105,6 +105,12 @@
                     android:textSize="?attr/content_font_18"
                     android:fontFamily="?attr/content_font_family" />
 
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/subreddit_suggestions_recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:visibility="gone" />
+
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>

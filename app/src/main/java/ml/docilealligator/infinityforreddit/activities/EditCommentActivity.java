@@ -65,6 +65,7 @@ import ml.docilealligator.infinityforreddit.thing.GiphyGif;
 import ml.docilealligator.infinityforreddit.thing.MediaMetadata;
 import ml.docilealligator.infinityforreddit.thing.UploadedImage;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
+import ml.docilealligator.infinityforreddit.utils.RedditMentionHelper;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import ml.docilealligator.infinityforreddit.viewmodels.EditCommentActivityViewModel;
@@ -262,6 +263,9 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
                 }
             }
         });
+
+        RedditMentionHelper commentMentionHelper = new RedditMentionHelper(this, binding.commentEditTextEditCommentActivity);
+        commentMentionHelper.setup();
     }
 
     @Override

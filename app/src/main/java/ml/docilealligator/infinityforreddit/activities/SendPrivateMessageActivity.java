@@ -25,6 +25,7 @@ import ml.docilealligator.infinityforreddit.R;
 import ml.docilealligator.infinityforreddit.customtheme.CustomThemeWrapper;
 import ml.docilealligator.infinityforreddit.databinding.ActivitySendPrivateMessageBinding;
 import ml.docilealligator.infinityforreddit.message.ComposeMessage;
+import ml.docilealligator.infinityforreddit.utils.RedditMentionHelper;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import retrofit2.Retrofit;
 
@@ -101,6 +102,12 @@ public class SendPrivateMessageActivity extends BaseActivity {
         if (username != null) {
             binding.usernameEditTextSendPrivateMessageActivity.setText(username);
         }
+
+        RedditMentionHelper usernameMentionHelper = new RedditMentionHelper(this, binding.usernameEditTextSendPrivateMessageActivity);
+        usernameMentionHelper.setup();
+
+        RedditMentionHelper contentMentionHelper = new RedditMentionHelper(this, binding.contentEditTextSendPrivateMessageActivity);
+        contentMentionHelper.setup();
     }
 
     @Override

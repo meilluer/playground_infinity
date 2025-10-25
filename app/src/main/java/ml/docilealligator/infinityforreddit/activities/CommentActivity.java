@@ -14,6 +14,7 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -91,8 +92,15 @@ import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import ml.docilealligator.infinityforreddit.adapters.SubredditAutocompleteRecyclerViewAdapter;
+import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
+
 public class CommentActivity extends BaseActivity implements UploadImageEnabledActivity,
-        AccountChooserBottomSheetFragment.AccountChooserListener, GiphyDialogFragment.GifSelectionListener {
+        AccountChooserBottomSheetFragment.AccountChooserListener, GiphyDialogFragment.GifSelectionListener, SubredditAutocompleteRecyclerViewAdapter.ItemOnClickListener {
+
 
     public static final String EXTRA_COMMENT_PARENT_TITLE_KEY = "ECPTK";
     public static final String EXTRA_COMMENT_PARENT_BODY_KEY = "ECPBK";
@@ -166,6 +174,18 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
         super.onCreate(savedInstanceState);
         binding = ActivityCommentBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        EditText editText = findViewById(R.id.comment_comment_edit_text);
+        RecyclerView subredditSuggestionsRecyclerView = findViewById(R.id.subreddit_suggestions_recycler_view);
+        SubredditAutocompleteRecyclerViewAdapter subredditAdapter = new SubredditAutocompleteRecyclerViewAdapter(this, mCustomThemeWrapper, this);
+        subredditSuggestionsRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        subredditSuggestionsRecyclerView.setAdapter(subredditAdapter);
+
+        if (editText != null) {
+            RSlashDetector detector = new RSlashDetector(this, editText, subredditSuggestionsRecyclerView, subredditAdapter, mOauthRetrofit, accessToken, false);
+            detector.startListening();
+        }
+
 
         EventBus.getDefault().register(this);
 
@@ -711,6 +731,18 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
                     "![gif](" + giphyGif.id + ")\n",
                     0, "![gif]()\n".length() + giphyGif.id.length());
         }
+    }
+
+    @Override
+    public void onClick(SubredditData subredditData) {
+        String text = binding.commentCommentEditText.getText().toString();
+        int rSlashIndex = text.lastIndexOf("r/");
+        if (rSlashIndex != -1) {
+            String newText = text.substring(0, rSlashIndex + 2) + subredditData.getName() + " ";
+            binding.commentCommentEditText.setText(newText);
+            binding.commentCommentEditText.setSelection(newText.length());
+        }
+        binding.subredditSuggestionsRecyclerView.setVisibility(View.GONE);
     }
 
     @Override

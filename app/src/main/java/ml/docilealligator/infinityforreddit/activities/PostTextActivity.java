@@ -65,6 +65,7 @@ import ml.docilealligator.infinityforreddit.subreddit.Flair;
 import ml.docilealligator.infinityforreddit.thing.SelectThingReturnKey;
 import ml.docilealligator.infinityforreddit.thing.UploadedImage;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
+import ml.docilealligator.infinityforreddit.utils.RedditMentionHelper;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import retrofit2.Retrofit;
 
@@ -392,6 +393,12 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
                 }
             }
         });
+
+        RedditMentionHelper titleMentionHelper = new RedditMentionHelper(this, binding.postTitleEditTextPostTextActivity);
+        titleMentionHelper.setup();
+
+        RedditMentionHelper contentMentionHelper = new RedditMentionHelper(this, binding.postTextContentEditTextPostTextActivity);
+        contentMentionHelper.setup();
     }
 
     private void loadCurrentAccount() {

@@ -131,10 +131,13 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import android.widget.EditText;
+import ml.docilealligator.infinityforreddit.activities.RSlashDetector;
+
 public class MainActivity extends BaseActivity implements SortTypeSelectionCallback,
         PostTypeBottomSheetFragment.PostTypeSelectionCallback, PostLayoutBottomSheetFragment.PostLayoutSelectionCallback,
         ActivityToolbarInterface, FABMoreOptionsBottomSheetFragment.FABOptionSelectionCallback,
-        RandomBottomSheetFragment.RandomOptionSelectionCallback, MarkPostAsReadInterface, RecyclerViewContentScrollingInterface {
+        RandomBottomSheetFragment.RandomOptionSelectionCallback, MarkPostAsReadInterface, RecyclerViewContentScrollingInterface, SubredditAutocompleteRecyclerViewAdapter.ItemOnClickListener {
 
     static final String EXTRA_MESSAGE_FULLNAME = "ENF";
     static final String EXTRA_NEW_ACCOUNT_NAME = "ENAN";
@@ -230,6 +233,15 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+
+        EditText editText = findViewById(R.id.comment_comment_edit_text);
+        RecyclerView subredditSuggestionsRecyclerView = findViewById(R.id.subreddit_suggestions_recycler_view);
+        SubredditAutocompleteRecyclerViewAdapter subredditAdapter = new SubredditAutocompleteRecyclerViewAdapter(this, mCustomThemeWrapper, this);
+        if (editText != null) {
+            RSlashDetector detector =  new RSlashDetector(this, editText, subredditSuggestionsRecyclerView, subredditAdapter, mOauthRetrofit, accessToken, false);
+            detector.startListening();
+        }
 
         hideFab = mSharedPreferences.getBoolean(SharedPreferencesUtils.HIDE_FAB_IN_POST_FEED, false);
         showBottomAppBar = mSharedPreferences.getBoolean(SharedPreferencesUtils.BOTTOM_APP_BAR_KEY, false);
@@ -426,6 +438,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         });
 
         initializeNotificationAndBindView();
+
+
     }
 
     @Override
@@ -1543,12 +1557,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         TextInputEditText thingEditText = rootView.findViewById(R.id.text_input_edit_text_go_to_thing_edit_text);
         RecyclerView recyclerView = rootView.findViewById(R.id.recycler_view_go_to_thing_edit_text);
         SubredditAutocompleteRecyclerViewAdapter adapter = new SubredditAutocompleteRecyclerViewAdapter(
-                this, mCustomThemeWrapper, subredditData -> {
-            Utils.hideKeyboard(this);
-            Intent intent = new Intent(MainActivity.this, ViewSubredditDetailActivity.class);
-            intent.putExtra(ViewSubredditDetailActivity.EXTRA_SUBREDDIT_NAME_KEY, subredditData.getName());
-            startActivity(intent);
-        });
+                this, mCustomThemeWrapper, this);
         recyclerView.setAdapter(adapter);
 
         thingEditText.requestFocus();
@@ -1696,6 +1705,14 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
     public void doNotShowRedditAPIInfoAgain() {
         mInternalSharedPreferences.edit().putBoolean(SharedPreferencesUtils.DO_NOT_SHOW_REDDIT_API_INFO_V2_AGAIN, true).apply();
+    }
+
+    @Override
+    public void onClick(SubredditData subredditData) {
+        Utils.hideKeyboard(this);
+        Intent intent = new Intent(MainActivity.this, ViewSubredditDetailActivity.class);
+        intent.putExtra(ViewSubredditDetailActivity.EXTRA_SUBREDDIT_NAME_KEY, subredditData.getName());
+        startActivity(intent);
     }
 
     private class SectionsPagerAdapter extends FragmentStateAdapter {
