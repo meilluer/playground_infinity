@@ -217,6 +217,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     private int fabOption;
     private int inboxCount;
     private ActivityMainBinding binding;
+    private RSlashDetector detector;
 
     @ExperimentalBadgeUtils
     @Override
@@ -239,7 +240,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         RecyclerView subredditSuggestionsRecyclerView = findViewById(R.id.subreddit_suggestions_recycler_view);
         SubredditAutocompleteRecyclerViewAdapter subredditAdapter = new SubredditAutocompleteRecyclerViewAdapter(this, mCustomThemeWrapper, this);
         if (editText != null) {
-            RSlashDetector detector =  new RSlashDetector(this, editText, subredditSuggestionsRecyclerView, subredditAdapter, mOauthRetrofit, accessToken, false);
+            detector =  new RSlashDetector(this, editText, subredditSuggestionsRecyclerView, subredditAdapter, mOauthRetrofit, accessToken, false);
             detector.startListening();
         }
 
@@ -580,7 +581,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 break;
             }
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_GO_TO_SUBREDDIT:
-                goToSubreddit();
+                goToSubreddit(detector);
                 break;
             case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_GO_TO_USER:
                 goToUser();
@@ -856,7 +857,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                     break;
                 }
                 case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_FAB_GO_TO_SUBREDDIT:
-                    goToSubreddit();
+                    goToSubreddit(detector);
                     break;
                 case SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_FAB_GO_TO_USER:
                     goToUser();
@@ -1519,7 +1520,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 startActivity(intent);
                 break;
             case FABMoreOptionsBottomSheetFragment.FAB_OPTION_GO_TO_SUBREDDIT: {
-                goToSubreddit();
+                goToSubreddit(detector);
                 break;
             }
             case FABMoreOptionsBottomSheetFragment.FAB_OPTION_GO_TO_USER: {
@@ -1551,7 +1552,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         }
     }
 
-    private void goToSubreddit() {
+    private void goToSubreddit(RSlashDetector detector) {
         View rootView = getLayoutInflater().inflate(R.layout.dialog_go_to_thing_edit_text,
                 binding.includedAppBar.coordinatorLayoutMainActivity, false);
         TextInputEditText thingEditText = rootView.findViewById(R.id.text_input_edit_text_go_to_thing_edit_text);
@@ -1709,6 +1710,9 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
 
     @Override
     public void onClick(SubredditData subredditData) {
+        if (detector != null) {
+            detector.setSuggestionSelected();
+        }
         Utils.hideKeyboard(this);
         Intent intent = new Intent(MainActivity.this, ViewSubredditDetailActivity.class);
         intent.putExtra(ViewSubredditDetailActivity.EXTRA_SUBREDDIT_NAME_KEY, subredditData.getName());

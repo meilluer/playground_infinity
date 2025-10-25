@@ -33,6 +33,8 @@ class RSlashDetector(
     private val handler = android.os.Handler()
     private val executor: Executor = Executors.newSingleThreadExecutor()
 
+    private var isSuggestionSelected = false
+
     fun startListening() {
         editText.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -42,10 +44,13 @@ class RSlashDetector(
                     val rSlashIndex = it.lastIndexOf("r/")
                     if (rSlashIndex != -1) {
                         val query = it.substring(rSlashIndex + 2)
-                        if (query.isNotEmpty()) {
+                        if (query.isNotEmpty() && !isSuggestionSelected) {
                             fetchSubredditSuggestions(query)
                         } else {
                             recyclerView.visibility = View.GONE
+                            if (isSuggestionSelected) {
+                                isSuggestionSelected = false
+                            }
                         }
                     } else {
                         recyclerView.visibility = View.GONE
@@ -55,6 +60,10 @@ class RSlashDetector(
 
             override fun afterTextChanged(s: Editable?) {}
         })
+    }
+
+    fun setSuggestionSelected() {
+        isSuggestionSelected = true
     }
 
     private fun fetchSubredditSuggestions(query: String) {
