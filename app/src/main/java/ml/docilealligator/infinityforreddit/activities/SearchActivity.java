@@ -204,6 +204,11 @@ public class SearchActivity extends BaseActivity implements SavedSubredditsRecyc
 
         subredditAutocompleteRecyclerViewAdapter = new SubredditAutocompleteRecyclerViewAdapter(this,
                 mCustomThemeWrapper, subredditData -> {
+            if (subredditData.getName().startsWith("r/")) {
+                // Do nothing, as we don't want to save "r/" suggestions
+            } else {
+                savedSubredditsManager.saveSubreddit(subredditData);
+            }
             if (searchOnlySubreddits || searchSubredditsAndUsers) {
                 Intent returnIntent = new Intent();
                 if (getIntent().getBooleanExtra(EXTRA_IS_MULTI_SELECTION, false)) {
@@ -218,6 +223,7 @@ public class SearchActivity extends BaseActivity implements SavedSubredditsRecyc
             } else {
                 Intent intent = new Intent(SearchActivity.this, ViewSubredditDetailActivity.class);
                 intent.putExtra(ViewSubredditDetailActivity.EXTRA_SUBREDDIT_NAME_KEY, subredditData.getName());
+                intent.putExtra(ViewSubredditDetailActivity.EXTRA_FROM_SUGGESTION, true);
                 startActivity(intent);
             }
             finish();

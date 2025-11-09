@@ -14,4 +14,13 @@
         app:controller_layout_id="@layout/exo_playback_control_view"
         app:animation_enabled="false" />
 
+    <ImageView
+        android:id="@+id/video_icon_image_view"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android.src="@drawable/ic_video_day_night_24dp" />
+
 </RelativeLayout>

@@ -227,6 +227,17 @@
             android:src="@drawable/ic_error_white_36dp"
             android:visibility="gone" />
 
+        <TextView
+            android:id="@+id/video_text_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|start"
+            android:layout_margin="8dp"
+            android:background="@drawable/bg_video_text"
+            android:text="@string/video"
+            android:textColor="@android:color/white"
+            android:textSize="12sp" />
+
     </androidx.media3.ui.AspectRatioFrameLayout>
 
     <androidx.recyclerview.widget.RecyclerView

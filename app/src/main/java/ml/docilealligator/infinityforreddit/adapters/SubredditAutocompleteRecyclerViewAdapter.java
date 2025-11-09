@@ -79,6 +79,12 @@ public class SubredditAutocompleteRecyclerViewAdapter extends RecyclerView.Adapt
         notifyDataSetChanged();
     }
 
+    private boolean saveOnSuggestionClick = false;
+
+    public void setSaveOnSuggestionClick(boolean saveOnSuggestionClick) {
+        this.saveOnSuggestionClick = saveOnSuggestionClick;
+    }
+
     class SubredditViewHolder extends RecyclerView.ViewHolder {
 
         GifImageView iconImageView;
@@ -108,7 +114,6 @@ public class SubredditAutocompleteRecyclerViewAdapter extends RecyclerView.Adapt
 
             itemView.setOnClickListener(view -> {
                 SubredditData subredditData = subreddits.get(getBindingAdapterPosition());
-                savedSubredditsManager.saveSubreddit(subredditData);
                 itemOnClickListener.onClick(subredditData);
             });
         }

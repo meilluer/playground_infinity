@@ -30,7 +30,7 @@ class ViewImgurVideoFragmentBindingAdapter {
     }
 
     PlayerView getRoot() {
-        return binding.getRoot();
+        return binding.getRoot().findViewById(R.id.player_view);
     }
 
     MaterialButton getMuteButton() {

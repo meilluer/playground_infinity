@@ -1,10 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.media3.ui.PlayerView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
-    app:controller_layout_id="@layout/exo_playback_control_view"
-    app:animation_enabled="false"
-    tools:context=".fragments.ViewImgurVideoFragment" />
+    tools:context=".fragments.ViewImgurVideoFragment">
+
+    <androidx.media3.ui.PlayerView
+        android:id="@+id/player_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        app:controller_layout_id="@layout/exo_playback_control_view"
+        app:animation_enabled="false" />
+
+    <ImageView
+        android:id="@+id/video_icon_image_view"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="8dp"
+        android:src="@drawable/ic_video_day_night_24dp" />
+
+</RelativeLayout>

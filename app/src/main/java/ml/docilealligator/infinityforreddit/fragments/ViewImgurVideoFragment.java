@@ -98,14 +98,17 @@ public class ViewImgurVideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        binding = new ViewImgurVideoFragmentBindingAdapter(FragmentViewImgurVideoBinding.inflate(inflater, container, false));
+        FragmentViewImgurVideoBinding binding = FragmentViewImgurVideoBinding.inflate(inflater, container, false);
+        this.binding = new ViewImgurVideoFragmentBindingAdapter(binding);
+        View rootView = binding.getRoot();
+        PlayerView playerView = binding.playerView;
 
         ((Infinity) activity.getApplication()).getAppComponent().inject(this);
 
         setHasOptionsMenu(true);
 
         if (activity.typeface != null) {
-            binding.getTitleTextView().setTypeface(activity.typeface);
+            this.binding.getTitleTextView().setTypeface(activity.typeface);
         }
 
         activity.setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -116,19 +119,19 @@ public class ViewImgurVideoFragment extends Fragment {
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT || getResources().getBoolean(R.bool.isTablet)) {
                 //Set player controller bottom margin in order to display it above the navbar
                 int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-                LinearLayout controllerLinearLayout = binding.getRoot().findViewById(R.id.linear_layout_exo_playback_control_view);
+                LinearLayout controllerLinearLayout = playerView.findViewById(R.id.linear_layout_exo_playback_control_view);
                 ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) controllerLinearLayout.getLayoutParams();
                 params.bottomMargin = getResources().getDimensionPixelSize(resourceId);
             } else {
                 //Set player controller right margin in order to display it above the navbar
                 int resourceId = getResources().getIdentifier("navigation_bar_height", "dimen", "android");
-                LinearLayout controllerLinearLayout = binding.getRoot().findViewById(R.id.linear_layout_exo_playback_control_view);
+                LinearLayout controllerLinearLayout = playerView.findViewById(R.id.linear_layout_exo_playback_control_view);
                 ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) controllerLinearLayout.getLayoutParams();
                 params.rightMargin = getResources().getDimensionPixelSize(resourceId);
             }
         }
 
-        binding.getRoot().setControllerVisibilityListener(new PlayerView.ControllerVisibilityListener() {
+        playerView.setControllerVisibilityListener(new PlayerView.ControllerVisibilityListener() {
             @Override
             public void onVisibilityChanged(int visibility) {
                 switch (visibility) {
@@ -155,7 +158,7 @@ public class ViewImgurVideoFragment extends Fragment {
                 .setTrackSelector(trackSelector)
                 .setRenderersFactory(new DefaultRenderersFactory(activity).setEnableDecoderFallback(true))
                 .build();
-        binding.getRoot().setPlayer(player);
+        playerView.setPlayer(player);
         dataSourceFactory = new CacheDataSource.Factory().setCache(mSimpleCache)
                 .setUpstreamDataSourceFactory(new OkHttpDataSource.Factory(mOkHttpClient).setUserAgent(APIUtils.sUserAgent));
         player.prepare();
@@ -165,19 +168,19 @@ public class ViewImgurVideoFragment extends Fragment {
             playbackSpeed = savedInstanceState.getInt(PLAYBACK_SPEED_STATE);
         }
         setPlaybackSpeed(Integer.parseInt(mSharedPreferences.getString(SharedPreferencesUtils.DEFAULT_PLAYBACK_SPEED, "100")));
-        preparePlayer(savedInstanceState);
+        preparePlayer(savedInstanceState, playerView);
 
-        binding.getTitleTextView().setText(getString(R.string.view_imgur_media_activity_video_label,
+        this.binding.getTitleTextView().setText(getString(R.string.view_imgur_media_activity_video_label,
                 getArguments().getInt(EXTRA_INDEX) + 1, getArguments().getInt(EXTRA_MEDIA_COUNT)));
 
         if (activity.isUseBottomAppBar()) {
-            binding.getBottomAppBar().setVisibility(View.VISIBLE);
+            this.binding.getBottomAppBar().setVisibility(View.VISIBLE);
 
-            binding.getBackButton().setOnClickListener(view -> {
+            this.binding.getBackButton().setOnClickListener(view -> {
                 activity.finish();
             });
 
-            binding.getDownloadButton().setOnClickListener(view -> {
+            this.binding.getDownloadButton().setOnClickListener(view -> {
                 if (isDownloading) {
                     return;
                 }
@@ -185,12 +188,12 @@ public class ViewImgurVideoFragment extends Fragment {
                 requestPermissionAndDownload();
             });
 
-            binding.getPlaybackSpeedButton().setOnClickListener(view -> {
+            this.binding.getPlaybackSpeedButton().setOnClickListener(view -> {
                 changePlaybackSpeed();
             });
         }
 
-        return binding.getRoot();
+        return rootView;
     }
 
     private void changePlaybackSpeed() {
@@ -270,7 +273,7 @@ public class ViewImgurVideoFragment extends Fragment {
         Toast.makeText(activity, R.string.download_started, Toast.LENGTH_SHORT).show();
     }
 
-    private void preparePlayer(Bundle savedInstanceState) {
+    private void preparePlayer(Bundle savedInstanceState, PlayerView playerView) {
         if (mSharedPreferences.getBoolean(SharedPreferencesUtils.LOOP_VIDEO, true)) {
             player.setRepeatMode(Player.REPEAT_MODE_ALL);
         } else {
@@ -301,7 +304,7 @@ public class ViewImgurVideoFragment extends Fragment {
             binding.getMuteButton().setIconResource(R.drawable.ic_unmute_24dp);
         }
 
-        MaterialButton playPauseButton = binding.getRoot().findViewById(R.id.exo_play_pause_button_exo_playback_control_view);
+        MaterialButton playPauseButton = playerView.findViewById(R.id.exo_play_pause_button_exo_playback_control_view);
         Drawable playDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play_arrow_24dp, null);
         Drawable pauseDrawable = ResourcesCompat.getDrawable(getResources(), R.drawable.ic_pause_24dp, null);
         playPauseButton.setOnClickListener(view -> {

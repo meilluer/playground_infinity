@@ -45,6 +45,14 @@
                 android:layout_gravity="center"
                 android:visibility="gone" />
 
+            <ImageView
+                android:id="@+id/video_icon_image_view"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="top|end"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_video_day_night_24dp" />
+
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
     </app.futured.hauler.LockableNestedScrollView>

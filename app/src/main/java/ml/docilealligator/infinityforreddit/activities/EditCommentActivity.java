@@ -264,7 +264,7 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
             }
         });
 
-        RedditMentionHelper commentMentionHelper = new RedditMentionHelper(this, binding.commentEditTextEditCommentActivity);
+        RedditMentionHelper commentMentionHelper = new RedditMentionHelper(this, binding.commentEditTextEditCommentActivity, false);
         commentMentionHelper.setup();
     }
 

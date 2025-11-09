@@ -394,10 +394,10 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
             }
         });
 
-        RedditMentionHelper titleMentionHelper = new RedditMentionHelper(this, binding.postTitleEditTextPostTextActivity);
+        RedditMentionHelper titleMentionHelper = new RedditMentionHelper(this, binding.postTitleEditTextPostTextActivity, true);
         titleMentionHelper.setup();
 
-        RedditMentionHelper contentMentionHelper = new RedditMentionHelper(this, binding.postTextContentEditTextPostTextActivity);
+        RedditMentionHelper contentMentionHelper = new RedditMentionHelper(this, binding.postTextContentEditTextPostTextActivity, true);
         contentMentionHelper.setup();
     }
 

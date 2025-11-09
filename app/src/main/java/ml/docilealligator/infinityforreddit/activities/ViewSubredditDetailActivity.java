@@ -391,6 +391,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
         boolean hideSubredditDescription = mSharedPreferences.getBoolean(SharedPreferencesUtils.HIDE_SUBREDDIT_DESCRIPTION, false);
 
         subredditName = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME_KEY);
+        fromSuggestion = getIntent().getBooleanExtra(EXTRA_FROM_SUGGESTION, false);
 
         fragmentManager = getSupportFragmentManager();
 
@@ -662,6 +663,8 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
         }
     }
 
+    public static final String EXTRA_FROM_SUGGESTION = "EFS";
+    private boolean fromSuggestion = false;
     private void fetchSubredditData() {
         if (!mFetchSubredditInfoSuccess) {
             Handler handler = new Handler();
@@ -672,8 +675,10 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                         public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
                             //mNCurrentOnlineSubscribers = nCurrentOnlineSubscribers;
                             binding.onlineSubscriberCountTextViewViewSubredditDetailActivity.setText(getString(R.string.online_subscribers_number_detail, nCurrentOnlineSubscribers));
-                            InsertSubredditData.insertSubredditData(mExecutor, handler, mRedditDataRoomDatabase,
-                                    subredditData, () -> mFetchSubredditInfoSuccess = true);
+                            if (!fromSuggestion) {
+                                InsertSubredditData.insertSubredditData(mExecutor, handler, mRedditDataRoomDatabase,
+                                        subredditData, () -> mFetchSubredditInfoSuccess = true);
+                            }
                         }
 
                         @Override

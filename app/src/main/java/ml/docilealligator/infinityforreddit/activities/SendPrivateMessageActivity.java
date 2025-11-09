@@ -29,6 +29,9 @@ import ml.docilealligator.infinityforreddit.utils.RedditMentionHelper;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import retrofit2.Retrofit;
 
+import android.os.Handler;
+import android.os.Looper;
+
 public class SendPrivateMessageActivity extends BaseActivity {
     public static final String EXTRA_RECIPIENT_USERNAME = "ERU";
 
@@ -45,6 +48,7 @@ public class SendPrivateMessageActivity extends BaseActivity {
     CustomThemeWrapper mCustomThemeWrapper;
     @Inject
     Executor mExecutor;
+    private final Handler mHandler = new Handler(Looper.getMainLooper());
     private String mAccessToken;
     private boolean isSubmitting = false;
     private ActivitySendPrivateMessageBinding binding;
@@ -103,10 +107,10 @@ public class SendPrivateMessageActivity extends BaseActivity {
             binding.usernameEditTextSendPrivateMessageActivity.setText(username);
         }
 
-        RedditMentionHelper usernameMentionHelper = new RedditMentionHelper(this, binding.usernameEditTextSendPrivateMessageActivity);
+        RedditMentionHelper usernameMentionHelper = new RedditMentionHelper(this, binding.usernameEditTextSendPrivateMessageActivity, false);
         usernameMentionHelper.setup();
 
-        RedditMentionHelper contentMentionHelper = new RedditMentionHelper(this, binding.contentEditTextSendPrivateMessageActivity);
+        RedditMentionHelper contentMentionHelper = new RedditMentionHelper(this, binding.contentEditTextSendPrivateMessageActivity, false);
         contentMentionHelper.setup();
     }
 

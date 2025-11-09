@@ -738,7 +738,7 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
         String text = binding.commentCommentEditText.getText().toString();
         int rSlashIndex = text.lastIndexOf("r/");
         if (rSlashIndex != -1) {
-            String newText = text.substring(0, rSlashIndex + 2) + subredditData.getName() + " ";
+            String newText = text.substring(0, rSlashIndex) + "[r/" + subredditData.getName() + "](https://www.reddit.com/r/" + subredditData.getName() + ")";
             binding.commentCommentEditText.setText(newText);
             binding.commentCommentEditText.setSelection(newText.length());
         }

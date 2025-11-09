@@ -29,9 +29,12 @@ public class RedditMentionHelper {
     private SuggestionAdapter adapter;
     private List<Suggestion> items = new ArrayList<>();
 
-    public RedditMentionHelper(Activity activity, EditText editText) {
+    private final boolean saveOnClick;
+
+    public RedditMentionHelper(Activity activity, EditText editText, boolean saveOnClick) {
         this.activity = activity;
         this.editText = editText;
+        this.saveOnClick = saveOnClick;
     }
 
     public void setup() {
@@ -58,6 +61,11 @@ public class RedditMentionHelper {
                     if (atIndex != -1) {
                         String prefix = text.substring(atIndex, atIndex + 2);
                         String query = text.substring(atIndex + 2, cursorPosition);
+
+                        if (query.contains(" ")) {
+                            hideSuggestions();
+                            return;
+                        }
 
                         if (prefix.equals("r/")) {
                             if (query.length() > 0) {
@@ -110,6 +118,12 @@ public class RedditMentionHelper {
             adapter = new SuggestionAdapter(activity, items);
             listView.setAdapter(adapter);
             listView.setOnItemClickListener((parent, view, position, id) -> {
+                if (saveOnClick) {
+                    Log.d("RedditMentionHelper", "saveOnClick is true, saving subreddit");
+                    // TODO: Add saving logic here
+                } else {
+                    Log.d("RedditMentionHelper", "saveOnClick is false, not saving subreddit");
+                }
                 Suggestion selectedItem = items.get(position);
                 String text = editText.getText().toString();
                 int cursorPosition = editText.getSelectionStart();

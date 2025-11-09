@@ -10,8 +10,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Type;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SavedSubredditsManager {
 
@@ -25,32 +25,34 @@ public class SavedSubredditsManager {
     }
 
     public void saveSubreddit(SubredditData subredditData) {
-        Set<SubredditData> savedSubreddits = getSavedSubreddits();
-        savedSubreddits.add(subredditData);
-        saveSubredditsToFile(savedSubreddits);
+        List<SubredditData> savedSubreddits = getSavedSubreddits();
+        if (!savedSubreddits.contains(subredditData)) {
+            savedSubreddits.add(subredditData);
+            saveSubredditsToFile(savedSubreddits);
+        }
     }
 
-    public Set<SubredditData> getSavedSubreddits() {
+    public List<SubredditData> getSavedSubreddits() {
         if (!file.exists()) {
-            return new HashSet<>();
+            return new ArrayList<>();
         }
         try (FileReader reader = new FileReader(file)) {
-            Type type = new TypeToken<Set<SubredditData>>() {}.getType();
-            Set<SubredditData> savedSubreddits = gson.fromJson(reader, type);
-            return savedSubreddits != null ? savedSubreddits : new HashSet<>();
+            Type type = new TypeToken<List<SubredditData>>() {}.getType();
+            List<SubredditData> savedSubreddits = gson.fromJson(reader, type);
+            return savedSubreddits != null ? savedSubreddits : new ArrayList<>();
         } catch (IOException e) {
             e.printStackTrace();
-            return new HashSet<>();
+            return new ArrayList<>();
         }
     }
 
     public void removeSubreddit(SubredditData subredditData) {
-        Set<SubredditData> savedSubreddits = getSavedSubreddits();
+        List<SubredditData> savedSubreddits = getSavedSubreddits();
         savedSubreddits.remove(subredditData);
         saveSubredditsToFile(savedSubreddits);
     }
 
-    private void saveSubredditsToFile(Set<SubredditData> subreddits) {
+    private void saveSubredditsToFile(List<SubredditData> subreddits) {
         try (FileWriter writer = new FileWriter(file)) {
             gson.toJson(subreddits, writer);
         } catch (IOException e) {
