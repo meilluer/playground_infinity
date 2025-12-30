@@ -3,13 +3,18 @@ import static ml.docilealligator.infinityforreddit.utils.APIUtils.gemini;
 
 import okhttp3.*;
 import com.google.gson.*;
+import java.io.IOException;
 
 public class GeminiSummarizer {
-    private static final String API_KEY = gemini;//change with gemini
+    private static final String API_KEY = gemini;
     private static final String ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=" + API_KEY;
-    public static String summaryResult = "";
 
-    public static void summarizeWithGemini(String inputText) {
+    public interface GeminiCallback {
+        void onSuccess(String result);
+        void onError(String error);
+    }
+
+    public static void summarizeWithGemini(String inputText, GeminiCallback callback) {
         OkHttpClient client = new OkHttpClient();
 
         JsonObject part = new JsonObject();
@@ -34,24 +39,34 @@ public class GeminiSummarizer {
                 .post(body)
                 .build();
 
-        try (Response response = client.newCall(request).execute()) {
-            if (response.isSuccessful()) {
-                String responseBody = response.body().string();
-                JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
-                summaryResult = jsonResponse
-                        .getAsJsonArray("candidates")
-                        .get(0).getAsJsonObject()
-                        .getAsJsonObject("content")
-                        .getAsJsonArray("parts")
-                        .get(0).getAsJsonObject()
-                        .get("text").getAsString();
-            } else {
-                summaryResult = "Error: " + response.message();
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                callback.onError(e.getMessage());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            summaryResult = "Exception: " + e.getMessage();
-        }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (response.isSuccessful()) {
+                    String responseBody = response.body().string();
+                    try {
+                        JsonObject jsonResponse = JsonParser.parseString(responseBody).getAsJsonObject();
+                        String result = jsonResponse
+                                .getAsJsonArray("candidates")
+                                .get(0).getAsJsonObject()
+                                .getAsJsonObject("content")
+                                .getAsJsonArray("parts")
+                                .get(0).getAsJsonObject()
+                                .get("text").getAsString();
+                        callback.onSuccess(result);
+                    } catch (Exception e) {
+                        callback.onError("Parse error: " + e.getMessage());
+                    }
+                } else {
+                    callback.onError("API error: " + response.message());
+                }
+            }
+        });
     }
 }
 

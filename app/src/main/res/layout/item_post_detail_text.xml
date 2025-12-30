@@ -312,6 +312,19 @@
             app:layout_constraintBottom_toBottomOf="@+id/comments_count_button_item_post_detail_text"
             app:layout_constraintStart_toEndOf="@+id/text_to_speech_button_item_post_detail_text" />
 
+        <com.google.android.material.progressindicator.CircularProgressIndicator
+            android:id="@+id/gemini_progress_indicator"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:layout_marginStart="4dp"
+            android:indeterminate="true"
+            android:visibility="gone"
+            app:indicatorSize="20dp"
+            app:trackThickness="2dp"
+            app:layout_constraintTop_toTopOf="@+id/gemini_logo_item_post_detail_text"
+            app:layout_constraintBottom_toBottomOf="@+id/gemini_logo_item_post_detail_text"
+            app:layout_constraintStart_toEndOf="@+id/gemini_logo_item_post_detail_text" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/save_button_item_post_detail_text"
             android:layout_width="wrap_content"
@@ -325,7 +338,7 @@
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/gemini_logo_item_post_detail_text"
+            app:layout_constraintStart_toEndOf="@id/gemini_progress_indicator"
             app:layout_constraintEnd_toStartOf="@id/share_button_item_post_detail_text"
             style="?attr/materialIconButtonOutlinedStyle" />
 

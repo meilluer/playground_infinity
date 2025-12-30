@@ -534,14 +534,26 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         if (holder instanceof PostDetailBaseViewHolder) {
             if (holder instanceof PostDetailTextViewHolder) {
                 ((PostDetailTextViewHolder) holder).binding.geminiLogoItemPostDetailText.setOnClickListener(view -> {
+                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.VISIBLE);
                     ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
                     ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");
-                    new Thread(() -> {
-                        GeminiSummarizer.summarizeWithGemini(mPost.getSelfText());
-                        mActivity.runOnUiThread(() -> {
-                            ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(GeminiSummarizer.summaryResult);
-                        });
-                    }).start();
+                    GeminiSummarizer.summarizeWithGemini(mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            mActivity.runOnUiThread(() -> {
+                                ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                                ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(result);
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            mActivity.runOnUiThread(() -> {
+                                ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                                ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: " + error);
+                            });
+                        }
+                    });
                 });
             }
             ((PostDetailBaseViewHolder) holder).titleTextView.setText(mPost.getTitle());
@@ -727,6 +739,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty() && mPost.getSelfText().length() <= 700) {
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
+                        Toast.makeText(mActivity, "request send", Toast.LENGTH_SHORT).show();
                         TtsManager ttsManager = new TtsManager(mActivity);
                         ttsManager.speak(mPost.getSelfText(), null);
                     });
