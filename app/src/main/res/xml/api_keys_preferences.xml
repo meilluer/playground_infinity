@@ -36,12 +36,12 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
+        <ml.docilealligator.infinityforreddit.customviews.preference.ElevenLabsApiKeyPreference
             android:key="elevenlabs_api_key"
             android:title="ElevenLabs API Key"
             android:summary="Enter your ElevenLabs API Key"
             android:persistent="true"
             android:singleLine="true"
-            app:useSimpleSummaryProvider="true" />
+            app:widgetLayout="@layout/preference_info_button" />
 
     </PreferenceCategory></PreferenceScreen>

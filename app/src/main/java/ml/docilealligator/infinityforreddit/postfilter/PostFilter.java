@@ -83,13 +83,14 @@ public class PostFilter implements Parcelable {
 
     protected PostFilter(Parcel in) {
         name = in.readString();
+        containSubreddits = in.readString();
+        containUsers = in.readString();
         maxVote = in.readInt();
         minVote = in.readInt();
         maxComments = in.readInt();
         minComments = in.readInt();
         maxAwards = in.readInt();
         minAwards = in.readInt();
-        containSubreddits = in.readString();
         allowNSFW = in.readByte() != 0;
         onlyNSFW = in.readByte() != 0;
         onlySpoiler = in.readByte() != 0;
@@ -99,7 +100,6 @@ public class PostFilter implements Parcelable {
         postTitleContainsStrings = in.readString();
         excludeSubreddits = in.readString();
         excludeUsers = in.readString();
-        containUsers = in.readString();
         containFlairs = in.readString();
         excludeFlairs = in.readString();
         excludeDomains = in.readString();
@@ -261,9 +261,12 @@ public class PostFilter implements Parcelable {
         }
         if (postFilter.excludeFlairs != null && !postFilter.excludeFlairs.equals("")) {
             String[] flairs = postFilter.excludeFlairs.split(",", 0);
-            for (String f : flairs) {
-                if (!f.trim().equals("") && post.getFlair().equalsIgnoreCase(f.trim())) {
-                    return false;
+            String postFlair = post.getFlair();
+            if (postFlair != null) {
+                for (String f : flairs) {
+                    if (!f.trim().equals("") && postFlair.equalsIgnoreCase(f.trim())) {
+                        return false;
+                    }
                 }
             }
         }
@@ -294,14 +297,17 @@ public class PostFilter implements Parcelable {
             String[] flairs = postFilter.containFlairs.split(",", 0);
             if (flairs.length > 0) {
                 boolean match = false;
-                for (int i = 0; i < flairs.length; i++) {
-                    String flair = flairs[i].trim();
-                    if (flair.equals("") && i == flairs.length - 1) {
-                       return false;
-                    }
-                    if (!flair.equals("") && post.getFlair().equalsIgnoreCase(flair)) {
-                        match = true;
-                        break;
+                String postFlair = post.getFlair();
+                if (postFlair != null) {
+                    for (int i = 0; i < flairs.length; i++) {
+                        String flair = flairs[i].trim();
+                        if (flair.equals("") && i == flairs.length - 1) {
+                            return false;
+                        }
+                        if (!flair.equals("") && postFlair.equalsIgnoreCase(flair)) {
+                            match = true;
+                            break;
+                        }
                     }
                 }
 
@@ -320,80 +326,142 @@ public class PostFilter implements Parcelable {
         StringBuilder stringBuilder;
         postFilter.name = "Merged";
         for (PostFilter p : postFilterList) {
-            postFilter.maxVote = Math.min(p.maxVote, postFilter.maxVote);
-            postFilter.minVote = Math.max(p.minVote, postFilter.minVote);
-            postFilter.maxComments = Math.min(p.maxComments, postFilter.maxComments);
-            postFilter.minComments = Math.max(p.minComments, postFilter.minComments);
-            postFilter.maxAwards = Math.min(p.maxAwards, postFilter.maxAwards);
-            postFilter.minAwards = Math.max(p.minAwards, postFilter.minAwards);
+            if (p.maxVote > 0) {
+                if (postFilter.maxVote < 0) {
+                    postFilter.maxVote = p.maxVote;
+                } else {
+                    postFilter.maxVote = Math.min(p.maxVote, postFilter.maxVote);
+                }
+            }
+            if (p.minVote > 0) {
+                postFilter.minVote = Math.max(p.minVote, postFilter.minVote);
+            }
+            if (p.maxComments > 0) {
+                if (postFilter.maxComments < 0) {
+                    postFilter.maxComments = p.maxComments;
+                } else {
+                    postFilter.maxComments = Math.min(p.maxComments, postFilter.maxComments);
+                }
+            }
+            if (p.minComments > 0) {
+                postFilter.minComments = Math.max(p.minComments, postFilter.minComments);
+            }
+            if (p.maxAwards > 0) {
+                if (postFilter.maxAwards < 0) {
+                    postFilter.maxAwards = p.maxAwards;
+                } else {
+                    postFilter.maxAwards = Math.min(p.maxAwards, postFilter.maxAwards);
+                }
+            }
+            if (p.minAwards > 0) {
+                postFilter.minAwards = Math.max(p.minAwards, postFilter.minAwards);
+            }
 
-            postFilter.onlyNSFW = p.onlyNSFW ? p.onlyNSFW : postFilter.onlyNSFW;
-            postFilter.onlySpoiler = p.onlySpoiler ? p.onlySpoiler : postFilter.onlySpoiler;
+            postFilter.onlyNSFW = p.onlyNSFW || postFilter.onlyNSFW;
+            postFilter.onlySpoiler = p.onlySpoiler || postFilter.onlySpoiler;
 
             if (p.postTitleExcludesRegex != null && !p.postTitleExcludesRegex.equals("")) {
-                postFilter.postTitleExcludesRegex = p.postTitleExcludesRegex;
+                if (postFilter.postTitleExcludesRegex == null || postFilter.postTitleExcludesRegex.equals("")) {
+                    postFilter.postTitleExcludesRegex = p.postTitleExcludesRegex;
+                } else {
+                    postFilter.postTitleExcludesRegex = postFilter.postTitleExcludesRegex + "|" + p.postTitleExcludesRegex;
+                }
             }
 
             if (p.postTitleContainsRegex != null && !p.postTitleContainsRegex.equals("")) {
-                postFilter.postTitleContainsRegex = p.postTitleContainsRegex;
+                if (postFilter.postTitleContainsRegex == null || postFilter.postTitleContainsRegex.equals("")) {
+                    postFilter.postTitleContainsRegex = p.postTitleContainsRegex;
+                } else {
+                    postFilter.postTitleContainsRegex = postFilter.postTitleContainsRegex + "|" + p.postTitleContainsRegex;
+                }
             }
             if (p.containSubreddits != null && !p.containSubreddits.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.containSubreddits == null ? "" : postFilter.containSubreddits);
-                stringBuilder.append(",").append(p.containSubreddits);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.containSubreddits);
                 postFilter.containSubreddits = stringBuilder.toString();
             }
             if (p.containUsers != null && !p.containUsers.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.containUsers == null ? "" : postFilter.containUsers);
-                stringBuilder.append(",").append(p.containUsers);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.containUsers);
                 postFilter.containUsers = stringBuilder.toString();
             }
 
 
             if (p.postTitleExcludesStrings != null && !p.postTitleExcludesStrings.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.postTitleExcludesStrings == null ? "" : postFilter.postTitleExcludesStrings);
-                stringBuilder.append(",").append(p.postTitleExcludesStrings);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.postTitleExcludesStrings);
                 postFilter.postTitleExcludesStrings = stringBuilder.toString();
             }
 
             if (p.postTitleContainsStrings != null && !p.postTitleContainsStrings.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.postTitleContainsStrings == null ? "" : postFilter.postTitleContainsStrings);
-                stringBuilder.append(",").append(p.postTitleContainsStrings);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.postTitleContainsStrings);
                 postFilter.postTitleContainsStrings = stringBuilder.toString();
             }
 
             if (p.excludeSubreddits != null && !p.excludeSubreddits.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.excludeSubreddits == null ? "" : postFilter.excludeSubreddits);
-                stringBuilder.append(",").append(p.excludeSubreddits);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.excludeSubreddits);
                 postFilter.excludeSubreddits = stringBuilder.toString();
             }
 
             if (p.excludeUsers != null && !p.excludeUsers.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.excludeUsers == null ? "" : postFilter.excludeUsers);
-                stringBuilder.append(",").append(p.excludeUsers);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.excludeUsers);
                 postFilter.excludeUsers = stringBuilder.toString();
             }
 
             if (p.containFlairs != null && !p.containFlairs.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.containFlairs == null ? "" : postFilter.containFlairs);
-                stringBuilder.append(",").append(p.containFlairs);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.containFlairs);
                 postFilter.containFlairs = stringBuilder.toString();
             }
 
             if (p.excludeFlairs != null && !p.excludeFlairs.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.excludeFlairs == null ? "" : postFilter.excludeFlairs);
-                stringBuilder.append(",").append(p.excludeFlairs);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.excludeFlairs);
                 postFilter.excludeFlairs = stringBuilder.toString();
             }
 
             if (p.excludeDomains != null && !p.excludeDomains.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.excludeDomains == null ? "" : postFilter.excludeDomains);
-                stringBuilder.append(",").append(p.excludeDomains);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.excludeDomains);
                 postFilter.excludeDomains = stringBuilder.toString();
             }
 
             if (p.containDomains != null && !p.containDomains.equals("")) {
                 stringBuilder = new StringBuilder(postFilter.containDomains == null ? "" : postFilter.containDomains);
-                stringBuilder.append(",").append(p.containDomains);
+                if (stringBuilder.length() > 0) {
+                    stringBuilder.append(",");
+                }
+                stringBuilder.append(p.containDomains);
                 postFilter.containDomains = stringBuilder.toString();
             }
 

@@ -597,13 +597,17 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     }
                 }
 
-                if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
-                    ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
-                        TtsManager ttsManager = new TtsManager(mActivity);
-                        ttsManager.speak(comment.getCommentRawText(), ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0).itemView.findViewById(android.R.id.text1));
-                    });
-                }
-            }
+                            if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
+                                if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty() && comment.getCommentRawText().length() <= 700) {
+                                    ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
+                                    ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
+                                        TtsManager ttsManager = new TtsManager(mActivity);
+                                        ttsManager.speak(comment.getCommentRawText(), ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0).itemView.findViewById(android.R.id.text1));
+                                    });
+                                } else {
+                                    ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);
+                                }
+                            }            }
         } else if (holder instanceof CommentFullyCollapsedViewHolder) {
             Comment comment = getCurrentComment(position);
             if (comment != null) {

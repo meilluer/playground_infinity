@@ -63,11 +63,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|start"
-                android:layout_margin="8dp"
+                android:layout_margin="6dp"
                 android:background="@drawable/bg_video_text"
                 android:text="@string/video"
                 android:textColor="@android:color/white"
-                android:textSize="18sp" />
+                android:textSize="13.5sp" />
 
         </androidx.media3.ui.AspectRatioFrameLayout>
 

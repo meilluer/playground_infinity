@@ -724,10 +724,15 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             }
 
             if (((PostDetailBaseViewHolder) holder).textToSpeechButton != null) {
-                ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
-                    TtsManager ttsManager = new TtsManager(mActivity);
-                    ttsManager.speak(mPost.getSelfText(), null);
-                });
+                if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty() && mPost.getSelfText().length() <= 700) {
+                    ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
+                    ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
+                        TtsManager ttsManager = new TtsManager(mActivity);
+                        ttsManager.speak(mPost.getSelfText(), null);
+                    });
+                } else {
+                    ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);
+                }
             }
 
             if (holder instanceof PostDetailBaseVideoAutoplayViewHolder) {
