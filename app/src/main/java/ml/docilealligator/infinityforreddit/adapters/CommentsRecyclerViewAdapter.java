@@ -597,29 +597,57 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     }
                 }
 
-                                        if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
+                                                    if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
 
-                                            if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty() && comment.getCommentRawText().length() <= 700) {
+                                                        if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty() && comment.getCommentRawText().length() <= 700) {
 
-                                                ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
+                                                            ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
 
-                                                ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
+                                                            ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
 
-                                                    Toast.makeText(mActivity, "request send", Toast.LENGTH_SHORT).show();
+                                                                Toast.makeText(mActivity, "request send", Toast.LENGTH_SHORT).show();
 
-                                                    TtsManager ttsManager = new TtsManager(mActivity);
+                                                                TtsManager ttsManager = new TtsManager(mActivity);
 
-                                                    ttsManager.speak(comment.getCommentRawText(), ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0).itemView.findViewById(android.R.id.text1));
+                                                                                        TextView tv = null;
 
-                                                });
+                                                                                        if (((CommentBaseViewHolder) holder).commentMarkdownView.getChildCount() > 0) {
 
-                                            } else {
+                                                                                            RecyclerView.ViewHolder vh = ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0);
 
-                                                ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);
+                                                                                            if (vh != null) {
 
-                                            }
+                                                                                                if (vh.itemView instanceof TextView) {
 
-                                        }            }
+                                                                                                    tv = (TextView) vh.itemView;
+
+                                                                                                } else {
+
+                                                                                                    tv = vh.itemView.findViewById(android.R.id.text1);
+
+                                                                                                    if (tv == null) {
+
+                                                                                                        tv = vh.itemView.findViewById(R.id.text);
+
+                                                                                                    }
+
+                                                                                                }
+
+                                                                                            }
+
+                                                                                        }
+
+                                                                                        ttsManager.speak(comment.getCommentRawText(), tv);
+
+                                                            });
+
+                                                        } else {
+
+                                                            ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);
+
+                                                        }
+
+                                                    }            }
         } else if (holder instanceof CommentFullyCollapsedViewHolder) {
             Comment comment = getCurrentComment(position);
             if (comment != null) {

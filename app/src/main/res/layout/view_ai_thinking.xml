@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center">
+
+    <!-- Pulsating Line -->
+    <View
+        android:id="@+id/aiThinkingLine"
+        android:layout_width="120dp"
+        android:layout_height="3dp"
+        android:background="@drawable/ai_thinking_line"/>
+
+    <!-- Optional text (recommended) -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Thinking…"
+        android:textSize="14sp"
+        android:textColor="?attr/colorOnSurfaceVariant"/>
+</LinearLayout>

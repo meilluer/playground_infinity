@@ -741,7 +741,21 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
                         Toast.makeText(mActivity, "request send", Toast.LENGTH_SHORT).show();
                         TtsManager ttsManager = new TtsManager(mActivity);
-                        ttsManager.speak(mPost.getSelfText(), null);
+                        TextView tv = null;
+                        if (((PostDetailBaseViewHolder) holder).contentMarkdownView.getChildCount() > 0) {
+                            RecyclerView.ViewHolder vh = ((PostDetailBaseViewHolder) holder).contentMarkdownView.findViewHolderForAdapterPosition(0);
+                            if (vh != null) {
+                                if (vh.itemView instanceof TextView) {
+                                    tv = (TextView) vh.itemView;
+                                } else {
+                                    tv = vh.itemView.findViewById(android.R.id.text1);
+                                    if (tv == null) {
+                                        tv = vh.itemView.findViewById(R.id.text);
+                                    }
+                                }
+                            }
+                        }
+                        ttsManager.speak(mPost.getSelfTextPlain(), tv);
                     });
                 } else {
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);

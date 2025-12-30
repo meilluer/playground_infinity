@@ -15,6 +15,7 @@ public class GeminiSummarizer {
     }
 
     public static void summarizeWithGemini(String inputText, GeminiCallback callback) {
+
         OkHttpClient client = new OkHttpClient();
 
         JsonObject part = new JsonObject();
