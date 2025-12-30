@@ -36,6 +36,12 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
-    </PreferenceCategory>
+        <EditTextPreference
+            android:key="elevenlabs_api_key"
+            android:title="ElevenLabs API Key"
+            android:summary="Enter your ElevenLabs API Key"
+            android:persistent="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true" />
 
-</PreferenceScreen>
+    </PreferenceCategory></PreferenceScreen>

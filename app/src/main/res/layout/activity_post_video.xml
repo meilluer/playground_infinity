@@ -291,9 +291,8 @@
                         android:layout_margin="8dp"
                         android:background="@drawable/bg_video_text"
                         android:text="@string/video"
-                        android:textColor="@android:color/white"
-                        android:textSize="12sp" />
-
+                                        android:textColor="@android:color/white"
+                                        android:textSize="18sp" />
                 </FrameLayout>
 
             </LinearLayout>

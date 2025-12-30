@@ -40,19 +40,33 @@ abstract class NetworkModule {
     static OkHttpClient provideBaseOkhttp(@Named("proxy") SharedPreferences mProxySharedPreferences) {
         boolean proxyEnabled = mProxySharedPreferences.getBoolean(SharedPreferencesUtils.PROXY_ENABLED, false);
 
-        var builder =  new OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS);
+        var builder = new OkHttpClient.Builder()
+                .connectTimeout(30, TimeUnit.SECONDS)
+                .readTimeout(30, TimeUnit.SECONDS)
+                .writeTimeout(30, TimeUnit.SECONDS)
+                .addInterceptor(chain -> {
+                    if (chain.request().header("User-Agent") == null) {
+                        return chain.proceed(
+                                chain.request()
+                                        .newBuilder()
+                                        .header("User-Agent", APIUtils.USER_AGENT)
+                                        .build()
+                        );
+                    } else {
+                        return chain.proceed(chain.request());
+                    }
+                });
 
         if (proxyEnabled) {
             Proxy.Type proxyType = Proxy.Type.valueOf(mProxySharedPreferences.getString(SharedPreferencesUtils.PROXY_TYPE, "HTTP"));
-            String proxyHost = mProxySharedPreferences.getString(SharedPreferencesUtils.PROXY_HOSTNAME, "127.0.0.1");
-            int proxyPort = Integer.parseInt(mProxySharedPreferences.getString(SharedPreferencesUtils.PROXY_PORT, "1080"));
+            if (proxyType != Proxy.Type.DIRECT) {
+                String proxyHost = mProxySharedPreferences.getString(SharedPreferencesUtils.PROXY_HOSTNAME, "127.0.0.1");
+                int proxyPort = Integer.parseInt(mProxySharedPreferences.getString(SharedPreferencesUtils.PROXY_PORT, "1080"));
 
-            InetSocketAddress proxyAddr = new InetSocketAddress(proxyHost, proxyPort);
-            Proxy proxy = new Proxy(proxyType, proxyAddr);
-            builder.proxy(proxy);
+                InetSocketAddress proxyAddr = new InetSocketAddress(proxyHost, proxyPort);
+                Proxy proxy = new Proxy(proxyType, proxyAddr);
+                builder.proxy(proxy);
+            }
         }
 
         return builder.build();
@@ -214,7 +228,7 @@ abstract class NetworkModule {
                 .addInterceptor(chain -> chain.proceed(
                         chain.request()
                                 .newBuilder()
-                                .header("User-Agent", APIUtils.sUserAgent)
+                                .header("User-Agent", APIUtils.USER_AGENT)
                                 .build()
                 ))
                 .addInterceptor(accessTokenAuthenticator)
@@ -225,6 +239,15 @@ abstract class NetworkModule {
                 .client(okHttpClientBuilder.build())
                 .build();
     }
+
+    /*@Provides
+    @Named("redgifs")
+    @Singleton
+    static Retrofit provideRedgifsRetrofit(@Named("base") Retrofit retrofit) {
+        return retrofit.newBuilder()
+                .baseUrl(APIUtils.OH_MY_DL_BASE_URI)
+                .build();
+    }*/
 
     @Provides
     @Named("imgur")

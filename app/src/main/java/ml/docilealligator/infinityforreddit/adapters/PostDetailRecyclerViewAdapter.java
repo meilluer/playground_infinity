@@ -122,6 +122,7 @@ import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.HeadphoneManager;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
+import ml.docilealligator.infinityforreddit.utils.TtsManager;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import ml.docilealligator.infinityforreddit.videoautoplay.CacheManager;
 import ml.docilealligator.infinityforreddit.videoautoplay.ExoCreator;
@@ -547,10 +548,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             if (mPost.getSubredditNamePrefixed().startsWith("u/")) {
                 if (mPost.getAuthorIconUrl() == null) {
                     String authorName = mPost.isAuthorDeleted() ? mPost.getSubredditNamePrefixed().substring(2) : mPost.getAuthor();
-                    LoadUserData.loadUserData(mExecutor, new Handler(), mRedditDataRoomDatabase,
-                            authorName, mRetrofit, iconImageUrl -> {
+                    LoadUserData.loadUserData(mExecutor, new Handler(), mRedditDataRoomDatabase, mAccessToken,
+                            authorName, mOauthRetrofit, mRetrofit, iconImageUrl -> {
                         if (mActivity != null && getItemCount() > 0) {
-                            if (iconImageUrl == null || iconImageUrl.equals("")) {
+                            if (iconImageUrl == null || iconImageUrl.isEmpty()) {
                                 mGlide.load(R.drawable.subreddit_default_icon)
                                         .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(72, 0)))
                                         .into(((PostDetailBaseViewHolder) holder).iconGifImageView);
@@ -720,6 +721,13 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 mMarkwonAdapter.setMarkdown(mPostDetailMarkwon, mPost.getSelfText());
                 // noinspection NotifyDataSetChanged
                 mMarkwonAdapter.notifyDataSetChanged();
+            }
+
+            if (((PostDetailBaseViewHolder) holder).textToSpeechButton != null) {
+                ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
+                    TtsManager ttsManager = new TtsManager(mActivity);
+                    ttsManager.speak(mPost.getSelfText(), null);
+                });
             }
 
             if (holder instanceof PostDetailBaseVideoAutoplayViewHolder) {
@@ -1230,6 +1238,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         TextView scoreTextView;
         MaterialButton downvoteButton;
         MaterialButton commentsCountButton;
+        MaterialButton textToSpeechButton;
         MaterialButton saveButton;
         MaterialButton shareButton;
 
@@ -1257,6 +1266,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                          TextView scoreTextView,
                          MaterialButton downvoteButton,
                          MaterialButton commentsCountButton,
+                         MaterialButton textToSpeechButton,
                          MaterialButton saveButton,
                          MaterialButton shareButton) {
             this.iconGifImageView = iconGifImageView;
@@ -1279,6 +1289,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             this.scoreTextView = scoreTextView;
             this.downvoteButton = downvoteButton;
             this.commentsCountButton = commentsCountButton;
+            this.textToSpeechButton = textToSpeechButton;
             this.saveButton = saveButton;
             this.shareButton = shareButton;
 
@@ -1782,6 +1793,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                                                      TextView scoreTextView,
                                                      MaterialButton downvoteButton,
                                                      MaterialButton commentsCountButton,
+                                                     MaterialButton textToSpeechButton,
                                                      MaterialButton saveButton,
                                                      MaterialButton shareButton) {
             super(itemView);
@@ -1805,6 +1817,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     scoreTextView,
                     downvoteButton,
                     commentsCountButton,
+                    textToSpeechButton,
                     saveButton,
                     shareButton);
 
@@ -1838,8 +1851,6 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             fullscreenButton.setOnClickListener(view -> {
                 if (helper != null) {
                     openMedia(mPost, helper.getLatestPlaybackInfo().getResumePosition());
-                } else {
-                    openMedia(mPost);
                 }
             });
 
@@ -2062,6 +2073,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailVideoAutoplay,
                     binding.downvoteButtonItemPostDetailVideoAutoplay,
                     binding.commentsCountButtonItemPostDetailVideoAutoplay,
+                    null,
                     binding.saveButtonItemPostDetailVideoAutoplay,
                     binding.shareButtonItemPostDetailVideoAutoplay);
         }
@@ -2099,6 +2111,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailVideoAutoplay,
                     binding.downvoteButtonItemPostDetailVideoAutoplay,
                     binding.commentsCountButtonItemPostDetailVideoAutoplay,
+                    null,
                     binding.saveButtonItemPostDetailVideoAutoplay,
                     binding.shareButtonItemPostDetailVideoAutoplay);
         }
@@ -2130,6 +2143,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailVideoAndGifPreview,
                     binding.downvoteButtonItemPostDetailVideoAndGifPreview,
                     binding.commentsCountButtonItemPostDetailVideoAndGifPreview,
+                    null,
                     binding.saveButtonItemPostDetailVideoAndGifPreview,
                     binding.shareButtonItemPostDetailVideoAndGifPreview);
 
@@ -2175,6 +2189,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailImageAndGifAutoplay,
                     binding.downvoteButtonItemPostDetailImageAndGifAutoplay,
                     binding.commentsCountButtonItemPostDetailImageAndGifAutoplay,
+                    null,
                     binding.saveButtonItemPostDetailImageAndGifAutoplay,
                     binding.shareButtonItemPostDetailImageAndGifAutoplay);
 
@@ -2218,6 +2233,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailLink,
                     binding.downvoteButtonItemPostDetailLink,
                     binding.commentsCountButtonItemPostDetailLink,
+                    null,
                     binding.saveButtonItemPostDetailLink,
                     binding.shareButtonItemPostDetailLink);
 
@@ -2269,6 +2285,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailNoPreview,
                     binding.downvoteButtonItemPostDetailNoPreview,
                     binding.commentsCountButtonItemPostDetailNoPreview,
+                    null,
                     binding.saveButtonItemPostDetailNoPreview,
                     binding.shareButtonItemPostDetailNoPreview);
 
@@ -2317,6 +2334,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailGallery,
                     binding.downvoteButtonItemPostDetailGallery,
                     binding.commentsCountButtonItemPostDetailGallery,
+                    null,
                     binding.saveButtonItemPostDetailGallery,
                     binding.shareButtonItemPostDetailGallery);
 
@@ -2468,6 +2486,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailText,
                     binding.downvoteButtonItemPostDetailText,
                     binding.commentsCountButtonItemPostDetailText,
+                    binding.textToSpeechButtonItemPostDetailText,
                     binding.saveButtonItemPostDetailText,
                     binding.shareButtonItemPostDetailText);
         }

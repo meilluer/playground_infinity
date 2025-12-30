@@ -112,18 +112,17 @@
         app:flRowSpacing="8dp"
         app:flRowVerticalGravity="center">
 
-        <com.libRG.CustomTextView
-            android:id="@+id/type_text_view_item_post_detail_video_autoplay"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="@string/video"
-            android:textSize="?attr/font_12"
-            android:fontFamily="?attr/font_family"
-            app:lib_setRadius="6dp"
-            app:lib_setRoundedView="true"
-            app:lib_setShape="rectangle" />
-
+                    <com.libRG.CustomTextView
+                        android:id="@+id/type_text_view_item_post_detail_video_autoplay"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:padding="4dp"
+                        android:text="@string/video"
+                        android:textSize="18sp"
+                        android:fontFamily="?attr/font_family"
+                        app:lib_setRadius="6dp"
+                        app:lib_setRoundedView="true"
+                        app:lib_setShape="rectangle" />
         <com.libRG.CustomTextView
             android:id="@+id/spoiler_custom_text_view_item_post_detail_video_autoplay"
             android:layout_width="wrap_content"

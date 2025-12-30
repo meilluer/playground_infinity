@@ -234,7 +234,7 @@
                 android:background="@drawable/bg_video_text"
                 android:text="@string/video"
                 android:textColor="@android:color/white"
-                android:textSize="12sp" />
+                android:textSize="18sp" />
 
         </androidx.media3.ui.AspectRatioFrameLayout>
 

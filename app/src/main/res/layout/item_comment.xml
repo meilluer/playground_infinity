@@ -186,22 +186,35 @@
                 app:icon="@drawable/ic_downvote_24dp"
                 app:iconSize="24dp"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/placeholder_item_post_comment"
+                app:layout_constraintEnd_toStartOf="@+id/text_to_speech_button_item_post_comment"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/score_text_view_item_post_comment"
                 app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/text_to_speech_button_item_post_comment"
+                style="?attr/materialIconButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:icon="@drawable/ic_mic_14dp"
+                app:iconSize="24dp"
+                app:iconTint="#FFFFFF"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/placeholder_item_post_comment"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/downvote_button_item_post_comment"
+                app:layout_constraintTop_toTopOf="parent"
+                app:strokeWidth="0dp" />
 
             <View
                 android:id="@+id/placeholder_item_post_comment"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                app:layout_constraintWidth_min="1dp"
-                app:layout_constrainedWidth="true"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/more_button_item_post_comment"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/downvote_button_item_post_comment"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintStart_toEndOf="@id/text_to_speech_button_item_post_comment"
+                app:layout_constraintEnd_toStartOf="@id/more_button_item_post_comment"
+                />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/more_button_item_post_comment"

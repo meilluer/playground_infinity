@@ -115,7 +115,7 @@
                 android:layout_height="wrap_content"
                 android:padding="4dp"
                 android:text="@string/video"
-                android:textSize="?attr/font_12"
+                android:textSize="18sp"
                 android:fontFamily="?attr/font_family"
                 app:lib_setRadius="6dp"
                 app:lib_setRoundedView="true"

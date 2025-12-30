@@ -1,13 +1,12 @@
 package ml.docilealligator.infinityforreddit.utils;
 
 import android.util.Base64;
-
+import android.os.SystemClock;
+import androidx.annotation.NonNull;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.Context;
-import android.content.SharedPreferences;
-import androidx.preference.PreferenceManager;
 import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
@@ -25,9 +24,12 @@ public class APIUtils {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         sRedditClientId = preferences.getString("reddit_api_key", "NOe2iKrPPzwscA");
         sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:" + " (by /u/Hostilenemy)");
+        USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
         gemini=preferences.getString("gemini_key","123");
+        Elevenlabs=preferences.getString("elevenlabs_api_key","");
     }
+    public static String Elevenlabs="";
     public static String gemini="";
     public static final String OAUTH_URL = "https://www.reddit.com/api/v1/authorize.compact";
     public static final String OAUTH_API_BASE_URI = "https://oauth.reddit.com";
@@ -61,7 +63,7 @@ public class APIUtils {
     public static final String AUTHORIZATION_KEY = "Authorization";
     public static final String AUTHORIZATION_BASE = "bearer ";
     public static final String USER_AGENT_KEY = "User-Agent";
-    public static String sUserAgent;
+    public static String sUserAgent = "android:ml.docilealligator.infinityforreddit:" + " (by /u/Hostilenemy)";
     public static final String USERNAME_KEY = "username";
 
     public static final String GRANT_TYPE_KEY = "grant_type";
@@ -176,4 +178,29 @@ public class APIUtils {
         params.put(APIUtils.USER_AGENT_KEY, sUserAgent);
         return params;
     }
+
+    // RedGifs token management
+    public static final AtomicReference<RedgifsAuthToken> REDGIFS_TOKEN = new AtomicReference<>(new RedgifsAuthToken("", 0));
+
+    public static class RedgifsAuthToken {
+        @NonNull
+        public final String token;
+        private final long expireAt;
+
+        private RedgifsAuthToken(@NonNull String token, final long expireAt) {
+            this.token = token;
+            this.expireAt = expireAt;
+        }
+
+        public static RedgifsAuthToken expireIn1day(@NonNull String token) {
+            // 23 not 24 to give an hour leeway
+            long expireTime = 1000 * 60 * 60 * 23;
+            return new RedgifsAuthToken(token, SystemClock.uptimeMillis() + expireTime);
+        }
+
+        public boolean isValid() {
+            return !token.isEmpty() && expireAt > SystemClock.uptimeMillis();
+        }
+    }
+
 }

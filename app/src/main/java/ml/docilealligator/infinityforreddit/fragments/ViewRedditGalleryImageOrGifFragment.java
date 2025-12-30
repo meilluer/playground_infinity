@@ -57,7 +57,6 @@ import ml.docilealligator.infinityforreddit.BuildConfig;
 import ml.docilealligator.infinityforreddit.Infinity;
 import ml.docilealligator.infinityforreddit.R;
 import ml.docilealligator.infinityforreddit.SaveMemoryCenterInisdeDownsampleStrategy;
-import ml.docilealligator.infinityforreddit.SetAsWallpaperCallback;
 import ml.docilealligator.infinityforreddit.activities.ViewRedditGalleryActivity;
 import ml.docilealligator.infinityforreddit.asynctasks.SaveBitmapImageToFile;
 import ml.docilealligator.infinityforreddit.asynctasks.SaveGIFToFile;
@@ -194,7 +193,7 @@ public class ViewRedditGalleryImageOrGifFragment extends Fragment {
             }
         });
 
-        //loadImage();
+        loadImage();
 
         String caption = media.caption;
         String captionUrl = media.captionUrl;
@@ -387,7 +386,7 @@ public class ViewRedditGalleryImageOrGifFragment extends Fragment {
 
         PersistableBundle extras = new PersistableBundle();
         extras.putString(DownloadMediaService.EXTRA_URL, media.hasFallback() ? media.fallbackUrl : media.url); // Retrieve original instead of the one additionally compressed by reddit
-        extras.putInt(DownloadMediaService.EXTRA_MEDIA_TYPE, media.mediaType == Post.Gallery.TYPE_GIF ? DownloadMediaService.EXTRA_MEDIA_TYPE_GIF: DownloadMediaService.EXTRA_MEDIA_TYPE_IMAGE);
+        extras.putInt(DownloadMediaService.EXTRA_MEDIA_TYPE, media.mediaType == Post.Gallery.TYPE_GIF ? DownloadMediaService.EXTRA_MEDIA_TYPE_GIF : DownloadMediaService.EXTRA_MEDIA_TYPE_IMAGE);
         extras.putString(DownloadMediaService.EXTRA_FILE_NAME, media.fileName);
         extras.putString(DownloadMediaService.EXTRA_SUBREDDIT_NAME, subredditName);
         extras.putInt(DownloadMediaService.EXTRA_IS_NSFW, isNsfw ? 1 : 0);
@@ -490,7 +489,8 @@ public class ViewRedditGalleryImageOrGifFragment extends Fragment {
                 setAsWallpaperBottomSheetFragment.setArguments(bundle);
                 setAsWallpaperBottomSheetFragment.show(activity.getSupportFragmentManager(), setAsWallpaperBottomSheetFragment.getTag());
             } else {
-                ((SetAsWallpaperCallback) activity).setToBoth(activity.getCurrentPagePosition());
+               activity.setToBoth(activity.getCurrentPagePosition());
+                activity.setToBoth(activity.getCurrentPagePosition());
             }
         }
     }
@@ -535,23 +535,15 @@ public class ViewRedditGalleryImageOrGifFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
+    public void onDestroyView() {
+        super.onDestroyView();
         binding.imageViewViewRedditGalleryImageOrGifFragment.cancel();
+        isFallback = false;
         SubsamplingScaleImageView subsamplingScaleImageView = binding.imageViewViewRedditGalleryImageOrGifFragment.getSSIV();
         if (subsamplingScaleImageView != null) {
             subsamplingScaleImageView.recycle();
         }
     }
-
-//    @Override
-//    public void onDestroyView() {
-//        super.onDestroyView();
-//        binding.imageViewViewRedditGalleryImageOrGifFragment.cancel();
-//        isFallback = false;
-//        SubsamplingScaleImageView subsamplingScaleImageView = binding.imageViewViewRedditGalleryImageOrGifFragment.getSSIV();
-//        if (subsamplingScaleImageView != null) {
-//            subsamplingScaleImageView.recycle();
-//        }
-//    }
 }
+
+

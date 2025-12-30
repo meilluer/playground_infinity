@@ -81,6 +81,7 @@ import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.user.UserProfileImagesBatchLoader;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
+import ml.docilealligator.infinityforreddit.utils.TtsManager;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import retrofit2.Retrofit;
 
@@ -594,6 +595,13 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) holder.itemView.getLayoutParams();
                         params.setMargins(0, (int) Utils.convertDpToPixel(16, mActivity), 0, 0);
                     }
+                }
+
+                if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
+                    ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
+                        TtsManager ttsManager = new TtsManager(mActivity);
+                        ttsManager.speak(comment.getCommentRawText(), ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0).itemView.findViewById(android.R.id.text1));
+                    });
                 }
             }
         } else if (holder instanceof CommentFullyCollapsedViewHolder) {
@@ -1314,6 +1322,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         MaterialButton upvoteButton;
         TextView scoreTextView;
         MaterialButton downvoteButton;
+        MaterialButton textToSpeechButton;
         View placeholder;
         MaterialButton moreButton;
         MaterialButton saveButton;
@@ -1339,6 +1348,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                          MaterialButton upvoteButton,
                          TextView scoreTextView,
                          MaterialButton downvoteButton,
+                         MaterialButton textToSpeechButton,
                          View placeholder,
                          MaterialButton moreButton,
                          MaterialButton saveButton,
@@ -1358,6 +1368,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             this.upvoteButton = upvoteButton;
             this.scoreTextView = scoreTextView;
             this.downvoteButton = downvoteButton;
+            this.textToSpeechButton = textToSpeechButton;
             this.placeholder = placeholder;
             this.moreButton = moreButton;
             this.saveButton = saveButton;
@@ -1903,6 +1914,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     binding.upvoteButtonItemPostComment,
                     binding.scoreTextViewItemPostComment,
                     binding.downvoteButtonItemPostComment,
+                    binding.textToSpeechButtonItemPostComment,
                     binding.placeholderItemPostComment,
                     binding.moreButtonItemPostComment,
                     binding.saveButtonItemPostComment,
