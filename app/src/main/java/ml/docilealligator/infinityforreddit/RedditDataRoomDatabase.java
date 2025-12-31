@@ -30,6 +30,8 @@ import ml.docilealligator.infinityforreddit.postfilter.PostFilter;
 import ml.docilealligator.infinityforreddit.postfilter.PostFilterDao;
 import ml.docilealligator.infinityforreddit.postfilter.PostFilterUsage;
 import ml.docilealligator.infinityforreddit.postfilter.PostFilterUsageDao;
+import ml.docilealligator.infinityforreddit.readpost.ReadComment;
+import ml.docilealligator.infinityforreddit.readpost.ReadCommentDao;
 import ml.docilealligator.infinityforreddit.readpost.ReadPost;
 import ml.docilealligator.infinityforreddit.readpost.ReadPostDao;
 import ml.docilealligator.infinityforreddit.recentsearchquery.RecentSearchQuery;
@@ -46,7 +48,7 @@ import ml.docilealligator.infinityforreddit.user.UserData;
 @Database(entities = {Account.class, SubredditData.class, SubscribedSubredditData.class, UserData.class,
         SubscribedUserData.class, MultiReddit.class, CustomTheme.class, RecentSearchQuery.class,
         ReadPost.class, PostFilter.class, PostFilterUsage.class, AnonymousMultiredditSubreddit.class,
-        CommentFilter.class, CommentFilterUsage.class, CommentDraft.class}, version = 29, exportSchema = false)
+        CommentFilter.class, CommentFilterUsage.class, CommentDraft.class, ReadComment.class}, version = 30, exportSchema = false)
 @TypeConverters(Converters.class)
 public abstract class RedditDataRoomDatabase extends RoomDatabase {
 
@@ -59,7 +61,8 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
                         MIGRATION_13_14, MIGRATION_14_15, MIGRATION_15_16, MIGRATION_16_17,
                         MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21,
                         MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25,
-                        MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29)
+                        MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
+                        MIGRATION_29_30)
                 .build();
     }
 
@@ -80,6 +83,8 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
     public abstract RecentSearchQueryDao recentSearchQueryDao();
 
     public abstract ReadPostDao readPostDao();
+
+    public abstract ReadCommentDao readCommentDao();
 
     public abstract PostFilterDao postFilterDao();
 
@@ -462,6 +467,11 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("ALTER TABLE post_filter ADD COLUMN contain_users TEXT");
             database.execSQL("ALTER TABLE post_filter ADD COLUMN contain_subreddits TEXT");
+            database.execSQL("CREATE TABLE read_comments " +
+                    "(username TEXT NOT NULL, post_id TEXT NOT NULL, " +
+                    "last_read_comment_index INTEGER NOT NULL DEFAULT 0, time INTEGER NOT NULL DEFAULT 0, " +
+                    "PRIMARY KEY(username, post_id), " +
+                    "FOREIGN KEY(username) REFERENCES accounts(username) ON DELETE CASCADE)");
         }
     };
 }

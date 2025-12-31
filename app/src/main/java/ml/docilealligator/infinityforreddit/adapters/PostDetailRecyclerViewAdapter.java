@@ -534,6 +534,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         if (holder instanceof PostDetailBaseViewHolder) {
             if (holder instanceof PostDetailTextViewHolder) {
                 ((PostDetailTextViewHolder) holder).binding.geminiLogoItemPostDetailText.setOnClickListener(view -> {
+                    PostDetailTextViewHolder vh = (PostDetailTextViewHolder) holder;
                     ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.VISIBLE);
                     ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
                     ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");

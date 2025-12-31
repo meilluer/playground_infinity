@@ -1221,6 +1221,81 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         if (binding.postDetailRecyclerViewViewPostDetailFragment != null) {
             binding.postDetailRecyclerViewViewPostDetailFragment.onWindowVisibilityChanged(View.GONE);
         }
+        saveScrollPosition();
+    }
+
+    private void restoreScrollPosition() {
+        if (mPost != null && activity != null) {
+            mExecutor.execute(() -> {
+                ml.docilealligator.infinityforreddit.readpost.ReadComment readComment = mRedditDataRoomDatabase.readCommentDao().getReadComment(activity.accountName, mPost.getId());
+                if (readComment != null && readComment.getLastReadCommentIndex() > 0) {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        int indexToScroll = readComment.getLastReadCommentIndex();
+
+                        if (mCommentsRecyclerView != null) {
+                             ((LinearLayoutManager) mCommentsRecyclerView.getLayoutManager()).scrollToPositionWithOffset(indexToScroll, 0);
+                        } else {
+                            if (binding != null && binding.postDetailRecyclerViewViewPostDetailFragment != null) {
+                                // Add 1 because of Post header
+                                ((LinearLayoutManager) binding.postDetailRecyclerViewViewPostDetailFragment.getLayoutManager()).scrollToPositionWithOffset(indexToScroll + 1, 0);
+                            }
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    private void saveScrollPosition() {
+        if (mCommentsAdapter != null && mPost != null && activity != null) {
+            int position = -1;
+            boolean includesPost = false;
+
+            if (mCommentsRecyclerView != null) {
+                LinearLayoutManager myLayoutManager = (LinearLayoutManager) mCommentsRecyclerView.getLayoutManager();
+                if (myLayoutManager != null) {
+                    position = myLayoutManager.findFirstVisibleItemPosition();
+                    includesPost = false;
+                }
+            } else {
+                LinearLayoutManager myLayoutManager = (LinearLayoutManager) binding.postDetailRecyclerViewViewPostDetailFragment.getLayoutManager();
+                if (myLayoutManager != null) {
+                    position = myLayoutManager.findFirstVisibleItemPosition();
+                    includesPost = true;
+                }
+            }
+
+            if (position >= 0) {
+                int commentIndex = position;
+                if (includesPost) {
+                    commentIndex = Math.max(0, position - 1);
+                }
+
+                if (commentIndex > 0) {
+                    final int finalCommentIndex = commentIndex;
+                    mExecutor.execute(() -> {
+                        try {
+                            ml.docilealligator.infinityforreddit.readpost.ReadComment readComment = new ml.docilealligator.infinityforreddit.readpost.ReadComment(
+                                    activity.accountName, mPost.getId(), finalCommentIndex);
+                            mRedditDataRoomDatabase.readCommentDao().insert(readComment);
+                        } catch (android.database.sqlite.SQLiteConstraintException e) {
+                            if (Account.ANONYMOUS_ACCOUNT.equals(activity.accountName)) {
+                                mRedditDataRoomDatabase.accountDao().insert(Account.getAnonymousAccount());
+                                try {
+                                    ml.docilealligator.infinityforreddit.readpost.ReadComment readComment = new ml.docilealligator.infinityforreddit.readpost.ReadComment(
+                                            activity.accountName, mPost.getId(), finalCommentIndex);
+                                    mRedditDataRoomDatabase.readCommentDao().insert(readComment);
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            } else {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @Override
@@ -1361,6 +1436,8 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
 
                                                                 hasMoreChildren = children.size() != 0;
                                                                 mCommentsAdapter.addComments(expandedComments, hasMoreChildren);
+
+                                                                restoreScrollPosition();
 
                                                                 if (children.size() > 0) {
                                                                     (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).clearOnScrollListeners();
@@ -1508,6 +1585,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                         comments = expandedComments;
                         hasMoreChildren = children.size() != 0;
                         mCommentsAdapter.addComments(expandedComments, hasMoreChildren);
+
+                        if (!changeRefreshState && !isRefreshing) {
+                            restoreScrollPosition();
+                        }
 
                         if (children.size() > 0) {
                             (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).clearOnScrollListeners();
