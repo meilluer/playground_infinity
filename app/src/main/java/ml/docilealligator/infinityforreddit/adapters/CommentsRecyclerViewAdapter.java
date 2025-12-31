@@ -599,7 +599,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                                                     if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
 
-                                                        if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty() && comment.getCommentRawText().length() <= 700) {
+                                                        if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty()) {
 
                                                             ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
 
@@ -902,7 +902,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     }
 
     @Nullable
-    private Comment getCurrentComment(int position) {
+    public Comment getCurrentComment(int position) {
         if (mIsSingleCommentThreadMode) {
             if (position - 1 >= 0 && position - 1 < mVisibleComments.size()) {
                 return mVisibleComments.get(position - 1);

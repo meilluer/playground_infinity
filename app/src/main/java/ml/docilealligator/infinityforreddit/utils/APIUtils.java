@@ -27,9 +27,7 @@ public class APIUtils {
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
         gemini=preferences.getString("gemini_key","123");
-        Elevenlabs=preferences.getString("elevenlabs_api_key","");
     }
-    public static String Elevenlabs="";
     public static String gemini="";
     public static final String OAUTH_URL = "https://www.reddit.com/api/v1/authorize.compact";
     public static final String OAUTH_API_BASE_URI = "https://oauth.reddit.com";

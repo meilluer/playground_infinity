@@ -231,6 +231,16 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     private HeadphoneManager headphoneManager;
     private boolean mUnmuteAutoplayWithHeadphones;
 
+    public interface OnLongClickTtsListener {
+        void onLongClickTts(Post post);
+    }
+
+    private OnLongClickTtsListener mOnLongClickTtsListener;
+
+    public void setOnLongClickTtsListener(OnLongClickTtsListener listener) {
+        mOnLongClickTtsListener = listener;
+    }
+
     public PostDetailRecyclerViewAdapter(@NonNull BaseActivity activity, ViewPostDetailFragment fragment,
                                          Executor executor, CustomThemeWrapper customThemeWrapper,
                                          Retrofit oauthRetrofit, Retrofit retrofit,
@@ -737,7 +747,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             }
 
             if (((PostDetailBaseViewHolder) holder).textToSpeechButton != null) {
-                if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty() && mPost.getSelfText().length() <= 700) {
+                if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty()) {
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
                         Toast.makeText(mActivity, "request send", Toast.LENGTH_SHORT).show();
@@ -757,6 +767,14 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                             }
                         }
                         ttsManager.speak(mPost.getSelfTextPlain(), tv);
+                    });
+                    
+                    ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnLongClickListener(v -> {
+                        if (mOnLongClickTtsListener != null) {
+                            mOnLongClickTtsListener.onLongClickTts(mPost);
+                            return true;
+                        }
+                        return false;
                     });
                 } else {
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);

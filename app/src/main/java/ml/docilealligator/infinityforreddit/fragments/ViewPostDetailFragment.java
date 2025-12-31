@@ -26,6 +26,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -127,7 +128,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class ViewPostDetailFragment extends Fragment implements FragmentCommunicator, PostModerationActionHandler {
+public class ViewPostDetailFragment extends Fragment implements FragmentCommunicator, PostModerationActionHandler, PostDetailRecyclerViewAdapter.OnLongClickTtsListener {
 
     public static final String EXTRA_POST_DATA = "EPD";
     public static final String EXTRA_POST_ID = "EPI";
@@ -609,6 +610,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                     mSeparatePostAndComments, activity.accessToken, activity.accountName, mPost, mLocale,
                     mSharedPreferences, mCurrentAccountSharedPreferences, mNsfwAndSpoilerSharedPreferences, mPostDetailsSharedPreferences,
                     mExoCreator, post -> EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, postListPosition)));
+            mPostAdapter.setOnLongClickTtsListener(this);
             mCommentsAdapter = new CommentsRecyclerViewAdapter(activity,
                     this, mCustomThemeWrapper, mExecutor, mRetrofit, mOauthRetrofit,
                     activity.accessToken, activity.accountName, mPost, mLocale, mSingleCommentId,
@@ -1385,6 +1387,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                     mCurrentAccountSharedPreferences, mNsfwAndSpoilerSharedPreferences,
                                     mPostDetailsSharedPreferences, mExoCreator,
                                     post1 -> EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, postListPosition)));
+                            mPostAdapter.setOnLongClickTtsListener(ViewPostDetailFragment.this);
 
                             mCommentsAdapter = new CommentsRecyclerViewAdapter(activity,
                                     ViewPostDetailFragment.this, mCustomThemeWrapper, mExecutor,
@@ -2167,4 +2170,103 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     public void toggleMod(@NonNull Post post, int position) {
         viewPostDetailFragmentViewModel.toggleMod(post, position);
     }
-}
+
+    private ml.docilealligator.infinityforreddit.utils.TtsManager mSequentialTtsManager;
+    private boolean mIsReadingAll = false;
+    private int mCurrentCommentIndex = -1;
+
+    @Override
+    public void onLongClickTts(Post post) {
+        if (mIsReadingAll) {
+                mIsReadingAll = false;
+                if (mSequentialTtsManager != null) {
+                    mSequentialTtsManager.stop();
+                }
+                Toast.makeText(activity, "Stopped reading", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            mIsReadingAll = true;
+            Toast.makeText(activity, "Reading post and comments...", Toast.LENGTH_SHORT).show();
+
+            if (mSequentialTtsManager == null) {
+                mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+            }
+
+            // Try to find the TextView for highlighting if visible.
+            // It's in the first item of the recycler view (usually).
+            // Since we are reading the post, we assume it's at the top.
+            RecyclerView rv = binding.postDetailRecyclerViewViewPostDetailFragment;
+            TextView postTv = null;
+            RecyclerView.ViewHolder vh = rv.findViewHolderForAdapterPosition(0);
+            // This is a rough approximation, better to just pass null if not easily found or handle in TtsManager if view is recycled.
+            // TtsManager checks for null view.
+
+            // Wait, vh might be PostDetailBaseViewHolder.
+            if (vh instanceof PostDetailRecyclerViewAdapter.PostDetailBaseViewHolder) {
+                // Accessing the TextView inside is hard because it's private/protected in Adapter or ViewHolder.
+                // But TtsManager.speak handles null textView.
+            }
+
+            mSequentialTtsManager.speak(post.getSelfTextPlain(), null, () -> {
+                if (mIsReadingAll) {
+                    mCurrentCommentIndex = 0;
+                    new Handler(Looper.getMainLooper()).post(this::readNextComment);
+                }
+            });
+        }
+
+        private void readNextComment() {
+            if (!mIsReadingAll || mCommentsAdapter == null || mCurrentCommentIndex >= mCommentsAdapter.getItemCount()) {
+                mIsReadingAll = false;
+                return;
+            }
+
+            RecyclerView rv = mCommentsRecyclerView != null ? mCommentsRecyclerView : binding.postDetailRecyclerViewViewPostDetailFragment;
+
+            // Calculate position in the RecyclerView
+            int positionInRv = mCurrentCommentIndex;
+            if (mConcatAdapter != null) {
+                positionInRv += mPostAdapter.getItemCount();
+            }
+
+            int finalPosition = positionInRv;
+            rv.smoothScrollToPosition(finalPosition);
+
+            new Handler(Looper.getMainLooper()).postDelayed(() -> {
+                if (!mIsReadingAll) return;
+
+                // Try to find the view holder after scroll
+                RecyclerView.ViewHolder vh = rv.findViewHolderForAdapterPosition(finalPosition);
+                TextView commentTv = null;
+
+                // Simplified: just pass null for now to fix compilation error.
+                // We avoid complex view traversal.
+
+                Comment comment = mCommentsAdapter.getCurrentComment(mCurrentCommentIndex);
+                if (comment != null && comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty()) {
+                    mSequentialTtsManager.speak(comment.getCommentRawText(), commentTv, () -> {
+                        if (mIsReadingAll) {
+                            mCurrentCommentIndex++;
+                            new Handler(Looper.getMainLooper()).post(this::readNextComment);
+                        }
+                    });
+                } else {
+                    // Skip invalid/empty comment
+                    if (mIsReadingAll) {
+                        mCurrentCommentIndex++;
+                        readNextComment();
+                    }
+                }
+            }, 1000); // Delay for scroll
+        }
+
+        @Override
+        public void onDestroy () {
+            if (mSequentialTtsManager != null) {
+                mSequentialTtsManager.shutdown();
+            }
+            super.onDestroy();
+        }
+    }
+

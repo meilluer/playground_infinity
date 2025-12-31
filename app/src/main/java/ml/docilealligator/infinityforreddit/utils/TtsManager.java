@@ -1,235 +1,216 @@
 package ml.docilealligator.infinityforreddit.utils;
 
-import static ml.docilealligator.infinityforreddit.utils.APIUtils.Elevenlabs;
-
 import android.content.Context;
 import android.graphics.Color;
-import android.media.MediaPlayer;
+import android.media.AudioAttributes;
+import android.media.AudioManager;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.speech.tts.TextToSpeech;
+import android.speech.tts.UtteranceProgressListener;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.style.BackgroundColorSpan;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class TtsManager {
 
-    private TextView textView;
-    private String displayedText;
-    private final OkHttpClient client = new OkHttpClient();
-    private MediaPlayer mediaPlayer;
+    private static TextToSpeech tts;
+    private static boolean isInitialized = false;
+    private static WeakReference<TtsManager> currentInstanceRef;
+    private static final String UTTERANCE_ID = "infinity_tts_id";
+
     private final Context context;
-    private File currentTempFile;
-    private JSONObject alignment;
+    private TextView textView;
+    private String textToSpeak;
+    private final Map<String, Integer> chunkOffsets = new HashMap<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
-    private Runnable highlightRunnable;
-    private int currentHighlightedStart = -1;
-    private int currentHighlightedEnd = -1;
+    private Runnable onComplete;
+    private String lastUtteranceId;
 
     public TtsManager(Context context) {
         this.context = context;
+        initializeTTS();
+    }
+
+    private void initializeTTS() {
+        if (tts == null) {
+            tts = new TextToSpeech(context.getApplicationContext(), status -> {
+                if (status == TextToSpeech.SUCCESS) {
+                    AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                            .setUsage(AudioAttributes.USAGE_MEDIA)
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                            .build();
+                    tts.setAudioAttributes(audioAttributes);
+                    
+                    int result = tts.setLanguage(Locale.getDefault());
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                         // Fallback to English if default is not available
+                         tts.setLanguage(Locale.US);
+                    }
+                    
+                    tts.setOnUtteranceProgressListener(new UtteranceProgressListener() {
+                        @Override
+                        public void onStart(String utteranceId) {
+                            // Optional: Reset highlighting or UI state
+                        }
+
+                        @Override
+                        public void onDone(String utteranceId) {
+                           TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                           if (manager != null && manager.onComplete != null && utteranceId.equals(manager.lastUtteranceId)) {
+                               manager.handler.post(manager.onComplete);
+                           }
+                        }
+
+                        @Override
+                        public void onError(String utteranceId) {
+                             // Handle error
+                        }
+
+                        @Override
+                        public void onRangeStart(String utteranceId, int start, int end, int frame) {
+                            TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                            if (manager != null) {
+                                manager.handleRangeStart(utteranceId, start, end);
+                            }
+                        }
+                    });
+                    isInitialized = true;
+                    
+                    // Attempt to speak if a request was made during initialization
+                    TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                    if (manager != null) {
+                        manager.speakInternal();
+                    }
+                }
+            });
+        }
     }
 
     public void speak(String text, TextView textView) {
-        stop(); // Stop any existing playback and clear file
+        speak(text, textView, null);
+    }
 
+    public void speak(String text, TextView textView, Runnable onComplete) {
+        // Stop any previous playback globally to avoid overlap
+        if (tts != null) {
+            tts.stop();
+        }
+        
+        currentInstanceRef = new WeakReference<>(this);
+        this.textToSpeak = text;
         this.textView = textView;
-        this.displayedText = text;
+        this.onComplete = onComplete;
         
         if (this.textView != null) {
+            // Reset text to remove old highlights
             this.textView.setText(text);
         }
 
-        String apiKey = Elevenlabs;
-        String voiceId = "JBFqnCBsd6RMkjVDRZzb"; 
-        String url = "https://api.elevenlabs.io/v1/text-to-speech/" + voiceId + "/with-timestamps";
-
-        JSONObject json = new JSONObject();
-        try {
-            json.put("text", text);
-            json.put("model_id", "eleven_multilingual_v2");
-            JSONObject voiceSettings = new JSONObject();
-            voiceSettings.put("stability", 0.5);
-            voiceSettings.put("similarity_boost", 0.75);
-            json.put("voice_settings", voiceSettings);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if (isInitialized) {
+            speakInternal();
+        } else {
+             Toast.makeText(context, "Initializing TTS engine...", Toast.LENGTH_SHORT).show();
         }
+    }
 
-        RequestBody body = RequestBody.create(json.toString(), MediaType.get("application/json; charset=utf-8"));
-        Request request = new Request.Builder()
-                .url(url)
-                .addHeader("xi-api-key", apiKey)
-                .addHeader("Content-Type", "application/json")
-                .post(body)
-                .build();
-
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                e.printStackTrace();
+    private void speakInternal() {
+        if (tts != null && textToSpeak != null) {
+            chunkOffsets.clear();
+            int maxLength = TextToSpeech.getMaxSpeechInputLength();
+            
+            Bundle params = new Bundle();
+            params.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
+            params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f);
+            
+            if (textToSpeak.length() <= maxLength) {
+                 lastUtteranceId = UTTERANCE_ID;
+                 tts.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, params, UTTERANCE_ID);
+            } else {
+                 // Chunking logic for long text
+                 tts.speak("", TextToSpeech.QUEUE_FLUSH, null, null); // Clear queue
+                 int offset = 0;
+                 int chunkIndex = 0;
+                 while (offset < textToSpeak.length()) {
+                     int end = Math.min(offset + maxLength, textToSpeak.length());
+                     // Try to split at whitespace to avoid cutting words
+                     if (end < textToSpeak.length()) {
+                         int lastSpace = textToSpeak.lastIndexOf(' ', end);
+                         if (lastSpace > offset) {
+                             end = lastSpace + 1; // Include space
+                         }
+                     }
+                     String chunk = textToSpeak.substring(offset, end);
+                     String chunkId = UTTERANCE_ID + "_" + chunkIndex;
+                     chunkOffsets.put(chunkId, offset);
+                     
+                     tts.speak(chunk, TextToSpeech.QUEUE_ADD, params, chunkId);
+                     lastUtteranceId = chunkId; // Update last ID
+                     
+                     offset = end;
+                     chunkIndex++;
+                 }
             }
+        }
+    }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                if (response.isSuccessful() && response.body() != null) {
-                    try {
-                        String responseBody = response.body().string();
-                        JSONObject jsonResponse = new JSONObject(responseBody);
-                        String audioBase64 = jsonResponse.getString("audio_base64");
-                        alignment = jsonResponse.getJSONObject("alignment");
+    private void handleRangeStart(String utteranceId, int start, int end) {
+        int globalOffset = 0;
+        if (utteranceId.startsWith(UTTERANCE_ID + "_")) {
+            Integer offset = chunkOffsets.get(utteranceId);
+            if (offset != null) globalOffset = offset;
+        }
+        highlightText(globalOffset + start, globalOffset + end);
+    }
 
-                        JSONArray charsArray = alignment.getJSONArray("characters");
-                        StringBuilder sb = new StringBuilder();
-                        for (int i = 0; i < charsArray.length(); i++) {
-                            sb.append(charsArray.getString(i));
-                        }
-                        displayedText = sb.toString();
-
-                        byte[] audioBytes = android.util.Base64.decode(audioBase64, android.util.Base64.DEFAULT);
-                        File tempAudioFile = File.createTempFile("tts_audio", ".mp3", context.getCacheDir());
-                        tempAudioFile.deleteOnExit();
-                        currentTempFile = tempAudioFile;
-
-                        try (FileOutputStream outputStream = new FileOutputStream(tempAudioFile)) {
-                            outputStream.write(audioBytes);
-                        }
-
-                        handler.post(() -> {
-                            try {
-                                if (TtsManager.this.textView != null) {
-                                    TtsManager.this.textView.setText(displayedText);
-                                }
-                                
-                                mediaPlayer = new MediaPlayer();
-                                mediaPlayer.setDataSource(tempAudioFile.getAbsolutePath());
-                                mediaPlayer.prepare();
-                                mediaPlayer.start();
-                                startHighlighting();
-                                mediaPlayer.setOnCompletionListener(mp -> {
-                                    stop();
-                                });
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                                stop();
-                            }
-                        });
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+    private void highlightText(int start, int end) {
+        if (textView == null || textToSpeak == null) return;
+        
+        handler.post(() -> {
+            try {
+                 if (textView.getText() instanceof Spannable) {
+                     Spannable spannable = (Spannable) textView.getText();
+                     // Remove old spans to keep only current word highlighted
+                     BackgroundColorSpan[] spans = spannable.getSpans(0, spannable.length(), BackgroundColorSpan.class);
+                     for (BackgroundColorSpan span : spans) {
+                         spannable.removeSpan(span);
+                     }
+                     
+                     spannable.setSpan(new BackgroundColorSpan(Color.parseColor("#B3FFF59D")), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                     // We don't need setText here if it's already a Spannable and attached to the view,
+                     // updating the spannable updates the view automatically usually, but calling setText ensures invalidation.
+                     textView.setText(spannable);
+                 } else {
+                     SpannableString spannable = new SpannableString(textToSpeak);
+                     spannable.setSpan(new BackgroundColorSpan(Color.parseColor("#B3FFF59D")), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                     textView.setText(spannable);
+                 }
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         });
     }
 
-    private void startHighlighting() {
-        highlightRunnable = new Runnable() {
-            @Override
-            public void run() {
-                if (mediaPlayer != null) {
-                    boolean isPlaying = false;
-                    try {
-                        isPlaying = mediaPlayer.isPlaying();
-                    } catch (IllegalStateException ignore) {}
-                    
-                    if (isPlaying) {
-                        updateHighlight();
-                        handler.postDelayed(this, 30); // Faster polling for better sync
-                    }
-                }
-            }
-        };
-        handler.post(highlightRunnable);
-    }
-
-    private void updateHighlight() {
-        if (mediaPlayer == null || textView == null || alignment == null || displayedText == null) return;
-
-        try {
-            // Add a small offset (e.g. 50ms) to account for processing lag
-            double currentTime = (mediaPlayer.getCurrentPosition() + 50) / 1000.0;
-            JSONArray startTimes = alignment.getJSONArray("character_start_times_seconds");
-            JSONArray endTimes = alignment.getJSONArray("character_end_times_seconds");
-
-            int charIndex = -1;
-            for (int i = 0; i < startTimes.length(); i++) {
-                if (currentTime >= startTimes.getDouble(i) && currentTime < endTimes.getDouble(i)) {
-                    charIndex = i;
-                    break;
-                }
-            }
-
-            if (charIndex != -1 && charIndex < displayedText.length()) {
-                int start = charIndex;
-                while (start > 0 && !Character.isWhitespace(displayedText.charAt(start - 1))) {
-                    start--;
-                }
-                int end = charIndex;
-                while (end < displayedText.length() && !Character.isWhitespace(displayedText.charAt(end))) {
-                    end++;
-                }
-
-                if (start != currentHighlightedStart || end != currentHighlightedEnd) {
-                    currentHighlightedStart = start;
-                    currentHighlightedEnd = end;
-                    
-                    Spannable spannable = new SpannableString(displayedText);
-                    // Use Material Yellow 200 with higher alpha for better visibility
-                    spannable.setSpan(new BackgroundColorSpan(Color.parseColor("#B3FFF59D")), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    textView.setText(spannable, TextView.BufferType.SPANNABLE);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     public void stop() {
-        if (highlightRunnable != null) {
-            handler.removeCallbacks(highlightRunnable);
+        onComplete = null;
+        if (tts != null) {
+            tts.stop();
         }
-        currentHighlightedStart = -1;
-        currentHighlightedEnd = -1;
-
-        if (mediaPlayer != null) {
-            try {
-                if (mediaPlayer.isPlaying()) {
-                    mediaPlayer.stop();
-                }
-            } catch (IllegalStateException e) {
-                // ignore
-            }
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-
-        if (currentTempFile != null && currentTempFile.exists()) {
-            currentTempFile.delete();
-            currentTempFile = null;
-        }
-
-        if (textView != null && displayedText != null) {
-            textView.setText(displayedText);
+        if (textView != null && textToSpeak != null) {
+             textView.setText(textToSpeak); // Reset text (clears highlights)
         }
     }
-
+    
     public void shutdown() {
         stop();
+        // We do not shutdown the static TTS engine to reuse it.
     }
 }
