@@ -625,6 +625,37 @@
 
         </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/show_downloaded_tab_linear_layout_customize_main_page_tabs_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="72dp"
+            android:paddingEnd="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/show_downloaded_tab_title_text_view_customize_main_page_tabs_fragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center_vertical"
+                android:text="Show Downloaded Tab"
+                android:textSize="?attr/font_16"
+                android:fontFamily="?attr/font_family" />
+
+            <ml.docilealligator.infinityforreddit.customviews.ThemedMaterialSwitch
+                android:id="@+id/show_downloaded_tab_switch_material_customize_main_page_tabs_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
     </LinearLayout>
 
 </androidx.core.widget.NestedScrollView>

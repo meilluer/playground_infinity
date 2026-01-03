@@ -212,6 +212,7 @@
         <item>@string/downvoted</item>
         <item>@string/hidden</item>
         <item>@string/saved</item>
+        <item>@string/downloads</item>
     </string-array>
 
     <string-array name="settings_tab_post_type_anonymous">
@@ -221,6 +222,7 @@
         <item>@string/subreddit</item>
         <item>@string/multi_reddit</item>
         <item>@string/user</item>
+        <item>@string/downloads</item>
     </string-array>
 
     <string-array name="settings_time_format">

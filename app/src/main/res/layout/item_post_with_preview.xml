@@ -101,6 +101,17 @@
             android:textSize="?attr/title_font_18"
             android:fontFamily="?attr/title_font_family" />
 
+        <TextView
+            android:id="@+id/gemini_summary_text_view_item_post_with_preview"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:paddingTop="4dp"
+            android:textSize="?attr/font_12"
+            android:fontFamily="?attr/font_family"
+            android:visibility="gone" />
+
         <com.nex3z.flowlayout.FlowLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

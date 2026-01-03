@@ -305,11 +305,15 @@ public class SharedPreferencesUtils {
     public static final int MAIN_PAGE_TAB_POST_TYPE_DOWNVOTED = 7;
     public static final int MAIN_PAGE_TAB_POST_TYPE_HIDDEN = 8;
     public static final int MAIN_PAGE_TAB_POST_TYPE_SAVED = 9;
-    public static final int MAIN_PAGE_TAB_POST_TYPE_GILDED = 10;
+    public static final int MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS = 10;
     public static final String MAIN_PAGE_SHOW_MULTIREDDITS = "_main_page_show_multireddits";
     public static final String MAIN_PAGE_SHOW_FAVORITE_MULTIREDDITS = "_main_page_show_favorite_multireddits";
     public static final String MAIN_PAGE_SHOW_SUBSCRIBED_SUBREDDITS = "_main_page_show_subscribed_subreddits";
     public static final String MAIN_PAGE_SHOW_FAVORITE_SUBSCRIBED_SUBREDDITS = "_main_page_show_favorite_subscribed_subreddits";
+    public static final String MAIN_PAGE_SHOW_DOWNLOADED_TAB = "_main_page_show_downloaded_tab";
+
+    public static final String GEMINI_ENABLED = "gemini_enabled";
+    public static final String GEMINI_API_KEY = "gemini_key";
 
     public static final String BOTTOM_APP_BAR_SHARED_PREFERENCES_FILE = "ml.docilealligator.infinityforreddit.bottom_app_bar";
     public static final String MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_COUNT = "main_activity_bottom_app_bar_option_count";

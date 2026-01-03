@@ -87,5 +87,13 @@
         android:defaultValue="false"
         app:key="click_to_show_media_in_gallery_layout"
         app:title="@string/settings_click_to_show_media_in_gallery_layout" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceCategory
+        app:title="Gemini AI" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="false"
+        app:key="gemini_enabled"
+        app:title="@string/enable_gemini_summary" />
     
 </PreferenceScreen>

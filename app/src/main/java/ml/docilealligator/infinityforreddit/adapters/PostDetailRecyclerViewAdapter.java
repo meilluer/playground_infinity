@@ -120,6 +120,7 @@ import ml.docilealligator.infinityforreddit.thing.SaveThing;
 import ml.docilealligator.infinityforreddit.thing.StreamableVideo;
 import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
+import ml.docilealligator.infinityforreddit.utils.GeminiHelper;
 import ml.docilealligator.infinityforreddit.utils.HeadphoneManager;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.TtsManager;
@@ -154,6 +155,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     private final Provider<StreamableAPI> mStreamableApiProvider;
     private final RedditDataRoomDatabase mRedditDataRoomDatabase;
     private final SharedPreferences mCurrentAccountSharedPreferences;
+    private final SharedPreferences mSharedPreferences;
     private final RequestManager mGlide;
     private final SaveMemoryCenterInisdeDownsampleStrategy mSaveMemoryCenterInsideDownsampleStrategy;
     private final EmoteCloseBracketInlineProcessor mEmoteCloseBracketInlineProcessor;
@@ -263,6 +265,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         mStreamableApiProvider = streamableApiProvider;
         mRedditDataRoomDatabase = redditDataRoomDatabase;
         mGlide = glide;
+        mSharedPreferences = sharedPreferences;
         mSaveMemoryCenterInsideDownsampleStrategy = new SaveMemoryCenterInisdeDownsampleStrategy(Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.POST_FEED_MAX_RESOLUTION, "5000000")));
         mCurrentAccountSharedPreferences = currentAccountSharedPreferences;
         mSecondaryTextColor = customThemeWrapper.getSecondaryTextColor();
@@ -544,27 +547,35 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         if (holder instanceof PostDetailBaseViewHolder) {
             if (holder instanceof PostDetailTextViewHolder) {
                 ((PostDetailTextViewHolder) holder).binding.geminiLogoItemPostDetailText.setOnClickListener(view -> {
-                    PostDetailTextViewHolder vh = (PostDetailTextViewHolder) holder;
-                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.VISIBLE);
-                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
-                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");
-                    GeminiSummarizer.summarizeWithGemini(mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
-                        @Override
-                        public void onSuccess(String result) {
-                            mActivity.runOnUiThread(() -> {
-                                ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                                ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(result);
-                            });
-                        }
+                    if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
+                        ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.VISIBLE);
+                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
+                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");
+                        
+                        String apiKey = ml.docilealligator.infinityforreddit.utils.APIUtils.gemini;
+                        if (apiKey != null && !apiKey.isEmpty()) {
+                            GeminiSummarizer.summarizeWithGemini(mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
+                                @Override
+                                public void onSuccess(String result) {
+                                    mActivity.runOnUiThread(() -> {
+                                        ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(result);
+                                    });
+                                }
 
-                        @Override
-                        public void onError(String error) {
-                            mActivity.runOnUiThread(() -> {
-                                ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                                ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: " + error);
+                                @Override
+                                public void onError(String error) {
+                                    mActivity.runOnUiThread(() -> {
+                                        ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: " + error);
+                                    });
+                                }
                             });
+                        } else {
+                             ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                             ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: API Key missing");
                         }
-                    });
+                    }
                 });
             }
             ((PostDetailBaseViewHolder) holder).titleTextView.setText(mPost.getTitle());
@@ -875,6 +886,50 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             } else if (holder instanceof PostDetailLinkViewHolder) {
                 String domain = Uri.parse(mPost.getUrl()).getHost();
                 ((PostDetailLinkViewHolder) holder).binding.linkTextViewItemPostDetailLink.setText(domain);
+
+                ((PostDetailLinkViewHolder) holder).binding.geminiLogoItemPostDetailLink.setOnClickListener(view -> {
+                    if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
+                        ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.VISIBLE);
+                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.VISIBLE);
+                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("loading...");
+                        
+                        String apiKey = ml.docilealligator.infinityforreddit.utils.APIUtils.gemini;
+                        if (apiKey != null && !apiKey.isEmpty()) {
+                            GeminiHelper.summarizeLink(apiKey, mPost.getUrl(), new GeminiHelper.SummaryCallback() {
+                                @Override
+                                public void onSuccess(String summary) {
+                                    new Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                        ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
+                                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText(summary);
+                                        GeminiHelper.cacheSummary(mPost.getUrl(), summary);
+                                    });
+                                }
+
+                                @Override
+                                public void onFailure(String error) {
+                                    new Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                        ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
+                                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: " + error);
+                                    });
+                                }
+                            });
+                        } else {
+                             ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
+                             ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: API Key missing");
+                        }
+                    }
+                });
+
+                if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
+                    String summary = GeminiHelper.getSummary(mPost.getUrl());
+                    if (summary != null) {
+                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText(summary);
+                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.VISIBLE);
+                    } else {
+                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.GONE);
+                    }
+                }
+
                 Post.Preview preview = getSuitablePreview(mPost.getPreviews());
                 if (preview != null) {
                     ((PostDetailLinkViewHolder) holder).binding.imageViewItemPostDetailLink.setRatio((float) preview.getPreviewHeight() / (float) preview.getPreviewWidth());
@@ -1275,6 +1330,8 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         TextView authorFlairTextView;
         TextView postTimeTextView;
         TextView titleTextView;
+        @Nullable
+        TextView geminiSummaryTextView;
         CustomTextView typeTextView;
         ImageView crosspostImageView;
         ImageView archivedImageView;
@@ -2287,6 +2344,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     null,
                     binding.saveButtonItemPostDetailLink,
                     binding.shareButtonItemPostDetailLink);
+            geminiSummaryTextView = binding.geminiSummaryTextViewItemPostDetailLink;
 
             if (mActivity.typeface != null) {
                 binding.linkTextViewItemPostDetailLink.setTypeface(mActivity.typeface);

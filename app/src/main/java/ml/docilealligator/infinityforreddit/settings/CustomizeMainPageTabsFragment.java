@@ -20,11 +20,14 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
+import org.greenrobot.eventbus.EventBus;
+
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import ml.docilealligator.infinityforreddit.Infinity;
 import ml.docilealligator.infinityforreddit.R;
+import ml.docilealligator.infinityforreddit.events.RecreateActivityEvent;
 import ml.docilealligator.infinityforreddit.thing.SelectThingReturnKey;
 import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.activities.SearchActivity;
@@ -392,6 +395,15 @@ public class CustomizeMainPageTabsFragment extends Fragment {
             binding.showFavoriteSubscribedSubredditsSwitchMaterialCustomizeMainPageTabsFragment.performClick();
         });
 
+        binding.showDownloadedTabSwitchMaterialCustomizeMainPageTabsFragment.setChecked(mainActivityTabsSharedPreferences.getBoolean((activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : activity.accountName) + SharedPreferencesUtils.MAIN_PAGE_SHOW_DOWNLOADED_TAB, false));
+        binding.showDownloadedTabSwitchMaterialCustomizeMainPageTabsFragment.setOnCheckedChangeListener((compoundButton, b) -> {
+            mainActivityTabsSharedPreferences.edit().putBoolean((activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : activity.accountName) + SharedPreferencesUtils.MAIN_PAGE_SHOW_DOWNLOADED_TAB, b).apply();
+            EventBus.getDefault().post(new RecreateActivityEvent());
+        });
+        binding.showDownloadedTabLinearLayoutCustomizeMainPageTabsFragment.setOnClickListener(view -> {
+            binding.showDownloadedTabSwitchMaterialCustomizeMainPageTabsFragment.performClick();
+        });
+
         return binding.getRoot();
     }
 
@@ -453,6 +465,9 @@ public class CustomizeMainPageTabsFragment extends Fragment {
                 constraintLayout.setVisibility(View.VISIBLE);
                 titleTextView.setText(R.string.settings_tab_username);
                 break;
+            case SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS:
+                constraintLayout.setVisibility(View.GONE);
+                break;
             default:
                 constraintLayout.setVisibility(View.GONE);
         }
@@ -472,6 +487,9 @@ public class CustomizeMainPageTabsFragment extends Fragment {
                 linearLayout.setVisibility(View.VISIBLE);
                 titleTextView.setText(R.string.settings_tab_username);
                 break;
+            case SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS:
+                linearLayout.setVisibility(View.GONE);
+                break;
             default:
                 linearLayout.setVisibility(View.GONE);
         }
@@ -490,6 +508,9 @@ public class CustomizeMainPageTabsFragment extends Fragment {
             case SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_USER:
                 constraintLayout.setVisibility(View.VISIBLE);
                 titleTextView.setText(R.string.settings_tab_username);
+                break;
+            case SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS:
+                constraintLayout.setVisibility(View.GONE);
                 break;
             default:
                 constraintLayout.setVisibility(View.GONE);

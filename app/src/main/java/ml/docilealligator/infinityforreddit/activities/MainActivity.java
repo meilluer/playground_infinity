@@ -28,6 +28,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.annotation.OptIn;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
@@ -224,6 +225,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         return accessToken;
     }
 
+    @OptIn(markerClass = ExperimentalBadgeUtils.class)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
@@ -1002,12 +1004,31 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         mShowMultiReddits = mMainActivityTabsSharedPreferences.getBoolean((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_SHOW_MULTIREDDITS, false);
         mShowFavoriteSubscribedSubreddits = mMainActivityTabsSharedPreferences.getBoolean((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_SHOW_FAVORITE_SUBSCRIBED_SUBREDDITS, false);
         mShowSubscribedSubreddits = mMainActivityTabsSharedPreferences.getBoolean((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_SHOW_SUBSCRIBED_SUBREDDITS, false);
+        boolean mShowDownloadedTab = mMainActivityTabsSharedPreferences.getBoolean((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_SHOW_DOWNLOADED_TAB, false);
+        
+        boolean hasDownloadsInTabs = false;
+        if (tabCount >= 1 && mMainActivityTabsSharedPreferences.getInt((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_TAB_1_POST_TYPE, -1) == SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS) {
+            hasDownloadsInTabs = true;
+        }
+        if (!hasDownloadsInTabs && tabCount >= 2 && mMainActivityTabsSharedPreferences.getInt((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_TAB_2_POST_TYPE, -1) == SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS) {
+            hasDownloadsInTabs = true;
+        }
+        if (!hasDownloadsInTabs && tabCount >= 3 && mMainActivityTabsSharedPreferences.getInt((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_TAB_3_POST_TYPE, -1) == SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS) {
+            hasDownloadsInTabs = true;
+        }
+
+        if (hasDownloadsInTabs) {
+            mShowDownloadedTab = false;
+        }
+        
+        final boolean finalShowDownloadedTab = mShowDownloadedTab;
+
         sectionsPagerAdapter = new SectionsPagerAdapter(this, tabCount, mShowFavoriteMultiReddits,
-                mShowMultiReddits, mShowFavoriteSubscribedSubreddits, mShowSubscribedSubreddits);
+                mShowMultiReddits, mShowFavoriteSubscribedSubreddits, mShowSubscribedSubreddits, mShowDownloadedTab);
         binding.includedAppBar.viewPagerMainActivity.setAdapter(sectionsPagerAdapter);
         binding.includedAppBar.viewPagerMainActivity.setUserInputEnabled(!mDisableSwipingBetweenTabs);
         if (mMainActivityTabsSharedPreferences.getBoolean((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_SHOW_TAB_NAMES, true)) {
-            if (mShowFavoriteMultiReddits || mShowMultiReddits || mShowFavoriteSubscribedSubreddits || mShowSubscribedSubreddits) {
+            if (mShowFavoriteMultiReddits || mShowMultiReddits || mShowFavoriteSubscribedSubreddits || mShowSubscribedSubreddits || mShowDownloadedTab) {
                 binding.includedAppBar.tabLayoutMainActivity.setTabMode(TabLayout.MODE_SCROLLABLE);
             } else {
                 binding.includedAppBar.tabLayoutMainActivity.setTabMode(TabLayout.MODE_FIXED);
@@ -1024,6 +1045,11 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                         Utils.setTitleWithCustomFontToTab(typeface, tab, mMainActivityTabsSharedPreferences.getString((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_TAB_3_TITLE, getString(R.string.all)));
                         break;
                 }
+
+                if (finalShowDownloadedTab && position == sectionsPagerAdapter.getItemCount() - 1) {
+                    Utils.setTitleWithCustomFontToTab(typeface, tab, "Downloaded");
+                }
+
                 if (position >= tabCount && (mShowFavoriteMultiReddits || mShowMultiReddits ||
                         mShowFavoriteSubscribedSubreddits || mShowSubscribedSubreddits)
                         && sectionsPagerAdapter != null) {
@@ -1733,10 +1759,11 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         List<MultiReddit> multiReddits;
         List<SubscribedSubredditData> favoriteSubscribedSubreddits;
         List<SubscribedSubredditData> subscribedSubreddits;
+        boolean showDownloadedTab;
 
         SectionsPagerAdapter(FragmentActivity fa, int tabCount, boolean showFavoriteMultiReddits,
                              boolean showMultiReddits, boolean showFavoriteSubscribedSubreddits,
-                             boolean showSubscribedSubreddits) {
+                             boolean showSubscribedSubreddits, boolean showDownloadedTab) {
             super(fa);
             this.tabCount = tabCount;
             favoriteMultiReddits = new ArrayList<>();
@@ -1747,13 +1774,14 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             this.showMultiReddits = showMultiReddits;
             this.showFavoriteSubscribedSubreddits = showFavoriteSubscribedSubreddits;
             this.showSubscribedSubreddits = showSubscribedSubreddits;
+            this.showDownloadedTab = showDownloadedTab;
         }
 
         @NonNull
         @Override
         public Fragment createFragment(int position) {
             // Check for Offline Fragment (last tab)
-            if (position == getItemCount() - 1) {
+            if (showDownloadedTab && position == getItemCount() - 1) {
                 return new ml.docilealligator.infinityforreddit.fragments.OfflineFragment();
             }
 
@@ -1838,6 +1866,8 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
                 bundle.putInt(PostFragment.EXTRA_POST_TYPE, accountName.equals(Account.ANONYMOUS_ACCOUNT) ? PostPagingSource.TYPE_ANONYMOUS_FRONT_PAGE : PostPagingSource.TYPE_FRONT_PAGE);
                 fragment.setArguments(bundle);
                 return fragment;
+            } else if (postType == SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_DOWNLOADS) {
+                return new ml.docilealligator.infinityforreddit.fragments.OfflineFragment();
             } else if (postType == SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_ALL) {
                 PostFragment fragment = new PostFragment();
                 Bundle bundle = new Bundle();
@@ -1900,52 +1930,23 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         }
 
         public int getItemCount() {
-            if (showFavoriteMultiReddits && showMultiReddits) {
-                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
-                    return tabCount + favoriteMultiReddits.size() + multiReddits.size()
-                            + favoriteSubscribedSubreddits.size() + subscribedSubreddits.size() + 1;
-                } else if (showFavoriteSubscribedSubreddits) {
-                    return tabCount + favoriteMultiReddits.size() + multiReddits.size()
-                            + favoriteSubscribedSubreddits.size() + 1;
-                } else if (showSubscribedSubreddits) {
-                    return tabCount + favoriteMultiReddits.size() + multiReddits.size()
-                            + subscribedSubreddits.size() + 1;
-                } else {
-                    return tabCount + favoriteMultiReddits.size() + multiReddits.size() + 1;
-                }
-            } else if (showFavoriteMultiReddits) {
-                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
-                    return tabCount + favoriteMultiReddits.size() + favoriteSubscribedSubreddits.size()
-                            + subscribedSubreddits.size() + 1;
-                } else if (showFavoriteSubscribedSubreddits) {
-                    return tabCount + favoriteMultiReddits.size() + favoriteSubscribedSubreddits.size() + 1;
-                } else if (showSubscribedSubreddits) {
-                    return tabCount + favoriteMultiReddits.size() + subscribedSubreddits.size() + 1;
-                } else {
-                    return tabCount + favoriteMultiReddits.size() + 1;
-                }
-            } else if (showMultiReddits) {
-                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
-                    return tabCount + multiReddits.size() + favoriteSubscribedSubreddits.size()
-                            + subscribedSubreddits.size() + 1;
-                } else if (showFavoriteSubscribedSubreddits) {
-                    return tabCount + multiReddits.size() + favoriteSubscribedSubreddits.size() + 1;
-                } else if (showSubscribedSubreddits) {
-                    return tabCount + multiReddits.size() + subscribedSubreddits.size() + 1;
-                } else {
-                    return tabCount + multiReddits.size() + 1;
-                }
-            } else {
-                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
-                    return tabCount + favoriteSubscribedSubreddits.size() + subscribedSubreddits.size() + 1;
-                } else if (showFavoriteSubscribedSubreddits) {
-                    return tabCount + favoriteSubscribedSubreddits.size() + 1;
-                } else if (showSubscribedSubreddits) {
-                    return tabCount + subscribedSubreddits.size() + 1;
-                } else {
-                    return tabCount + 1;
-                }
+            int count = tabCount;
+            if (showFavoriteMultiReddits) {
+                count += favoriteMultiReddits.size();
             }
+            if (showMultiReddits) {
+                count += multiReddits.size();
+            }
+            if (showFavoriteSubscribedSubreddits) {
+                count += favoriteSubscribedSubreddits.size();
+            }
+            if (showSubscribedSubreddits) {
+                count += subscribedSubreddits.size();
+            }
+            if (showDownloadedTab) {
+                count += 1;
+            }
+            return count;
         }
 
         @Nullable

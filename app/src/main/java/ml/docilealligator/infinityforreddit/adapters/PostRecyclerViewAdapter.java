@@ -129,6 +129,7 @@ import ml.docilealligator.infinityforreddit.thing.SaveThing;
 import ml.docilealligator.infinityforreddit.thing.StreamableVideo;
 import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
+import ml.docilealligator.infinityforreddit.utils.GeminiHelper;
 import ml.docilealligator.infinityforreddit.utils.HeadphoneManager;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
@@ -923,6 +924,32 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                         if (post.getPostType() == Post.NO_PREVIEW_LINK_TYPE) {
                             ((PostWithPreviewTypeViewHolder) holder).imageViewNoPreviewGallery.setVisibility(View.VISIBLE);
                             ((PostWithPreviewTypeViewHolder) holder).imageViewNoPreviewGallery.setImageResource(R.drawable.ic_link_day_night_24dp);
+                        }
+
+                        if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
+                            if (((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView != null) {
+                                String summary = GeminiHelper.getSummary(post.getUrl());
+                                if (summary != null) {
+                                    ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setText(summary);
+                                    ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.VISIBLE);
+                                } else {
+                                    ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.GONE);
+                                    String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                                    if (!apiKey.isEmpty()) {
+                                        GeminiHelper.summarizeLink(apiKey, post.getUrl(), new GeminiHelper.SummaryCallback() {
+                                            @Override
+                                            public void onSuccess(String summary) {
+                                                GeminiHelper.cacheSummary(post.getUrl(), summary);
+                                                new Handler(android.os.Looper.getMainLooper()).post(() -> notifyItemChanged(holder.getBindingAdapterPosition()));
+                                            }
+
+                                            @Override
+                                            public void onFailure(String error) {
+                                            }
+                                        });
+                                    }
+                                }
+                            }
                         }
                     }
 
@@ -1934,6 +1961,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
         ImageView stickiedPostImageView;
         TextView postTimeTextView;
         TextView titleTextView;
+        @Nullable
+        TextView geminiSummaryTextView;
 
         @Nullable
         CustomTextView typeTextView;
@@ -3421,6 +3450,7 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     binding.loadImageErrorTextViewItemPostWithPreview,
                     binding.imageWrapperRelativeLayoutItemPostWithPreview,
                     binding.imageViewItemPostWithPreview);
+            geminiSummaryTextView = binding.geminiSummaryTextViewItemPostWithPreview;
         }
 
         void setBaseView(AspectRatioGifImageView iconGifImageView,
@@ -4754,6 +4784,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     binding.loadImageErrorTextViewItemPostCard2WithPreview,
                     null,
                     binding.imageViewItemPostCard2WithPreview);
+
+            geminiSummaryTextView = binding.geminiSummaryTextViewItemPostCard2WithPreview;
 
             binding.dividerItemPostCard2WithPreview.setBackgroundColor(mDividerColor);
         }
