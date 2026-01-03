@@ -76,6 +76,9 @@ import ml.docilealligator.infinityforreddit.fragments.HistoryPostFragment;
 import ml.docilealligator.infinityforreddit.fragments.InboxFragment;
 import ml.docilealligator.infinityforreddit.fragments.MorePostsInfoFragment;
 import ml.docilealligator.infinityforreddit.fragments.MultiRedditListingFragment;
+import ml.docilealligator.infinityforreddit.fragments.OfflineFragment;
+import ml.docilealligator.infinityforreddit.fragments.OfflinePostFragment;
+import ml.docilealligator.infinityforreddit.activities.OfflinePostsActivity;
 import ml.docilealligator.infinityforreddit.fragments.PostFragment;
 import ml.docilealligator.infinityforreddit.fragments.SidebarFragment;
 import ml.docilealligator.infinityforreddit.fragments.SubredditListingFragment;
@@ -119,6 +122,12 @@ public interface AppComponent {
     void inject(LoginActivity loginActivity);
 
     void inject(PostFragment postFragment);
+
+    void inject(OfflinePostFragment offlinePostFragment);
+    
+    void inject(OfflinePostsActivity offlinePostsActivity);
+
+    void inject(OfflineFragment offlineFragment);
 
     void inject(SubredditListingFragment subredditListingFragment);
 

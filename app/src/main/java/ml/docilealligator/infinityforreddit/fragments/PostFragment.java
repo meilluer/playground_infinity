@@ -104,7 +104,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
     private static final String CONCATENATED_SUBREDDIT_NAMES_STATE = "CSNS";
     private static final String POST_FRAGMENT_ID_STATE = "PFIS";
 
-    PostViewModel mPostViewModel;
+    protected PostViewModel mPostViewModel;
     @Inject
     @Named("redgifs")
     Retrofit mRedgifsRetrofit;
@@ -132,7 +132,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
     ExoCreator mExoCreator;
     private int postType;
     private boolean savePostFeedScrolledPosition;
-    private PostRecyclerViewAdapter mAdapter;
+    protected PostRecyclerViewAdapter mAdapter;
     private String subredditName;
     private String username;
     private String query;
@@ -827,7 +827,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         return binding.getRoot();
     }
 
-    private void initializeAndBindPostViewModel() {
+    protected void initializeAndBindPostViewModel() {
         if (postType == PostPagingSource.TYPE_SEARCH) {
             mPostViewModel = new ViewModelProvider(PostFragment.this, new PostViewModel.Factory(mExecutor,
                     activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit, activity.accessToken, activity.accountName, mSharedPreferences,
@@ -858,7 +858,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         bindPostViewModel();
     }
 
-    private void initializeAndBindPostViewModelForAnonymous(String concatenatedSubredditNames) {
+    protected void initializeAndBindPostViewModelForAnonymous(String concatenatedSubredditNames) {
         if (postType == PostPagingSource.TYPE_SEARCH) {
             mPostViewModel = new ViewModelProvider(PostFragment.this, new PostViewModel.Factory(mExecutor,
                     mRetrofit, null, activity.accountName, mSharedPreferences,

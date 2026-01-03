@@ -136,6 +136,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     public static final String EXTRA_CONTEXT_NUMBER = "ECN";
     public static final String EXTRA_MESSAGE_FULLNAME = "EMF";
     public static final String EXTRA_POST_LIST_POSITION = "EPLP";
+    public static final String EXTRA_IS_OFFLINE_POST = "EIOP";
     private static final int EDIT_POST_REQUEST_CODE = 2;
     private static final String SCROLL_POSITION_STATE = "SPS";
 
@@ -1351,7 +1352,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                         subredditId, mSingleCommentId, sortType, mContextNumber);
             } else {
                 postAndComments = mRetrofit.create(RedditAPI.class).getPostAndCommentsById(subredditId,
-                        sortType);
+                        sortType, null);
             }
         } else {
             if (isSingleCommentThreadMode && mSingleCommentId != null) {
@@ -1359,7 +1360,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                         mSingleCommentId, sortType, mContextNumber, APIUtils.getOAuthHeader(activity.accessToken));
             } else {
                 postAndComments = mOauthRetrofit.create(RedditAPI.class).getPostAndCommentsByIdOauth(subredditId,
-                        sortType, APIUtils.getOAuthHeader(activity.accessToken));
+                        sortType, null, APIUtils.getOAuthHeader(activity.accessToken));
             }
         }
         postAndComments.enqueue(new Callback<>() {
@@ -1575,6 +1576,53 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         String commentId = null;
         if (isSingleCommentThreadMode) {
             commentId = mSingleCommentId;
+        }
+
+        if (getArguments() != null && getArguments().getBoolean(EXTRA_IS_OFFLINE_POST, false)) {
+            mExecutor.execute(() -> {
+                List<ml.docilealligator.infinityforreddit.offline.OfflineComment> offlineComments = mRedditDataRoomDatabase.offlineCommentDao().getOfflineCommentsByPostId(mPost.getId());
+                if (offlineComments != null && !offlineComments.isEmpty()) {
+                    String json = offlineComments.get(0).getCommentJson();
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        ParseComment.parseComment(mExecutor, new Handler(Looper.getMainLooper()), json, mExpandChildren, mCommentFilter, new ParseComment.ParseCommentListener() {
+                            @Override
+                            public void onParseCommentSuccess(ArrayList<Comment> topLevelComments, ArrayList<Comment> expandedComments, String parentId, ArrayList<String> children) {
+                                ViewPostDetailFragment.this.children = children;
+                                comments = expandedComments;
+                                hasMoreChildren = children.size() != 0;
+                                mCommentsAdapter.addComments(expandedComments, hasMoreChildren);
+
+                                if (!changeRefreshState && !isRefreshing) {
+                                    restoreScrollPosition();
+                                }
+                                if (changeRefreshState) {
+                                    isRefreshing = false;
+                                }
+                                isFetchingComments = false;
+                            }
+
+                            @Override
+                            public void onParseCommentFailed() {
+                                isFetchingComments = false;
+                                mCommentsAdapter.initiallyLoadCommentsFailed();
+                                if (changeRefreshState) {
+                                    isRefreshing = false;
+                                }
+                            }
+                        });
+                    });
+                } else {
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        isFetchingComments = false;
+                        mCommentsAdapter.initiallyLoadCommentsFailed();
+                        if (changeRefreshState) {
+                            isRefreshing = false;
+                        }
+                        Toast.makeText(activity, "No offline comments found", Toast.LENGTH_SHORT).show();
+                    });
+                }
+            });
+            return;
         }
 
         Retrofit retrofit = activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;

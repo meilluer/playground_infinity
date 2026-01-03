@@ -81,6 +81,23 @@ public class Post implements Parcelable {
     private boolean spam;
     private long videoProgress;
 
+    public Post() {
+        this.id = "";
+        this.fullName = "";
+        this.subredditName = "";
+        this.subredditNamePrefixed = "";
+        this.author = "";
+        this.authorNamePrefixed = "";
+        this.authorFlair = "";
+        this.authorFlairHTML = "";
+        this.postTimeMillis = 0;
+        this.title = "";
+        this.permalink = "";
+        this.suggestedSort = "";
+        this.archived = false;
+        this.isCrosspost = false;
+    }
+
     public Post(String id, String fullName, String subredditName, String subredditNamePrefixed,
                 String author, String authorFlair, String authorFlairHTML, long postTimeMillis,
                 String title, String permalink, int score, int postType, int voteType, int nComments,

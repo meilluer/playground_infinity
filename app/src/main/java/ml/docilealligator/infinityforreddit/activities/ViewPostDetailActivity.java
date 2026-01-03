@@ -98,6 +98,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
     public static final String EXTRA_NEW_ACCOUNT_NAME = "ENAN";
     public static final String EXTRA_POST_FRAGMENT_ID = "EPFI";
     public static final String EXTRA_IS_NSFW_SUBREDDIT = "EINS";
+    public static final String EXTRA_IS_OFFLINE_POST = "EIOP";
     public static final int EDIT_COMMENT_REQUEST_CODE = 3;
     @State
     String mNewAccountName;
@@ -159,6 +160,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
     private boolean mVolumeKeysNavigateComments;
     private boolean mIsNsfwSubreddit;
     private boolean mHideFab;
+    private boolean mIsOfflinePost;
     private ActivityViewPostDetailBinding binding;
     @Nullable
     private ReadPostsListInterface readPostsList;
@@ -257,6 +259,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
 
         mPostListPosition = getIntent().getIntExtra(EXTRA_POST_LIST_POSITION, -1);
         mIsNsfwSubreddit = getIntent().getBooleanExtra(EXTRA_IS_NSFW_SUBREDDIT, false);
+        mIsOfflinePost = getIntent().getBooleanExtra(EXTRA_IS_OFFLINE_POST, false);
         mHideFab = mPostDetailsSharedPreferences.getBoolean(SharedPreferencesUtils.HIDE_FAB_IN_POST_DETAILS, false);
         if (mHideFab) {
             binding.fabViewPostDetailActivity.setVisibility(View.GONE);
@@ -978,6 +981,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
                 bundle.putString(ViewPostDetailFragment.EXTRA_CONTEXT_NUMBER, getIntent().getStringExtra(EXTRA_CONTEXT_NUMBER));
                 bundle.putString(ViewPostDetailFragment.EXTRA_MESSAGE_FULLNAME, getIntent().getStringExtra(EXTRA_MESSAGE_FULLNAME));
             }
+            bundle.putBoolean(ViewPostDetailFragment.EXTRA_IS_OFFLINE_POST, mIsOfflinePost);
             fragment.setArguments(bundle);
             return fragment;
         }

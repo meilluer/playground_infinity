@@ -106,13 +106,17 @@ public class TtsManager {
         }
         
         currentInstanceRef = new WeakReference<>(this);
-        this.textToSpeak = text;
         this.textView = textView;
         this.onComplete = onComplete;
         
         if (this.textView != null) {
-            // Reset text to remove old highlights
-            this.textView.setText(text);
+            // Use the text from TextView to ensure indices match for highlighting
+            // and avoid speaking raw markdown if rendered text is available.
+            this.textToSpeak = this.textView.getText().toString();
+            // Reset old highlights instead of resetting the whole text
+            clearHighlights();
+        } else {
+            this.textToSpeak = text;
         }
 
         if (isInitialized) {
@@ -122,8 +126,26 @@ public class TtsManager {
         }
     }
 
+    private void clearHighlights() {
+        if (textView == null) return;
+        handler.post(() -> {
+            try {
+                CharSequence text = textView.getText();
+                if (text instanceof Spannable) {
+                    Spannable spannable = (Spannable) text;
+                    BackgroundColorSpan[] spans = spannable.getSpans(0, spannable.length(), BackgroundColorSpan.class);
+                    for (BackgroundColorSpan span : spans) {
+                        spannable.removeSpan(span);
+                    }
+                }
+            } catch (Exception e) {
+                // Ignore
+            }
+        });
+    }
+
     private void speakInternal() {
-        if (tts != null && textToSpeak != null) {
+        if (tts != null && textToSpeak != null && !textToSpeak.trim().isEmpty()) {
             chunkOffsets.clear();
             int maxLength = TextToSpeech.getMaxSpeechInputLength();
             
@@ -176,25 +198,31 @@ public class TtsManager {
         
         handler.post(() -> {
             try {
-                 if (textView.getText() instanceof Spannable) {
-                     Spannable spannable = (Spannable) textView.getText();
-                     // Remove old spans to keep only current word highlighted
-                     BackgroundColorSpan[] spans = spannable.getSpans(0, spannable.length(), BackgroundColorSpan.class);
-                     for (BackgroundColorSpan span : spans) {
-                         spannable.removeSpan(span);
-                     }
-                     
-                     spannable.setSpan(new BackgroundColorSpan(Color.parseColor("#B3FFF59D")), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                     // We don't need setText here if it's already a Spannable and attached to the view,
-                     // updating the spannable updates the view automatically usually, but calling setText ensures invalidation.
-                     textView.setText(spannable);
+                 CharSequence currentText = textView.getText();
+                 Spannable spannable;
+                 if (currentText instanceof Spannable) {
+                     spannable = (Spannable) currentText;
                  } else {
-                     SpannableString spannable = new SpannableString(textToSpeak);
-                     spannable.setSpan(new BackgroundColorSpan(Color.parseColor("#B3FFF59D")), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                     textView.setText(spannable);
+                     // Create a new SpannableString from current text to preserve existing spans (e.g. Markdown formatting)
+                     spannable = new SpannableString(currentText);
                  }
+
+                 // Remove old spans to keep only current word highlighted
+                 BackgroundColorSpan[] spans = spannable.getSpans(0, spannable.length(), BackgroundColorSpan.class);
+                 for (BackgroundColorSpan span : spans) {
+                     spannable.removeSpan(span);
+                 }
+                 
+                 // Apply new highlight if within bounds
+                 if (start >= 0 && end <= spannable.length() && start < end) {
+                     spannable.setSpan(new BackgroundColorSpan(Color.parseColor("#B3FFF59D")), start, end, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                 }
+                 
+                 // Always update the text to ensure the UI reflects the change, 
+                 // especially if we converted from Spanned to Spannable.
+                 textView.setText(spannable);
             } catch (Exception e) {
-                e.printStackTrace();
+                // Ignore errors to prevent crashes during playback
             }
         });
     }
@@ -204,9 +232,7 @@ public class TtsManager {
         if (tts != null) {
             tts.stop();
         }
-        if (textView != null && textToSpeak != null) {
-             textView.setText(textToSpeak); // Reset text (clears highlights)
-        }
+        clearHighlights();
     }
     
     public void shutdown() {

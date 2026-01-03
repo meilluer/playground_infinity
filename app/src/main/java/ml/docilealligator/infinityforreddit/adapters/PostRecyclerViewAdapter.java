@@ -1803,6 +1803,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             intent.putExtra(ViewPostDetailActivity.EXTRA_POST_LIST_POSITION, position);
             intent.putExtra(ViewPostDetailActivity.EXTRA_POST_FRAGMENT_ID, mFragment.getPostFragmentId());
             intent.putExtra(ViewPostDetailActivity.EXTRA_IS_NSFW_SUBREDDIT, mFragment.getIsNsfwSubreddit());
+            if (mFragment instanceof ml.docilealligator.infinityforreddit.fragments.OfflinePostFragment) {
+                intent.putExtra(ViewPostDetailActivity.EXTRA_IS_OFFLINE_POST, true);
+            }
             mActivity.startActivity(intent);
         }
     }

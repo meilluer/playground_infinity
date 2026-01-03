@@ -220,6 +220,10 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
     private RSlashDetector detector;
 
     @ExperimentalBadgeUtils
+    public String getAccessToken() {
+        return accessToken;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         SplashScreen.installSplashScreen(this);
@@ -1748,6 +1752,11 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         @NonNull
         @Override
         public Fragment createFragment(int position) {
+            // Check for Offline Fragment (last tab)
+            if (position == getItemCount() - 1) {
+                return new ml.docilealligator.infinityforreddit.fragments.OfflineFragment();
+            }
+
             if (position == 0) {
                 int postType = mMainActivityTabsSharedPreferences.getInt((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_TAB_1_POST_TYPE, SharedPreferencesUtils.MAIN_PAGE_TAB_POST_TYPE_HOME);
                 String name = mMainActivityTabsSharedPreferences.getString((accountName.equals(Account.ANONYMOUS_ACCOUNT) ? "" : accountName) + SharedPreferencesUtils.MAIN_PAGE_TAB_1_NAME, "");
@@ -1890,10 +1899,53 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
             }
         }
 
-        @Override
         public int getItemCount() {
-            return tabCount + favoriteMultiReddits.size() + multiReddits.size() +
-                    favoriteSubscribedSubreddits.size() + subscribedSubreddits.size();
+            if (showFavoriteMultiReddits && showMultiReddits) {
+                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
+                    return tabCount + favoriteMultiReddits.size() + multiReddits.size()
+                            + favoriteSubscribedSubreddits.size() + subscribedSubreddits.size() + 1;
+                } else if (showFavoriteSubscribedSubreddits) {
+                    return tabCount + favoriteMultiReddits.size() + multiReddits.size()
+                            + favoriteSubscribedSubreddits.size() + 1;
+                } else if (showSubscribedSubreddits) {
+                    return tabCount + favoriteMultiReddits.size() + multiReddits.size()
+                            + subscribedSubreddits.size() + 1;
+                } else {
+                    return tabCount + favoriteMultiReddits.size() + multiReddits.size() + 1;
+                }
+            } else if (showFavoriteMultiReddits) {
+                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
+                    return tabCount + favoriteMultiReddits.size() + favoriteSubscribedSubreddits.size()
+                            + subscribedSubreddits.size() + 1;
+                } else if (showFavoriteSubscribedSubreddits) {
+                    return tabCount + favoriteMultiReddits.size() + favoriteSubscribedSubreddits.size() + 1;
+                } else if (showSubscribedSubreddits) {
+                    return tabCount + favoriteMultiReddits.size() + subscribedSubreddits.size() + 1;
+                } else {
+                    return tabCount + favoriteMultiReddits.size() + 1;
+                }
+            } else if (showMultiReddits) {
+                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
+                    return tabCount + multiReddits.size() + favoriteSubscribedSubreddits.size()
+                            + subscribedSubreddits.size() + 1;
+                } else if (showFavoriteSubscribedSubreddits) {
+                    return tabCount + multiReddits.size() + favoriteSubscribedSubreddits.size() + 1;
+                } else if (showSubscribedSubreddits) {
+                    return tabCount + multiReddits.size() + subscribedSubreddits.size() + 1;
+                } else {
+                    return tabCount + multiReddits.size() + 1;
+                }
+            } else {
+                if (showFavoriteSubscribedSubreddits && showSubscribedSubreddits) {
+                    return tabCount + favoriteSubscribedSubreddits.size() + subscribedSubreddits.size() + 1;
+                } else if (showFavoriteSubscribedSubreddits) {
+                    return tabCount + favoriteSubscribedSubreddits.size() + 1;
+                } else if (showSubscribedSubreddits) {
+                    return tabCount + subscribedSubreddits.size() + 1;
+                } else {
+                    return tabCount + 1;
+                }
+            }
         }
 
         @Nullable

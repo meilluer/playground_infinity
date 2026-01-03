@@ -26,6 +26,12 @@ import ml.docilealligator.infinityforreddit.multireddit.AnonymousMultiredditSubr
 import ml.docilealligator.infinityforreddit.multireddit.AnonymousMultiredditSubredditDao;
 import ml.docilealligator.infinityforreddit.multireddit.MultiReddit;
 import ml.docilealligator.infinityforreddit.multireddit.MultiRedditDao;
+import ml.docilealligator.infinityforreddit.offline.OfflineComment;
+import ml.docilealligator.infinityforreddit.offline.OfflineCommentDao;
+import ml.docilealligator.infinityforreddit.offline.OfflinePost;
+import ml.docilealligator.infinityforreddit.offline.OfflinePostDao;
+import ml.docilealligator.infinityforreddit.offline.OfflineSubreddit;
+import ml.docilealligator.infinityforreddit.offline.OfflineSubredditDao;
 import ml.docilealligator.infinityforreddit.postfilter.PostFilter;
 import ml.docilealligator.infinityforreddit.postfilter.PostFilterDao;
 import ml.docilealligator.infinityforreddit.postfilter.PostFilterUsage;
@@ -48,7 +54,8 @@ import ml.docilealligator.infinityforreddit.user.UserData;
 @Database(entities = {Account.class, SubredditData.class, SubscribedSubredditData.class, UserData.class,
         SubscribedUserData.class, MultiReddit.class, CustomTheme.class, RecentSearchQuery.class,
         ReadPost.class, PostFilter.class, PostFilterUsage.class, AnonymousMultiredditSubreddit.class,
-        CommentFilter.class, CommentFilterUsage.class, CommentDraft.class, ReadComment.class}, version = 30, exportSchema = false)
+        CommentFilter.class, CommentFilterUsage.class, CommentDraft.class, ReadComment.class,
+        OfflineSubreddit.class, OfflinePost.class, OfflineComment.class}, version = 31, exportSchema = false)
 @TypeConverters(Converters.class)
 public abstract class RedditDataRoomDatabase extends RoomDatabase {
 
@@ -62,7 +69,7 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
                         MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21,
                         MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25,
                         MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
-                        MIGRATION_29_30)
+                        MIGRATION_29_30, MIGRATION_30_31)
                 .build();
     }
 
@@ -97,6 +104,12 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
     public abstract CommentFilterUsageDao commentFilterUsageDao();
 
     public abstract CommentDraftDao commentDraftDao();
+
+    public abstract OfflineSubredditDao offlineSubredditDao();
+
+    public abstract OfflinePostDao offlinePostDao();
+
+    public abstract OfflineCommentDao offlineCommentDao();
 
     private static final Migration MIGRATION_1_2 = new Migration(1, 2) {
         @Override
@@ -439,7 +452,7 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
             database.execSQL("ALTER TABLE recent_search_queries ADD COLUMN search_in_thing_type INTEGER DEFAULT 0 NOT NULL");
         }
     };
-  
+
     private static final Migration MIGRATION_27_28 = new Migration(27, 28) {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
@@ -472,6 +485,16 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
                     "last_read_comment_index INTEGER NOT NULL DEFAULT 0, time INTEGER NOT NULL DEFAULT 0, " +
                     "PRIMARY KEY(username, post_id), " +
                     "FOREIGN KEY(username) REFERENCES accounts(username) ON DELETE CASCADE)");
+        }
+    };
+
+    private static final Migration MIGRATION_30_31 = new Migration(30, 31) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `offline_subreddits` (`name` TEXT NOT NULL, `postLimit` INTEGER NOT NULL, `sortType` TEXT, `downloadTime` INTEGER NOT NULL, `totalSize` INTEGER NOT NULL, PRIMARY KEY(`name`))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `offline_posts` (`id` TEXT NOT NULL, `subredditName` TEXT, `postJson` TEXT, `mediaPath` TEXT, PRIMARY KEY(`id`))");
+            database.execSQL("CREATE TABLE IF NOT EXISTS `offline_comments` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentPostId` TEXT, `commentJson` TEXT, FOREIGN KEY(`parentPostId`) REFERENCES `offline_posts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
+            database.execSQL("CREATE INDEX IF NOT EXISTS `index_offline_comments_parentPostId` ON `offline_comments` (`parentPostId`)");
         }
     };
 }

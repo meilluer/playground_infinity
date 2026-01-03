@@ -43,6 +43,7 @@
     <string name="subreddit_filter_popular_and_all_activity_label">r/all and r/popular</string>
     <string name="customize_post_filter_activity_label">Customize Post Filter</string>
     <string name="filtered_posts_activity_subtitle">Filtered Posts</string>
+    <string name="offline_posts_activity_label">Offline Posts</string>
     <string name="post_filter_preference_activity_label">Post Filter</string>
     <string name="search_users_result_activity_label">Users</string>
     <string name="multireddit_selection_activity_label">Select a Multireddit</string>

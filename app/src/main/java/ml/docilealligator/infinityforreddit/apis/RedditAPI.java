@@ -124,6 +124,7 @@ public interface RedditAPI {
 
     @GET("/comments/{id}.json?raw_json=1")
     Call<String> getPostAndCommentsByIdOauth(@Path("id") String id, @Query("sort") SortType.Type sortType,
+                                             @Query("limit") Integer limit,
                                              @HeaderMap Map<String, String> headers);
 
     @GET("/comments/{id}/placeholder/{singleCommentId}.json?raw_json=1")
@@ -131,7 +132,7 @@ public interface RedditAPI {
                                                     @Query("sort") SortType.Type sortType, @Query("context") String contextNumber);
 
     @GET("/comments/{id}.json?raw_json=1")
-    Call<String> getPostAndCommentsById(@Path("id") String id, @Query("sort") SortType.Type sortType);
+    Call<String> getPostAndCommentsById(@Path("id") String id, @Query("sort") SortType.Type sortType, @Query("limit") Integer limit);
 
     @Multipart
     @POST(".")

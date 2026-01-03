@@ -265,6 +265,11 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activities.OfflinePostsActivity"
+            android:label="@string/offline_posts_activity_label"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.Slidable" />
+        <activity
             android:name=".activities.SettingsActivity"
             android:label="@string/settings_activity_label"
             android:parentActivityName=".activities.MainActivity"

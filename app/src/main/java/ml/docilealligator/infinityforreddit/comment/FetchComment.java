@@ -28,13 +28,13 @@ public class FetchComment {
         Call<String> comments;
         if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
             if (commentId == null) {
-                comments = api.getPostAndCommentsById(article, sortType);
+                comments = api.getPostAndCommentsById(article, sortType, null);
             } else {
                 comments = api.getPostAndCommentsSingleThreadById(article, commentId, sortType, contextNumber);
             }
         } else {
             if (commentId == null) {
-                comments = api.getPostAndCommentsByIdOauth(article, sortType, APIUtils.getOAuthHeader(accessToken));
+                comments = api.getPostAndCommentsByIdOauth(article, sortType, null, APIUtils.getOAuthHeader(accessToken));
             } else {
                 comments = api.getPostAndCommentsSingleThreadByIdOauth(article, commentId, sortType, contextNumber,
                         APIUtils.getOAuthHeader(accessToken));
