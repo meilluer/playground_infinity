@@ -1281,6 +1281,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                             ml.docilealligator.infinityforreddit.readpost.ReadComment readComment = new ml.docilealligator.infinityforreddit.readpost.ReadComment(
                                     activity.accountName, mPost.getId(), finalCommentIndex);
                             mRedditDataRoomDatabase.readCommentDao().insert(readComment);
+                            mRedditDataRoomDatabase.readCommentDao().deleteOldReadComments(activity.accountName);
                         } catch (android.database.sqlite.SQLiteConstraintException e) {
                             if (Account.ANONYMOUS_ACCOUNT.equals(activity.accountName)) {
                                 mRedditDataRoomDatabase.accountDao().insert(Account.getAnonymousAccount());
@@ -1288,6 +1289,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                     ml.docilealligator.infinityforreddit.readpost.ReadComment readComment = new ml.docilealligator.infinityforreddit.readpost.ReadComment(
                                             activity.accountName, mPost.getId(), finalCommentIndex);
                                     mRedditDataRoomDatabase.readCommentDao().insert(readComment);
+                                    mRedditDataRoomDatabase.readCommentDao().deleteOldReadComments(activity.accountName);
                                 } catch (Exception ex) {
                                     ex.printStackTrace();
                                 }

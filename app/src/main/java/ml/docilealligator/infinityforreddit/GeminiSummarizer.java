@@ -64,7 +64,8 @@ public class GeminiSummarizer {
                         callback.onError("Parse error: " + e.getMessage());
                     }
                 } else {
-                    callback.onError("API error: " + response.message());
+                    String errorBody = response.body() != null ? response.body().string() : "No error body";
+                    callback.onError("API error: " + response.message() + "\nDetails: " + errorBody);
                 }
             }
         });

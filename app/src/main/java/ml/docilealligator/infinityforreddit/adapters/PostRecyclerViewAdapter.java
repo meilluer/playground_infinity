@@ -951,6 +951,10 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                                 }
                             }
                         }
+                    } else {
+                        if (((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView != null) {
+                            ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.GONE);
+                        }
                     }
 
                     if (mDataSavingMode && mDisableImagePreview) {

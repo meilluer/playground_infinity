@@ -143,7 +143,9 @@ public class APIUtils {
 
     public static Map<String, String> getOAuthHeader(String accessToken) {
         Map<String, String> params = new HashMap<>();
-        params.put(APIUtils.AUTHORIZATION_KEY, APIUtils.AUTHORIZATION_BASE + accessToken);
+        if (accessToken != null && !accessToken.isEmpty()) {
+            params.put(APIUtils.AUTHORIZATION_KEY, APIUtils.AUTHORIZATION_BASE + accessToken);
+        }
         params.put(APIUtils.USER_AGENT_KEY, sUserAgent);
         return params;
     }

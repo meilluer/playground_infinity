@@ -62,13 +62,6 @@
         android:layout_marginBottom="16dp"/>
 
     <CheckBox
-        android:id="@+id/checkbox_download_videos"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Download Videos"
-        android:checked="true"/>
-
-    <CheckBox
         android:id="@+id/checkbox_download_images"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -92,20 +85,6 @@
 
     <Spinner
         android:id="@+id/spinner_image_quality"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="8dp"/>
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Video Quality"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="4dp"/>
-
-    <Spinner
-        android:id="@+id/spinner_video_quality"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:minHeight="48dp"

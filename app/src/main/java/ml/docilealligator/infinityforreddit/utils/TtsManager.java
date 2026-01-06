@@ -16,7 +16,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
@@ -34,6 +36,11 @@ public class TtsManager {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable onComplete;
     private String lastUtteranceId;
+    
+    // For manual sequencing
+    private final List<String> pendingChunks = new ArrayList<>();
+    private final List<Integer> pendingOffsets = new ArrayList<>();
+    private int currentChunkIndex = 0;
 
     public TtsManager(Context context) {
         this.context = context;
@@ -64,15 +71,20 @@ public class TtsManager {
 
                         @Override
                         public void onDone(String utteranceId) {
-                           TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
-                           if (manager != null && manager.onComplete != null && utteranceId.equals(manager.lastUtteranceId)) {
-                               manager.handler.post(manager.onComplete);
-                           }
+                            TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                            if (manager != null) {
+                                // Manual sequencing: trigger next chunk
+                                manager.handler.post(manager::playNextChunk);
+                            }
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-                             // Handle error
+                             // Proceed to next even if error
+                             TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                             if (manager != null) {
+                                 manager.handler.post(manager::playNextChunk);
+                             }
                         }
 
                         @Override
@@ -146,55 +158,93 @@ public class TtsManager {
 
     private void speakInternal() {
         if (tts != null && textToSpeak != null && !textToSpeak.trim().isEmpty()) {
-            chunkOffsets.clear();
+            synchronized (chunkOffsets) {
+                chunkOffsets.clear();
+            }
+            pendingChunks.clear();
+            pendingOffsets.clear();
+            
             int maxLength = TextToSpeech.getMaxSpeechInputLength();
             
-            Bundle params = new Bundle();
-            params.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-            params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f);
+            int offset = 0;
+            int chunkIndex = 0;
             
-            if (textToSpeak.length() <= maxLength) {
-                 lastUtteranceId = UTTERANCE_ID;
-                 tts.speak(textToSpeak, TextToSpeech.QUEUE_FLUSH, params, UTTERANCE_ID);
-            } else {
-                 // Chunking logic for long text
-                 tts.speak("", TextToSpeech.QUEUE_FLUSH, null, null); // Clear queue
-                 int offset = 0;
-                 int chunkIndex = 0;
-                 while (offset < textToSpeak.length()) {
-                     int end = Math.min(offset + maxLength, textToSpeak.length());
-                     // Try to split at whitespace to avoid cutting words
-                     if (end < textToSpeak.length()) {
-                         int lastSpace = textToSpeak.lastIndexOf(' ', end);
-                         if (lastSpace > offset) {
-                             end = lastSpace + 1; // Include space
-                         }
-                     }
-                     String chunk = textToSpeak.substring(offset, end);
-                     String chunkId = UTTERANCE_ID + "_" + chunkIndex;
-                     chunkOffsets.put(chunkId, offset);
-                     
-                     tts.speak(chunk, TextToSpeech.QUEUE_ADD, params, chunkId);
-                     lastUtteranceId = chunkId; // Update last ID
-                     
-                     offset = end;
-                     chunkIndex++;
-                 }
+            while (offset < textToSpeak.length()) {
+                int end = Math.min(offset + maxLength, textToSpeak.length());
+                
+                // Prioritize splitting at newlines to handle paragraphs correctly
+                int firstNewline = textToSpeak.indexOf('\n', offset);
+                if (firstNewline != -1 && firstNewline < end) {
+                    end = firstNewline + 1; // Include the newline
+                } else {
+                    // If no newline within range, try to split at whitespace
+                    if (end < textToSpeak.length()) {
+                        int lastSpace = textToSpeak.lastIndexOf(' ', end);
+                        if (lastSpace > offset) {
+                            end = lastSpace + 1;
+                        }
+                    }
+                }
+
+                String chunk = textToSpeak.substring(offset, end);
+                
+                // Skip empty chunks but ensure we advance offset
+                if (!chunk.trim().isEmpty()) {
+                    pendingChunks.add(chunk);
+                    pendingOffsets.add(offset);
+                    
+                    String chunkId = UTTERANCE_ID + "_" + chunkIndex;
+                    synchronized (chunkOffsets) {
+                        chunkOffsets.put(chunkId, offset);
+                    }
+                    chunkIndex++;
+                }
+
+                offset = end;
             }
+            
+            currentChunkIndex = 0;
+            playNextChunk();
         }
+    }
+    
+    private void playNextChunk() {
+        if (currentChunkIndex >= pendingChunks.size()) {
+            // All chunks done for this comment
+            if (onComplete != null) {
+                onComplete.run();
+            }
+            return;
+        }
+        
+        String chunk = pendingChunks.get(currentChunkIndex);
+        String chunkId = UTTERANCE_ID + "_" + currentChunkIndex;
+        
+        Bundle params = new Bundle();
+        params.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
+        params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f);
+        
+        // Manual sequencing: wait for onDone of THIS chunk to trigger next
+        // Use QUEUE_FLUSH to be safe, as we handle sequence manually
+        tts.speak(chunk, TextToSpeech.QUEUE_FLUSH, params, chunkId);
+        
+        currentChunkIndex++;
     }
 
     private void handleRangeStart(String utteranceId, int start, int end) {
         int globalOffset = 0;
         if (utteranceId.startsWith(UTTERANCE_ID + "_")) {
-            Integer offset = chunkOffsets.get(utteranceId);
+            Integer offset;
+            synchronized (chunkOffsets) {
+                offset = chunkOffsets.get(utteranceId);
+            }
             if (offset != null) globalOffset = offset;
         }
         highlightText(globalOffset + start, globalOffset + end);
     }
 
     private void highlightText(int start, int end) {
-        if (textView == null || textToSpeak == null) return;
+        if (textView == null || textToSpeak == null) return; 
         
         handler.post(() -> {
             try {
@@ -229,6 +279,7 @@ public class TtsManager {
 
     public void stop() {
         onComplete = null;
+        pendingChunks.clear(); // Clear pending chunks to stop sequence
         if (tts != null) {
             tts.stop();
         }

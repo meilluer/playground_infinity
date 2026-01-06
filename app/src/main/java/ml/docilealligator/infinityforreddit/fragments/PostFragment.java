@@ -1182,16 +1182,20 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
     private String selectedFlair;
 
     private void fetchFlairs(String subredditName) {
-        FetchFlairs.fetchFlairsInSubreddit(mExecutor, mHandler, mOauthRetrofit, activity.accessToken, subredditName, new FetchFlairs.FetchFlairsInSubredditListener() {
+        Retrofit retrofit = activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;
+        FetchFlairs.fetchFlairsInSubreddit(mExecutor, mHandler, retrofit, activity.accessToken, subredditName, new FetchFlairs.FetchFlairsInSubredditListener() {
             @Override
             public void fetchSuccessful(List<Flair> flairs) {
                 if (flairs != null && !flairs.isEmpty()) {
                     binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.VISIBLE);
                     com.google.android.material.chip.ChipGroup chipGroup = binding.getRoot().findViewById(R.id.flair_chip_group);
+                    chipGroup.setSingleSelection(true);
                     chipGroup.removeAllViews();
                     for (Flair flair : flairs) {
-                        Chip chip = new Chip(activity);
+                        Chip chip = new Chip(activity, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
                         chip.setText(flair.getText());
+                        chip.setTextColor(mCustomThemeWrapper.getChipTextColor());
+                        chip.setCheckable(true);
                         chip.setOnClickListener(v -> {
                             if (selectedFlair != null && selectedFlair.equals(flair.getText())) {
                                 selectedFlair = null;

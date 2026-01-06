@@ -61,7 +61,6 @@ public class DownloadOfflineSubredditBottomSheetFragment extends BottomSheetDial
         String[] qualities = new String[]{"High", "Low"};
         ArrayAdapter<String> qualityAdapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_dropdown_item, qualities);
         binding.spinnerImageQuality.setAdapter(qualityAdapter);
-        binding.spinnerVideoQuality.setAdapter(qualityAdapter);
 
         android.content.SharedPreferences sharedPreferences = androidx.preference.PreferenceManager.getDefaultSharedPreferences(requireContext());
         int savedCommentLimit = sharedPreferences.getInt("offline_download_comment_limit", 50);
@@ -123,12 +122,12 @@ public class DownloadOfflineSubredditBottomSheetFragment extends BottomSheetDial
                 commentLimit = 0;
             }
 
-            boolean downloadVideos = binding.checkboxDownloadVideos.isChecked();
+            boolean downloadVideos = false;
             boolean downloadImages = binding.checkboxDownloadImages.isChecked();
             boolean downloadText = binding.checkboxDownloadText.isChecked();
             
             String imageQuality = binding.spinnerImageQuality.getSelectedItem().toString();
-            String videoQuality = binding.spinnerVideoQuality.getSelectedItem().toString();
+            String videoQuality = "";
 
             SortType.Type sortType = SortType.Type.BEST;
             String selectedSort = binding.spinnerSortType.getSelectedItem().toString();

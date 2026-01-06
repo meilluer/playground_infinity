@@ -15,4 +15,7 @@ public interface ReadCommentDao {
 
     @Query("DELETE FROM read_comments WHERE username = :username AND post_id = :postId")
     void deleteReadComment(String username, String postId);
+
+    @Query("DELETE FROM read_comments WHERE username = :username AND post_id NOT IN (SELECT post_id FROM read_comments WHERE username = :username ORDER BY time DESC LIMIT 100)")
+    void deleteOldReadComments(String username);
 }

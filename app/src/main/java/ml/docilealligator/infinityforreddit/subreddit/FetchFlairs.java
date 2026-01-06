@@ -8,6 +8,7 @@ import androidx.annotation.WorkerThread;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +32,20 @@ public class FetchFlairs {
                     public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                         if (response.isSuccessful()) {
                             executor.execute(() -> {
-                                List<Flair> flairs = parseFlairs(response.body());
-                                if (flairs != null) {
-                                    handler.post(() -> fetchFlairsInSubredditListener.fetchSuccessful(flairs));
+                                List<Flair> flairs = null;
+                                if (response.body() != null) {
+                                    flairs = parseFlairs(response.body());
+                                }
+                                
+                                final List<Flair> finalFlairs = flairs;
+                                if (finalFlairs != null) {
+                                    handler.post(() -> fetchFlairsInSubredditListener.fetchSuccessful(finalFlairs));
                                 } else {
                                     handler.post(fetchFlairsInSubredditListener::fetchFailed);
                                 }
                             });
                         } else if (response.code() == 403) {
-                            //No flairs
+                            //No flairs or access denied
                             fetchFlairsInSubredditListener.fetchSuccessful(null);
                         } else {
                             fetchFlairsInSubredditListener.fetchFailed();
@@ -56,17 +62,26 @@ public class FetchFlairs {
     @WorkerThread
     @Nullable
     private static List<Flair> parseFlairs(String response) {
+        if (response == null) return null;
         try {
             JSONArray jsonArray = new JSONArray(response);
             List<Flair> flairs = new ArrayList<>();
             for (int i = 0; i < jsonArray.length(); i++) {
                 try {
-                    String id = jsonArray.getJSONObject(i).getString(JSONUtils.ID_KEY);
-                    String text = jsonArray.getJSONObject(i).getString(JSONUtils.TEXT_KEY);
-                    boolean editable = jsonArray.getJSONObject(i).getBoolean(JSONUtils.TEXT_EDITABLE_KEY);
+                    JSONObject jsonObject = jsonArray.getJSONObject(i);
+                    String id = jsonObject.optString(JSONUtils.ID_KEY);
+                    String text = jsonObject.optString(JSONUtils.TEXT_KEY);
+                    
+                    // If text is missing, check "text" key again or "flair_text" just in case
+                    if (text.isEmpty()) {
+                        text = jsonObject.optString("flair_text");
+                    }
 
-                    flairs.add(new Flair(id, text, editable));
-                } catch (JSONException e) {
+                    if (!id.isEmpty() && !text.isEmpty()) {
+                        boolean editable = jsonObject.optBoolean(JSONUtils.TEXT_EDITABLE_KEY, false);
+                        flairs.add(new Flair(id, text, editable));
+                    }
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
