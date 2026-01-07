@@ -75,9 +75,7 @@ public class TtsManager {
 
                         @Override
                         public void onError(String utteranceId) {
-                             // Proceed to next even if error? 
-                             // With QUEUE_ADD, the system handles the queue. 
-                             // We just need to check if we are done.
+                             // Proceed to next even if error
                              TtsManager manager = currentInstance;
                              if (manager != null) {
                                  manager.handleDone(utteranceId);
@@ -170,13 +168,14 @@ public class TtsManager {
             while (offset < textToSpeak.length()) {
                 int end = Math.min(offset + maxLength, textToSpeak.length());
                 
-                // Prioritize splitting at newlines to handle paragraphs correctly
-                int firstNewline = textToSpeak.indexOf('\n', offset);
-                if (firstNewline != -1 && firstNewline < end) {
-                    end = firstNewline + 1; // Include the newline
-                } else {
-                    // If no newline within range, try to split at whitespace
-                    if (end < textToSpeak.length()) {
+                // Only try to split if we hit the length limit
+                if (end < textToSpeak.length()) {
+                    // Try to split at a newline or space near the end to avoid cutting words
+                    int lastNewline = textToSpeak.lastIndexOf('\n', end);
+                    // Ensure the newline is within the current chunk range
+                    if (lastNewline > offset) {
+                        end = lastNewline + 1; // Include the newline
+                    } else {
                         int lastSpace = textToSpeak.lastIndexOf(' ', end);
                         if (lastSpace > offset) {
                             end = lastSpace + 1;
@@ -187,8 +186,6 @@ public class TtsManager {
                 String chunk = textToSpeak.substring(offset, end);
                 
                 // Skip empty chunks but ensure we advance offset
-                // Note: keeping whitespace only chunks can help with pacing if needed, 
-                // but usually better to skip.
                 if (!chunk.trim().isEmpty()) {
                     chunks.add(chunk);
                     offsets.add(offset);
