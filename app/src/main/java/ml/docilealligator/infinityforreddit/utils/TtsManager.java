@@ -34,12 +34,9 @@ public class TtsManager {
     private final Map<String, Integer> chunkOffsets = new HashMap<>();
     private final Handler handler = new Handler(Looper.getMainLooper());
     private Runnable onComplete;
-    private String lastUtteranceId;
     
-    // For manual sequencing
-    private final List<String> pendingChunks = new ArrayList<>();
-    private final List<Integer> pendingOffsets = new ArrayList<>();
-    private int currentChunkIndex = 0;
+    // Track total chunks to know when to finish
+    private int totalChunks = 0;
 
     public TtsManager(Context context) {
         this.context = context;
@@ -72,17 +69,18 @@ public class TtsManager {
                         public void onDone(String utteranceId) {
                             TtsManager manager = currentInstance;
                             if (manager != null) {
-                                // Manual sequencing: trigger next chunk
-                                manager.handler.post(manager::playNextChunk);
+                                manager.handleDone(utteranceId);
                             }
                         }
 
                         @Override
                         public void onError(String utteranceId) {
-                             // Proceed to next even if error
+                             // Proceed to next even if error? 
+                             // With QUEUE_ADD, the system handles the queue. 
+                             // We just need to check if we are done.
                              TtsManager manager = currentInstance;
                              if (manager != null) {
-                                 manager.handler.post(manager::playNextChunk);
+                                 manager.handleDone(utteranceId);
                              }
                         }
 
@@ -160,14 +158,15 @@ public class TtsManager {
             synchronized (chunkOffsets) {
                 chunkOffsets.clear();
             }
-            pendingChunks.clear();
-            pendingOffsets.clear();
             
             int maxLength = TextToSpeech.getMaxSpeechInputLength();
-            
             int offset = 0;
             int chunkIndex = 0;
             
+            // Generate all chunks first
+            List<String> chunks = new ArrayList<>();
+            List<Integer> offsets = new ArrayList<>();
+
             while (offset < textToSpeak.length()) {
                 int end = Math.min(offset + maxLength, textToSpeak.length());
                 
@@ -188,9 +187,11 @@ public class TtsManager {
                 String chunk = textToSpeak.substring(offset, end);
                 
                 // Skip empty chunks but ensure we advance offset
+                // Note: keeping whitespace only chunks can help with pacing if needed, 
+                // but usually better to skip.
                 if (!chunk.trim().isEmpty()) {
-                    pendingChunks.add(chunk);
-                    pendingOffsets.add(offset);
+                    chunks.add(chunk);
+                    offsets.add(offset);
                     
                     String chunkId = UTTERANCE_ID + "_" + chunkIndex;
                     synchronized (chunkOffsets) {
@@ -202,37 +203,53 @@ public class TtsManager {
                 offset = end;
             }
             
-            currentChunkIndex = 0;
-            playNextChunk();
+            totalChunks = chunks.size();
+            
+            if (totalChunks == 0) {
+                 if (onComplete != null) onComplete.run();
+                 if (currentInstance == this) currentInstance = null;
+                 return;
+            }
+
+            // Queue all chunks
+            for (int i = 0; i < totalChunks; i++) {
+                String chunk = chunks.get(i);
+                String chunkId = UTTERANCE_ID + "_" + i;
+                
+                Bundle params = new Bundle();
+                params.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
+                params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f);
+                
+                // First chunk flushes (clears) previous queue, others add to it
+                int queueMode = (i == 0) ? TextToSpeech.QUEUE_FLUSH : TextToSpeech.QUEUE_ADD;
+                
+                tts.speak(chunk, queueMode, params, chunkId);
+            }
         }
     }
     
-    private void playNextChunk() {
-        if (currentChunkIndex >= pendingChunks.size()) {
-            // All chunks done for this comment
-            if (onComplete != null) {
-                onComplete.run();
+    private void handleDone(String utteranceId) {
+        // Check if this is the last chunk
+        if (utteranceId != null && utteranceId.startsWith(UTTERANCE_ID + "_")) {
+            try {
+                int index = Integer.parseInt(utteranceId.substring(UTTERANCE_ID.length() + 1));
+                if (index == totalChunks - 1) {
+                    // This was the last chunk
+                    handler.post(() -> {
+                        if (onComplete != null) {
+                            onComplete.run();
+                        }
+                    });
+                    
+                    // Release strong reference
+                    if (currentInstance == this) {
+                        currentInstance = null;
+                    }
+                }
+            } catch (NumberFormatException e) {
+                // Ignore
             }
-            
-            // Release the strong reference as playback is complete
-            if (currentInstance == this) {
-                currentInstance = null;
-            }
-            return;
         }
-        
-        String chunk = pendingChunks.get(currentChunkIndex);
-        String chunkId = UTTERANCE_ID + "_" + currentChunkIndex;
-        
-        Bundle params = new Bundle();
-        params.putInt(TextToSpeech.Engine.KEY_PARAM_STREAM, AudioManager.STREAM_MUSIC);
-        params.putFloat(TextToSpeech.Engine.KEY_PARAM_VOLUME, 1.0f);
-        
-        // Manual sequencing: wait for onDone of THIS chunk to trigger next
-        // Use QUEUE_FLUSH to be safe, as we handle sequence manually
-        tts.speak(chunk, TextToSpeech.QUEUE_FLUSH, params, chunkId);
-        
-        currentChunkIndex++;
     }
 
     private void handleRangeStart(String utteranceId, int start, int end) {
@@ -283,7 +300,6 @@ public class TtsManager {
 
     public void stop() {
         onComplete = null;
-        pendingChunks.clear(); // Clear pending chunks to stop sequence
         if (tts != null) {
             tts.stop();
         }
