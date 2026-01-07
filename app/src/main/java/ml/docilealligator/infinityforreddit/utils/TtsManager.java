@@ -15,7 +15,6 @@ import android.text.style.BackgroundColorSpan;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +25,7 @@ public class TtsManager {
 
     private static TextToSpeech tts;
     private static boolean isInitialized = false;
-    private static WeakReference<TtsManager> currentInstanceRef;
+    private static TtsManager currentInstance;
     private static final String UTTERANCE_ID = "infinity_tts_id";
 
     private final Context context;
@@ -71,7 +70,7 @@ public class TtsManager {
 
                         @Override
                         public void onDone(String utteranceId) {
-                            TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                            TtsManager manager = currentInstance;
                             if (manager != null) {
                                 // Manual sequencing: trigger next chunk
                                 manager.handler.post(manager::playNextChunk);
@@ -81,7 +80,7 @@ public class TtsManager {
                         @Override
                         public void onError(String utteranceId) {
                              // Proceed to next even if error
-                             TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                             TtsManager manager = currentInstance;
                              if (manager != null) {
                                  manager.handler.post(manager::playNextChunk);
                              }
@@ -89,7 +88,7 @@ public class TtsManager {
 
                         @Override
                         public void onRangeStart(String utteranceId, int start, int end, int frame) {
-                            TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                            TtsManager manager = currentInstance;
                             if (manager != null) {
                                 manager.handleRangeStart(utteranceId, start, end);
                             }
@@ -98,7 +97,7 @@ public class TtsManager {
                     isInitialized = true;
                     
                     // Attempt to speak if a request was made during initialization
-                    TtsManager manager = currentInstanceRef != null ? currentInstanceRef.get() : null;
+                    TtsManager manager = currentInstance;
                     if (manager != null) {
                         manager.speakInternal();
                     }
@@ -117,7 +116,7 @@ public class TtsManager {
             tts.stop();
         }
         
-        currentInstanceRef = new WeakReference<>(this);
+        currentInstance = this;
         this.textView = textView;
         this.onComplete = onComplete;
         
@@ -214,6 +213,11 @@ public class TtsManager {
             if (onComplete != null) {
                 onComplete.run();
             }
+            
+            // Release the strong reference as playback is complete
+            if (currentInstance == this) {
+                currentInstance = null;
+            }
             return;
         }
         
@@ -284,6 +288,10 @@ public class TtsManager {
             tts.stop();
         }
         clearHighlights();
+        
+        if (currentInstance == this) {
+            currentInstance = null;
+        }
     }
     
     public void shutdown() {
