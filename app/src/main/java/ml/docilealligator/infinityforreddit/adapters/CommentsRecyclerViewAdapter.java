@@ -168,10 +168,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     private boolean canStartActivity = true;
 
-    private final TtsManager ttsManager;
-    private boolean isPlayingSequence = false;
-    private int currentPlayingPosition = -1;
-
     public CommentsRecyclerViewAdapter(BaseActivity activity, ViewPostDetailFragment fragment,
                                        CustomThemeWrapper customThemeWrapper,
                                        Executor executor, Retrofit retrofit, Retrofit oauthRetrofit,
@@ -182,7 +178,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                                        SharedPreferences nsfwAndSpoilerSharedPreferences,
                                        CommentRecyclerViewAdapterCallback commentRecyclerViewAdapterCallback) {
         mActivity = activity;
-        ttsManager = new TtsManager(activity);
         mFragment = fragment;
         mExecutor = executor;
         mRetrofit = retrofit;
@@ -421,70 +416,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
     }
 
-    private void playCommentSequence(int commentIndex, boolean playSequentially) {
-        if (commentIndex < 0 || commentIndex >= mVisibleComments.size()) {
-            isPlayingSequence = false;
-            currentPlayingPosition = -1;
-            return;
-        }
 
-        currentPlayingPosition = commentIndex;
-        isPlayingSequence = true;
-
-        Comment comment = mVisibleComments.get(commentIndex);
-
-        if (comment.getPlaceholderType() != Comment.NOT_PLACEHOLDER 
-            || comment.getCommentRawText() == null 
-            || comment.getCommentRawText().isEmpty()) {
-            if (playSequentially) {
-                playCommentSequence(commentIndex + 1, true);
-            } else {
-                isPlayingSequence = false;
-                currentPlayingPosition = -1;
-            }
-            return;
-        }
-
-        int adapterPosition = mIsSingleCommentThreadMode ? commentIndex + 1 : commentIndex;
-        RecyclerView rv = mFragment.getView() != null ? mFragment.getView().findViewById(R.id.post_detail_recycler_view_view_post_detail_fragment) : null;
-        
-        if (rv != null) {
-            rv.smoothScrollToPosition(adapterPosition);
-        }
-
-        new Handler(android.os.Looper.getMainLooper()).postDelayed(() -> {
-            if (!isPlayingSequence || currentPlayingPosition != commentIndex) return;
-
-            TextView tv = null;
-            if (rv != null) {
-                RecyclerView.ViewHolder holder = rv.findViewHolderForAdapterPosition(adapterPosition);
-                if (holder instanceof CommentBaseViewHolder) {
-                    if (((CommentBaseViewHolder) holder).commentMarkdownView.getChildCount() > 0) {
-                        RecyclerView.ViewHolder vh = ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0);
-                        if (vh != null) {
-                             if (vh.itemView instanceof TextView) {
-                                  tv = (TextView) vh.itemView;
-                             } else {
-                                  tv = vh.itemView.findViewById(android.R.id.text1);
-                                  if (tv == null) {
-                                      tv = vh.itemView.findViewById(R.id.text);
-                                  }
-                             }
-                        }
-                    }
-                }
-            }
-
-            ttsManager.speak(comment.getCommentRawText(), tv, () -> {
-                if (playSequentially) {
-                    playCommentSequence(commentIndex + 1, true);
-                } else {
-                    isPlayingSequence = false;
-                    currentPlayingPosition = -1;
-                }
-            });
-        }, 500);
-    }
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
@@ -674,33 +606,28 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                                                             ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
 
                                                             ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
-                                                                int currentPos = holder.getBindingAdapterPosition();
-                                                                if (currentPos == RecyclerView.NO_POSITION) return;
-
-                                                                // Adjusted based on user feedback: Normal mode needs +1, Single mode needs currentPos.
-                                                                int commentIndex = mIsSingleCommentThreadMode ? currentPos : currentPos + 1;
-
-                                                                if (isPlayingSequence) {
-                                                                    ttsManager.stop();
-                                                                    isPlayingSequence = false;
-                                                                    currentPlayingPosition = -1;
-                                                                } else {
-                                                                    playCommentSequence(commentIndex, false);
+                                                                TextView tv = null;
+                                                                if (((CommentBaseViewHolder) holder).commentMarkdownView.getChildCount() > 0) {
+                                                                    RecyclerView.ViewHolder vh = ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0);
+                                                                    if (vh != null) {
+                                                                         if (vh.itemView instanceof TextView) {
+                                                                              tv = (TextView) vh.itemView;
+                                                                         } else {
+                                                                              tv = vh.itemView.findViewById(android.R.id.text1);
+                                                                              if (tv == null) {
+                                                                                  tv = vh.itemView.findViewById(R.id.text);
+                                                                              }
+                                                                         }
+                                                                    }
+                                                                }
+                                                                if (mCommentRecyclerViewAdapterCallback != null) {
+                                                                    mCommentRecyclerViewAdapterCallback.onTtsClick(comment, tv);
                                                                 }
                                                             });
 
                                                             ((CommentBaseViewHolder) holder).textToSpeechButton.setOnLongClickListener(v -> {
-                                                                int currentPos = holder.getBindingAdapterPosition();
-                                                                if (currentPos == RecyclerView.NO_POSITION) return true;
-
-                                                                int commentIndex = mIsSingleCommentThreadMode ? currentPos : currentPos + 1;
-
-                                                                if (isPlayingSequence) {
-                                                                    ttsManager.stop();
-                                                                    isPlayingSequence = false;
-                                                                    currentPlayingPosition = -1;
-                                                                } else {
-                                                                    playCommentSequence(commentIndex, true);
+                                                                if (mCommentRecyclerViewAdapterCallback != null) {
+                                                                    mCommentRecyclerViewAdapterCallback.onTtsLongClick(comment);
                                                                 }
                                                                 return true;
                                                             });
@@ -1415,6 +1342,10 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         void retryFetchingMoreComments();
 
         SortType.Type getSortType();
+
+        void onTtsClick(Comment comment, TextView textView);
+
+        void onTtsLongClick(Comment comment);
     }
 
     public class CommentBaseViewHolder extends RecyclerView.ViewHolder {

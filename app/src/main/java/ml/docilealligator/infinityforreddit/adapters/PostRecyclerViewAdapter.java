@@ -926,32 +926,17 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                             ((PostWithPreviewTypeViewHolder) holder).imageViewNoPreviewGallery.setImageResource(R.drawable.ic_link_day_night_24dp);
                         }
 
-                        if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
-                            if (((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView != null) {
-                                String summary = GeminiHelper.getSummary(post.getUrl());
-                                if (summary != null) {
-                                    ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setText(summary);
-                                    ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.VISIBLE);
-                                } else {
-                                    ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.GONE);
-                                    String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
-                                    if (!apiKey.isEmpty()) {
-                                        GeminiHelper.summarizeLink(apiKey, post.getUrl(), new GeminiHelper.SummaryCallback() {
-                                            @Override
-                                            public void onSuccess(String summary) {
-                                                GeminiHelper.cacheSummary(post.getUrl(), summary);
-                                                new Handler(android.os.Looper.getMainLooper()).post(() -> notifyItemChanged(holder.getBindingAdapterPosition()));
-                                            }
-
-                                            @Override
-                                            public void onFailure(String error) {
-                                            }
-                                        });
-                                    }
-                                }
-                            }
-                        }
-                    } else {
+                                            if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
+                                                if (((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView != null) {
+                                                    String summary = GeminiHelper.getSummary(post.getUrl());
+                                                    if (summary != null) {
+                                                        ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setText(summary);
+                                                        ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.VISIBLE);
+                                                    } else {
+                                                        ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.GONE);
+                                                    }
+                                                }
+                                            }                    } else {
                         if (((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView != null) {
                             ((PostWithPreviewTypeViewHolder) holder).geminiSummaryTextView.setVisibility(View.GONE);
                         }

@@ -128,7 +128,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
-public class ViewPostDetailFragment extends Fragment implements FragmentCommunicator, PostModerationActionHandler, PostDetailRecyclerViewAdapter.OnLongClickTtsListener {
+public class ViewPostDetailFragment extends Fragment implements FragmentCommunicator, PostModerationActionHandler, PostDetailRecyclerViewAdapter.OnLongClickTtsListener, PostDetailRecyclerViewAdapter.OnTtsClickListener {
 
     public static final String EXTRA_POST_DATA = "EPD";
     public static final String EXTRA_POST_ID = "EPI";
@@ -612,6 +612,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                     mSharedPreferences, mCurrentAccountSharedPreferences, mNsfwAndSpoilerSharedPreferences, mPostDetailsSharedPreferences,
                     mExoCreator, post -> EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, postListPosition)));
             mPostAdapter.setOnLongClickTtsListener(this);
+            mPostAdapter.setOnTtsClickListener(this);
             mCommentsAdapter = new CommentsRecyclerViewAdapter(activity,
                     this, mCustomThemeWrapper, mExecutor, mRetrofit, mOauthRetrofit,
                     activity.accessToken, activity.accountName, mPost, mLocale, mSingleCommentId,
@@ -633,6 +634,41 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                         @Override
                         public SortType.Type getSortType() {
                             return sortType;
+                        }
+
+                        @Override
+                        public void onTtsClick(Comment comment, TextView textView) {
+                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+                                mSequentialTtsManager.stop();
+                                mIsReadingAll = false;
+                                return;
+                            }
+                            if (mSequentialTtsManager == null) {
+                                mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+                            }
+                            mIsReadingAll = false;
+                            mSequentialTtsManager.speak(comment.getCommentRawText(), textView);
+                        }
+
+                        @Override
+                        public void onTtsLongClick(Comment comment) {
+                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+                                mSequentialTtsManager.stop();
+                                mIsReadingAll = false;
+                            }
+                            
+                            mIsReadingAll = true;
+                            // Find index of comment
+                            int index = -1;
+                             if (mCommentsAdapter != null && mCommentsAdapter.getVisibleComments() != null) {
+                                index = mCommentsAdapter.getVisibleComments().indexOf(comment);
+                            }
+                            if (index != -1) {
+                                mCurrentCommentIndex = index;
+                                readNextComment();
+                            } else {
+                                mIsReadingAll = false;
+                            }
                         }
                     });
             if (mCommentsRecyclerView != null) {
@@ -1414,6 +1450,41 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                         @Override
                                         public SortType.Type getSortType() {
                                             return sortType;
+                                        }
+
+                                        @Override
+                                        public void onTtsClick(Comment comment, TextView textView) {
+                                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+                                                mSequentialTtsManager.stop();
+                                                mIsReadingAll = false;
+                                                return;
+                                            }
+                                            if (mSequentialTtsManager == null) {
+                                                mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+                                            }
+                                            mIsReadingAll = false;
+                                            mSequentialTtsManager.speak(comment.getCommentRawText(), textView);
+                                        }
+
+                                        @Override
+                                        public void onTtsLongClick(Comment comment) {
+                                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+                                                mSequentialTtsManager.stop();
+                                                mIsReadingAll = false;
+                                            }
+
+                                            mIsReadingAll = true;
+                                            // Find index of comment
+                                            int index = -1;
+                                            if (mCommentsAdapter != null && mCommentsAdapter.getVisibleComments() != null) {
+                                                index = mCommentsAdapter.getVisibleComments().indexOf(comment);
+                                            }
+                                            if (index != -1) {
+                                                mCurrentCommentIndex = index;
+                                                readNextComment();
+                                            } else {
+                                                mIsReadingAll = false;
+                                            }
                                         }
                                     });
                             if (mCommentsRecyclerView != null) {
@@ -2226,45 +2297,43 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     private int mCurrentCommentIndex = -1;
 
     @Override
-    public void onLongClickTts(Post post) {
-        if (mIsReadingAll) {
-                mIsReadingAll = false;
-                if (mSequentialTtsManager != null) {
-                    mSequentialTtsManager.stop();
-                }
-                Toast.makeText(activity, "Stopped reading", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            mIsReadingAll = true;
-            Toast.makeText(activity, "Reading post and comments...", Toast.LENGTH_SHORT).show();
-
-            if (mSequentialTtsManager == null) {
-                mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
-            }
-
-            // Try to find the TextView for highlighting if visible.
-            // It's in the first item of the recycler view (usually).
-            // Since we are reading the post, we assume it's at the top.
-            RecyclerView rv = binding.postDetailRecyclerViewViewPostDetailFragment;
-            TextView postTv = null;
-            RecyclerView.ViewHolder vh = rv.findViewHolderForAdapterPosition(0);
-            // This is a rough approximation, better to just pass null if not easily found or handle in TtsManager if view is recycled.
-            // TtsManager checks for null view.
-
-            // Wait, vh might be PostDetailBaseViewHolder.
-            if (vh instanceof PostDetailRecyclerViewAdapter.PostDetailBaseViewHolder) {
-                // Accessing the TextView inside is hard because it's private/protected in Adapter or ViewHolder.
-                // But TtsManager.speak handles null textView.
-            }
-
-            mSequentialTtsManager.speak(post.getSelfTextPlain(), null, () -> {
-                if (mIsReadingAll) {
-                    mCurrentCommentIndex = 0;
-                    new Handler(Looper.getMainLooper()).post(this::readNextComment);
-                }
-            });
+    public void onTtsClick(Post post, TextView contentTextView) {
+        if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+            mSequentialTtsManager.stop();
+            mIsReadingAll = false;
+            Toast.makeText(activity, "Stopped reading", Toast.LENGTH_SHORT).show();
+            return;
         }
+
+        if (mSequentialTtsManager == null) {
+            mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+        }
+
+        mIsReadingAll = false;
+        mSequentialTtsManager.speak(post.getSelfTextPlain(), contentTextView);
+    }
+
+    @Override
+    public void onLongClickTts(Post post) {
+        if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+            mSequentialTtsManager.stop();
+            mIsReadingAll = false;
+        }
+
+        mIsReadingAll = true;
+        Toast.makeText(activity, "Reading post and comments...", Toast.LENGTH_SHORT).show();
+
+        if (mSequentialTtsManager == null) {
+            mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+        }
+
+        mSequentialTtsManager.speak(post.getSelfTextPlain(), null, () -> {
+            if (mIsReadingAll) {
+                mCurrentCommentIndex = 0;
+                new Handler(Looper.getMainLooper()).post(this::readNextComment);
+            }
+        });
+    }
 
         private void readNextComment() {
             if (!mIsReadingAll || mCommentsAdapter == null || mCurrentCommentIndex >= mCommentsAdapter.getItemCount()) {

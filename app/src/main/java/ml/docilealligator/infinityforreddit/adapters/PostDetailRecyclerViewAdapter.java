@@ -237,10 +237,19 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         void onLongClickTts(Post post);
     }
 
+    public interface OnTtsClickListener {
+        void onTtsClick(Post post, TextView contentTextView);
+    }
+
     private OnLongClickTtsListener mOnLongClickTtsListener;
+    private OnTtsClickListener mOnTtsClickListener;
 
     public void setOnLongClickTtsListener(OnLongClickTtsListener listener) {
         mOnLongClickTtsListener = listener;
+    }
+
+    public void setOnTtsClickListener(OnTtsClickListener listener) {
+        mOnTtsClickListener = listener;
     }
 
     public PostDetailRecyclerViewAdapter(@NonNull BaseActivity activity, ViewPostDetailFragment fragment,
@@ -761,23 +770,23 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty()) {
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
-                        Toast.makeText(mActivity, "request send", Toast.LENGTH_SHORT).show();
-                        TtsManager ttsManager = new TtsManager(mActivity);
-                        TextView tv = null;
-                        if (((PostDetailBaseViewHolder) holder).contentMarkdownView.getChildCount() > 0) {
-                            RecyclerView.ViewHolder vh = ((PostDetailBaseViewHolder) holder).contentMarkdownView.findViewHolderForAdapterPosition(0);
-                            if (vh != null) {
-                                if (vh.itemView instanceof TextView) {
-                                    tv = (TextView) vh.itemView;
-                                } else {
-                                    tv = vh.itemView.findViewById(android.R.id.text1);
-                                    if (tv == null) {
-                                        tv = vh.itemView.findViewById(R.id.text);
+                        if (mOnTtsClickListener != null) {
+                            TextView tv = null;
+                            if (((PostDetailBaseViewHolder) holder).contentMarkdownView.getChildCount() > 0) {
+                                RecyclerView.ViewHolder vh = ((PostDetailBaseViewHolder) holder).contentMarkdownView.findViewHolderForAdapterPosition(0);
+                                if (vh != null) {
+                                    if (vh.itemView instanceof TextView) {
+                                        tv = (TextView) vh.itemView;
+                                    } else {
+                                        tv = vh.itemView.findViewById(android.R.id.text1);
+                                        if (tv == null) {
+                                            tv = vh.itemView.findViewById(R.id.text);
+                                        }
                                     }
                                 }
                             }
+                            mOnTtsClickListener.onTtsClick(mPost, tv);
                         }
-                        ttsManager.speak(mPost.getSelfTextPlain(), tv);
                     });
                     
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnLongClickListener(v -> {
