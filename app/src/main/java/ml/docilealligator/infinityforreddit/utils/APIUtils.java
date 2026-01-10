@@ -23,7 +23,7 @@ public class APIUtils {
     public static void init(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         sRedditClientId = preferences.getString("reddit_api_key", "NOe2iKrPPzwscA");
-        sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:" + " (by /u/Hostilenemy)");
+        sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:\" + BuildConfig.VERSION_NAME + \" (by /u/Hostilenemy)");
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
         gemini=preferences.getString("gemini_key","123");

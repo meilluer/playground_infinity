@@ -606,22 +606,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                                                             ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
 
                                                             ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
-                                                                TextView tv = null;
-                                                                if (((CommentBaseViewHolder) holder).commentMarkdownView.getChildCount() > 0) {
-                                                                    RecyclerView.ViewHolder vh = ((CommentBaseViewHolder) holder).commentMarkdownView.findViewHolderForAdapterPosition(0);
-                                                                    if (vh != null) {
-                                                                         if (vh.itemView instanceof TextView) {
-                                                                              tv = (TextView) vh.itemView;
-                                                                         } else {
-                                                                              tv = vh.itemView.findViewById(android.R.id.text1);
-                                                                              if (tv == null) {
-                                                                                  tv = vh.itemView.findViewById(R.id.text);
-                                                                              }
-                                                                         }
-                                                                    }
-                                                                }
                                                                 if (mCommentRecyclerViewAdapterCallback != null) {
-                                                                    mCommentRecyclerViewAdapterCallback.onTtsClick(comment, tv);
+                                                                    mCommentRecyclerViewAdapterCallback.onTtsClick(comment, ((CommentBaseViewHolder) holder).itemView);
                                                                 }
                                                             });
 
@@ -1343,7 +1329,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         SortType.Type getSortType();
 
-        void onTtsClick(Comment comment, TextView textView);
+        void onTtsClick(Comment comment, View itemView);
 
         void onTtsLongClick(Comment comment);
     }

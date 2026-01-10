@@ -637,9 +637,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                         }
 
                         @Override
-                        public void onTtsClick(Comment comment, TextView textView) {
+                        public void onTtsClick(Comment comment, View itemView) {
                             if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
                                 mSequentialTtsManager.stop();
+                                unhighlightCurrentView();
                                 mIsReadingAll = false;
                                 return;
                             }
@@ -647,7 +648,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                 mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
                             }
                             mIsReadingAll = false;
-                            mSequentialTtsManager.speak(comment.getCommentRawText(), textView);
+                            highlightView(itemView);
+                            mSequentialTtsManager.speak(comment.getCommentRawText(), () -> {
+                                unhighlightCurrentView();
+                            });
                         }
 
                         @Override
@@ -1453,9 +1457,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                         }
 
                                         @Override
-                                        public void onTtsClick(Comment comment, TextView textView) {
+                                        public void onTtsClick(Comment comment, View itemView) {
                                             if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
                                                 mSequentialTtsManager.stop();
+                                                unhighlightCurrentView();
                                                 mIsReadingAll = false;
                                                 return;
                                             }
@@ -1463,7 +1468,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                                 mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
                                             }
                                             mIsReadingAll = false;
-                                            mSequentialTtsManager.speak(comment.getCommentRawText(), textView);
+                                            highlightView(itemView);
+                                            mSequentialTtsManager.speak(comment.getCommentRawText(), () -> {
+                                                unhighlightCurrentView();
+                                            });
                                         }
 
                                         @Override
@@ -2297,7 +2305,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     private int mCurrentCommentIndex = -1;
 
     @Override
-    public void onTtsClick(Post post, TextView contentTextView) {
+    public void onTtsClick(Post post) {
         if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
             mSequentialTtsManager.stop();
             mIsReadingAll = false;
@@ -2310,7 +2318,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         }
 
         mIsReadingAll = false;
-        mSequentialTtsManager.speak(post.getSelfTextPlain(), contentTextView);
+        mSequentialTtsManager.speak(post.getSelfTextPlain());
     }
 
     @Override
@@ -2327,7 +2335,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
             mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
         }
 
-        mSequentialTtsManager.speak(post.getSelfTextPlain(), null, () -> {
+        mSequentialTtsManager.speak(post.getSelfTextPlain(), () -> {
             if (mIsReadingAll) {
                 mCurrentCommentIndex = 0;
                 new Handler(Looper.getMainLooper()).post(this::readNextComment);
@@ -2335,50 +2343,74 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         });
     }
 
-        private void readNextComment() {
-            if (!mIsReadingAll || mCommentsAdapter == null || mCurrentCommentIndex >= mCommentsAdapter.getItemCount()) {
-                mIsReadingAll = false;
+    private View mCurrentHighlightedView;
+    private android.graphics.drawable.Drawable mOriginalBackground;
+
+    private void highlightView(View view) {
+        if (view == null) return;
+        unhighlightCurrentView();
+        mCurrentHighlightedView = view;
+        mOriginalBackground = view.getBackground();
+
+        android.util.TypedValue typedValue = new android.util.TypedValue();
+        activity.getTheme().resolveAttribute(android.R.attr.colorControlHighlight, typedValue, true);
+        view.setBackgroundColor(typedValue.data);
+    }
+
+    private void unhighlightCurrentView() {
+        if (mCurrentHighlightedView != null) {
+            mCurrentHighlightedView.setBackground(mOriginalBackground);
+            mCurrentHighlightedView = null;
+            mOriginalBackground = null;
+        }
+    }
+
+    private void readNextComment() {
+        if (!mIsReadingAll || mCommentsAdapter == null || mCurrentCommentIndex >= mCommentsAdapter.getItemCount()) {
+            mIsReadingAll = false;
+            unhighlightCurrentView();
+            return;
+        }
+
+        RecyclerView rv = mCommentsRecyclerView != null ? mCommentsRecyclerView : binding.postDetailRecyclerViewViewPostDetailFragment;
+
+        // Calculate position in the RecyclerView
+        int positionInRv = mCurrentCommentIndex;
+        if (mConcatAdapter != null) {
+            positionInRv += mPostAdapter.getItemCount();
+        }
+
+        int finalPosition = positionInRv;
+        rv.smoothScrollToPosition(finalPosition);
+
+        new Handler(Looper.getMainLooper()).postDelayed(() -> {
+            if (!mIsReadingAll) {
+                unhighlightCurrentView();
                 return;
             }
 
-            RecyclerView rv = mCommentsRecyclerView != null ? mCommentsRecyclerView : binding.postDetailRecyclerViewViewPostDetailFragment;
+            RecyclerView.ViewHolder vh = rv.findViewHolderForAdapterPosition(finalPosition);
+            View itemView = vh != null ? vh.itemView : null;
 
-            // Calculate position in the RecyclerView
-            int positionInRv = mCurrentCommentIndex;
-            if (mConcatAdapter != null) {
-                positionInRv += mPostAdapter.getItemCount();
-            }
-
-            int finalPosition = positionInRv;
-            rv.smoothScrollToPosition(finalPosition);
-
-            new Handler(Looper.getMainLooper()).postDelayed(() -> {
-                if (!mIsReadingAll) return;
-
-                // Try to find the view holder after scroll
-                RecyclerView.ViewHolder vh = rv.findViewHolderForAdapterPosition(finalPosition);
-                TextView commentTv = null;
-
-                // Simplified: just pass null for now to fix compilation error.
-                // We avoid complex view traversal.
-
-                Comment comment = mCommentsAdapter.getCurrentComment(mCurrentCommentIndex);
-                if (comment != null && comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty()) {
-                    mSequentialTtsManager.speak(comment.getCommentRawText(), commentTv, () -> {
-                        if (mIsReadingAll) {
-                            mCurrentCommentIndex++;
-                            new Handler(Looper.getMainLooper()).post(this::readNextComment);
-                        }
-                    });
-                } else {
-                    // Skip invalid/empty comment
+            Comment comment = mCommentsAdapter.getCurrentComment(mCurrentCommentIndex);
+            if (comment != null && comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty()) {
+                highlightView(itemView);
+                mSequentialTtsManager.speak(comment.getCommentRawText(), () -> {
+                    unhighlightCurrentView();
                     if (mIsReadingAll) {
                         mCurrentCommentIndex++;
-                        readNextComment();
+                        new Handler(Looper.getMainLooper()).post(this::readNextComment);
                     }
+                });
+            } else {
+                // Skip invalid/empty comment
+                if (mIsReadingAll) {
+                    mCurrentCommentIndex++;
+                    readNextComment();
                 }
-            }, 1000); // Delay for scroll
-        }
+            }
+        }, 1000); // Delay for scroll
+    }
 
         @Override
         public void onDestroy () {

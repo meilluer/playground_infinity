@@ -238,7 +238,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     }
 
     public interface OnTtsClickListener {
-        void onTtsClick(Post post, TextView contentTextView);
+        void onTtsClick(Post post);
     }
 
     private OnLongClickTtsListener mOnLongClickTtsListener;
@@ -771,21 +771,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
                     ((PostDetailBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
                         if (mOnTtsClickListener != null) {
-                            TextView tv = null;
-                            if (((PostDetailBaseViewHolder) holder).contentMarkdownView.getChildCount() > 0) {
-                                RecyclerView.ViewHolder vh = ((PostDetailBaseViewHolder) holder).contentMarkdownView.findViewHolderForAdapterPosition(0);
-                                if (vh != null) {
-                                    if (vh.itemView instanceof TextView) {
-                                        tv = (TextView) vh.itemView;
-                                    } else {
-                                        tv = vh.itemView.findViewById(android.R.id.text1);
-                                        if (tv == null) {
-                                            tv = vh.itemView.findViewById(R.id.text);
-                                        }
-                                    }
-                                }
-                            }
-                            mOnTtsClickListener.onTtsClick(mPost, tv);
+                            mOnTtsClickListener.onTtsClick(mPost);
                         }
                     });
                     
