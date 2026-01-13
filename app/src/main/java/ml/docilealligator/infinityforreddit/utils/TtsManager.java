@@ -7,23 +7,39 @@ import android.os.Looper;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.UtteranceProgressListener;
 
+import java.text.BreakIterator;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
 
 public class TtsManager {
     private final TextToSpeech mTextToSpeech;
     private boolean mIsInitialized = false;
     private final ArrayList<TtsChunk> mPendingChunks = new ArrayList<>();
+    // Map to store chunks by utteranceId for retrieval in callbacks
+    private final Map<String, TtsChunk> mChunkMap = new HashMap<>();
     private Runnable mOnDone;
+    private OnTtsUpdateListener mOnTtsUpdateListener;
     private String mCurrentUtteranceId;
     private final Handler mMainHandler = new Handler(Looper.getMainLooper());
+
+    public interface OnTtsUpdateListener {
+        void onSentenceStart(String text, int start, int end);
+        void onWordStart(String text, int start, int end);
+    }
 
     private static class TtsChunk {
         String text;
         String utteranceId;
+        int start;
+        int end;
         
-        TtsChunk(String text, String utteranceId) {
+        TtsChunk(String text, String utteranceId, int start, int end) {
             this.text = text;
             this.utteranceId = utteranceId;
+            this.start = start;
+            this.end = end;
         }
     }
 
@@ -40,10 +56,29 @@ public class TtsManager {
         mTextToSpeech.setOnUtteranceProgressListener(new UtteranceProgressListener() {
             @Override
             public void onStart(String utteranceId) {
+                if (mOnTtsUpdateListener != null) {
+                    TtsChunk chunk = mChunkMap.get(utteranceId);
+                    if (chunk != null) {
+                        mMainHandler.post(() -> mOnTtsUpdateListener.onSentenceStart(chunk.text, chunk.start, chunk.end));
+                    }
+                }
+            }
+
+            @Override
+            public void onRangeStart(String utteranceId, int start, int end, int frame) {
+                if (mOnTtsUpdateListener != null) {
+                    TtsChunk chunk = mChunkMap.get(utteranceId);
+                    if (chunk != null) {
+                        mMainHandler.post(() -> mOnTtsUpdateListener.onWordStart(chunk.text, start, end));
+                    }
+                }
             }
 
             @Override
             public void onDone(String utteranceId) {
+                // Remove processed chunk to save memory, though for short texts it doesn't matter much
+                mChunkMap.remove(utteranceId);
+                
                 if (utteranceId.equals(mCurrentUtteranceId)) {
                     if (mOnDone != null) {
                          mMainHandler.post(mOnDone);
@@ -53,17 +88,23 @@ public class TtsManager {
 
             @Override
             public void onError(String utteranceId) {
+                mChunkMap.remove(utteranceId);
             }
         });
     }
 
     public void speak(String text) {
-        speak(text, null);
+        speak(text, null, null);
     }
 
     public void speak(String text, Runnable onDone) {
+        speak(text, onDone, null);
+    }
+
+    public void speak(String text, Runnable onDone, OnTtsUpdateListener onTtsUpdateListener) {
         stop();
         mOnDone = onDone;
+        mOnTtsUpdateListener = onTtsUpdateListener;
         
         if (text == null || text.trim().isEmpty()) {
             if (onDone != null) onDone.run();
@@ -71,33 +112,31 @@ public class TtsManager {
         }
 
         mPendingChunks.clear();
+        mChunkMap.clear();
 
-        // Robust Chunking Logic:
-        // Split by length (3900 chars) to ensure we don't exceed TTS limits.
-        // We do NOT split by newlines merely for the sake of splitting, 
-        // because TTS engines handle newlines (pauses) correctly.
-        // This avoids the issue where splitting by paragraph caused stops.
-        
-        int start = 0;
+        // Split by sentences using BreakIterator
+        BreakIterator iterator = BreakIterator.getSentenceInstance(Locale.getDefault());
+        iterator.setText(text);
+        int start = iterator.first();
         int chunkCounter = 0;
-        int len = text.length();
         
-        while (start < len) {
-            int end = Math.min(start + 3900, len);
-            if (end < len) {
-                // Try to find a safe split point (last space) to avoid cutting words
-                int lastSpace = text.lastIndexOf(' ', end);
-                if (lastSpace > start) {
-                    end = lastSpace + 1;
+        for (int end = iterator.next(); end != BreakIterator.DONE; start = end, end = iterator.next()) {
+            String sentence = text.substring(start, end);
+            if (!sentence.trim().isEmpty()) {
+                // Check if sentence is too long for TTS (unlikely but possible)
+                if (sentence.length() > 3900) {
+                     // Fallback to splitting by length if a single sentence is huge
+                     int subStart = 0;
+                     int len = sentence.length();
+                     while (subStart < len) {
+                         int subEnd = Math.min(subStart + 3900, len);
+                         addChunk(sentence.substring(subStart, subEnd), chunkCounter++, start + subStart, start + subEnd);
+                         subStart = subEnd;
+                     }
+                } else {
+                    addChunk(sentence, chunkCounter++, start, end);
                 }
             }
-            
-            String subPart = text.substring(start, end);
-            // Only add if it has content
-            if (!subPart.trim().isEmpty()) {
-                addChunk(subPart, chunkCounter++);
-            }
-            start = end;
         }
 
         if (mIsInitialized) {
@@ -105,10 +144,11 @@ public class TtsManager {
         }
     }
     
-    private void addChunk(String text, int idSuffix) {
+    private void addChunk(String text, int idSuffix, int start, int end) {
         String utteranceId = System.currentTimeMillis() + "_" + idSuffix;
-        TtsChunk chunk = new TtsChunk(text, utteranceId);
+        TtsChunk chunk = new TtsChunk(text, utteranceId, start, end);
         mPendingChunks.add(chunk);
+        mChunkMap.put(utteranceId, chunk);
     }
 
     private void processPendingChunks() {
