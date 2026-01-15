@@ -320,7 +320,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                 sortTime = mSortTypeSharedPreferences.getString(SharedPreferencesUtils.SORT_TIME_SUBREDDIT_POST_BASE + subredditName,
                         mSharedPreferences.getString(SharedPreferencesUtils.SUBREDDIT_DEFAULT_SORT_TIME, SortType.Time.ALL.name()));
             }
-            fetchFlairs(subredditName);
+            
             boolean displaySubredditName = subredditName != null && (subredditName.equals("popular") || subredditName.equals("all"));
             postLayout = mPostLayoutSharedPreferences.getInt(SharedPreferencesUtils.POST_LAYOUT_SUBREDDIT_POST_BASE + subredditName, defaultPostLayout);
 
@@ -1179,46 +1179,10 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         }
     }
 
-    private String selectedFlair;
-
-    private void fetchFlairs(String subredditName) {
-        Retrofit retrofit = activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;
-        FetchFlairs.fetchFlairsInSubreddit(mExecutor, mHandler, retrofit, activity.accessToken, subredditName, new FetchFlairs.FetchFlairsInSubredditListener() {
-            @Override
-            public void fetchSuccessful(List<Flair> flairs) {
-                if (flairs != null && !flairs.isEmpty()) {
-                    binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.VISIBLE);
-                    com.google.android.material.chip.ChipGroup chipGroup = binding.getRoot().findViewById(R.id.flair_chip_group);
-                    chipGroup.setSingleSelection(true);
-                    chipGroup.removeAllViews();
-                    for (Flair flair : flairs) {
-                        Chip chip = new Chip(activity, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
-                        chip.setText(flair.getText());
-                        chip.setTextColor(mCustomThemeWrapper.getChipTextColor());
-                        chip.setCheckable(true);
-                        chip.setOnClickListener(v -> {
-                            if (selectedFlair != null && selectedFlair.equals(flair.getText())) {
-                                selectedFlair = null;
-                                mPostViewModel.changeFlair(null);
-                                chip.setChecked(false);
-                            } else {
-                                selectedFlair = flair.getText();
-                                mPostViewModel.changeFlair(flair.getText());
-                                chip.setChecked(true);
-                            }
-                        });
-                        chipGroup.addView(chip);
-                    }
-                } else {
-                    binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
-                }
-            }
-
-            @Override
-            public void fetchFailed() {
-                binding.getRoot().findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
-            }
-        });
+    public void changeFlair(String flair) {
+        if (mPostViewModel != null) {
+            mPostViewModel.changeFlair(flair);
+        }
     }
 
     @Override

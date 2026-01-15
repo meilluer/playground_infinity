@@ -26,9 +26,13 @@ public class APIUtils {
         sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:\" + BuildConfig.VERSION_NAME + \" (by /u/Hostilenemy)");
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
-        gemini=preferences.getString("gemini_key","123");
+        gemini=preferences.getString("gemini_key","");
+        REDIRECT_URI_key = preferences.getString("redirect_uri", "http://127.0.0.1");
+        SERVER_API_BASE_URI = REDIRECT_URI_key;
+        REDIRECT_URI = REDIRECT_URI_key;
     }
     public static String gemini="";
+    public static String REDIRECT_URI_key = "";
     public static final String OAUTH_URL = "https://www.reddit.com/api/v1/authorize.compact";
     public static final String OAUTH_API_BASE_URI = "https://oauth.reddit.com";
     public static final String API_BASE_URI = "https://www.reddit.com";
@@ -37,7 +41,7 @@ public class APIUtils {
     public static final String REDGIFS_API_BASE_URI = "https://api.redgifs.com";
     public static final String IMGUR_API_BASE_URI = "https://api.imgur.com/3/";
     public static final String STREAMABLE_API_BASE_URI = "https://api.streamable.com";
-    public static final String SERVER_API_BASE_URI = "http://127.0.0.1";
+    public static String SERVER_API_BASE_URI = REDIRECT_URI_key;
 
     public static final String CLIENT_ID_KEY = "client_id";
     public static final String CLIENT_SECRET_KEY = "client_secret";
@@ -51,7 +55,7 @@ public class APIUtils {
     public static final String STATE_KEY = "state";
     public static final String STATE = "23ro8xlxvzp4asqd";
     public static final String REDIRECT_URI_KEY = "redirect_uri";
-    public static final String REDIRECT_URI = "http://127.0.0.1";
+    public static String REDIRECT_URI =REDIRECT_URI_key;
     public static final String DURATION_KEY = "duration";
     public static final String DURATION = "permanent";
     public static final String SCOPE_KEY = "scope";

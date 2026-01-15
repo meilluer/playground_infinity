@@ -175,6 +175,8 @@
             app:tabRippleColor="?attr/colorControlHighlight"
             app:tabUnboundedRipple="false" />
 
+        <include layout="@layout/flair_strip" />
+
     </com.google.android.material.appbar.AppBarLayout>
 
     <androidx.viewpager2.widget.ViewPager2

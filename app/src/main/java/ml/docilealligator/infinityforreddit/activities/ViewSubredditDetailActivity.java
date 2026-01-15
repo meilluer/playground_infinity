@@ -65,6 +65,11 @@ import java.util.concurrent.Executor;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import ml.docilealligator.infinityforreddit.subreddit.FetchFlairs;
+import ml.docilealligator.infinityforreddit.subreddit.Flair;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
+
 import io.noties.markwon.AbstractMarkwonPlugin;
 import io.noties.markwon.Markwon;
 import io.noties.markwon.MarkwonConfiguration;
@@ -414,6 +419,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
         checkNewAccountAndBindView();
 
         fetchSubredditData();
+        fetchFlairs();
 
         String title = "r/" + subredditName;
         binding.subredditNameTextViewViewSubredditDetailActivity.setText(title);
@@ -567,6 +573,48 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                             });
                 }
 
+            }
+        });
+    }
+
+    private String selectedFlair;
+
+    private void fetchFlairs() {
+        Retrofit retrofit = accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;
+        FetchFlairs.fetchFlairsInSubreddit(mExecutor, new Handler(), retrofit, accessToken, subredditName, new FetchFlairs.FetchFlairsInSubredditListener() {
+            @Override
+            public void fetchSuccessful(java.util.List<Flair> flairs) {
+                if (flairs != null && !flairs.isEmpty()) {
+                    findViewById(R.id.flair_chip_group).setVisibility(View.VISIBLE);
+                    ChipGroup chipGroup = findViewById(R.id.flair_chip_group);
+                    chipGroup.setSingleSelection(true);
+                    chipGroup.removeAllViews();
+                    for (Flair flair : flairs) {
+                        Chip chip = new Chip(ViewSubredditDetailActivity.this, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
+                        chip.setText(flair.getText());
+                        chip.setTextColor(mCustomThemeWrapper.getChipTextColor());
+                        chip.setCheckable(true);
+                        chip.setOnClickListener(v -> {
+                            if (selectedFlair != null && selectedFlair.equals(flair.getText())) {
+                                selectedFlair = null;
+                                sectionsPagerAdapter.changeFlair(null);
+                                chip.setChecked(false);
+                            } else {
+                                selectedFlair = flair.getText();
+                                sectionsPagerAdapter.changeFlair(flair.getText());
+                                chip.setChecked(true);
+                            }
+                        });
+                        chipGroup.addView(chip);
+                    }
+                } else {
+                    findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+                }
+            }
+
+            @Override
+            public void fetchFailed() {
+                findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
             }
         });
     }
@@ -1748,6 +1796,13 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
             Fragment fragment = getCurrentFragment();
             if (fragment instanceof PostFragment) {
                 ((PostFragment) fragment).changePostLayout(postLayout);
+            }
+        }
+
+        void changeFlair(String flair) {
+            Fragment fragment = getCurrentFragment();
+            if (fragment instanceof PostFragment) {
+                ((PostFragment) fragment).changeFlair(flair);
             }
         }
 

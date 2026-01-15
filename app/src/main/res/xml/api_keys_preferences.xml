@@ -36,4 +36,13 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
+        <EditTextPreference
+            android:key="redirect_uri"
+            android:title="Redirect URI"
+            android:summary="Enter your Redirect URI"
+            android:defaultValue="http://127.0.0.1"
+            android:persistent="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true" />
+
     </PreferenceCategory></PreferenceScreen>

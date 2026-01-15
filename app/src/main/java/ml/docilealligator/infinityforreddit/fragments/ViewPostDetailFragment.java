@@ -2481,9 +2481,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                             if (wordStartIndex >= 0 && wordEndIndex <= contentString.length()) {
                                 android.text.Spannable spannable = (android.text.Spannable) content;
                                 if (mHighlightSpan == null) {
-                                    android.util.TypedValue typedValue = new android.util.TypedValue();
-                                    activity.getTheme().resolveAttribute(android.R.attr.colorControlHighlight, typedValue, true);
-                                    mHighlightSpan = new android.text.style.BackgroundColorSpan(typedValue.data);
+                                    mHighlightSpan = new android.text.style.BackgroundColorSpan(android.graphics.Color.parseColor("#FFF44F"));
                                 }
                                 spannable.setSpan(mHighlightSpan, wordStartIndex, wordEndIndex, android.text.Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                 mHighlightedTextView = tv;
