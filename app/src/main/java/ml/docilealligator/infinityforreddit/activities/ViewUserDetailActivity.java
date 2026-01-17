@@ -659,6 +659,12 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
         });
     }
 
+    public void editComment(Comment comment, int position) {
+        if (sectionsPagerAdapter != null) {
+            sectionsPagerAdapter.editComment(comment, position);
+        }
+    }
+
     public void editComment(String commentContentMarkdown, int position) {
         if (sectionsPagerAdapter != null) {
             sectionsPagerAdapter.editComment(commentContentMarkdown, position);

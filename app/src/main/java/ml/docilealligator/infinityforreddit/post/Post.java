@@ -80,6 +80,9 @@ public class Post implements Parcelable {
     private boolean removed;
     private boolean spam;
     private long videoProgress;
+    private boolean isTranslated;
+    private String originalTitle;
+    private String originalBody;
 
     public Post() {
         this.id = "";
@@ -321,6 +324,9 @@ public class Post implements Parcelable {
         mediaMetadataMap = (Map<String, MediaMetadata>) in.readValue(getClass().getClassLoader());
         gallery = in.createTypedArrayList(Gallery.CREATOR);
         videoProgress = in.readLong();
+        isTranslated = in.readByte() != 0;
+        originalTitle = in.readString();
+        originalBody = in.readString();
     }
 
     public static final Creator<Post> CREATOR = new Creator<Post>() {
@@ -676,6 +682,9 @@ public class Post implements Parcelable {
         dest.writeValue(mediaMetadataMap);
         dest.writeTypedList(gallery);
         dest.writeLong(videoProgress);
+        dest.writeByte((byte) (isTranslated ? 1 : 0));
+        dest.writeString(originalTitle);
+        dest.writeString(originalBody);
     }
 
     public boolean isStickied() {
@@ -769,6 +778,30 @@ public class Post implements Parcelable {
 
     public void setVideoProgress(long videoProgress) {
         this.videoProgress = videoProgress;
+    }
+
+    public boolean isTranslated() {
+        return isTranslated;
+    }
+
+    public void setIsTranslated(boolean translated) {
+        isTranslated = translated;
+    }
+
+    public String getOriginalTitle() {
+        return originalTitle;
+    }
+
+    public void setOriginalTitle(String originalTitle) {
+        this.originalTitle = originalTitle;
+    }
+
+    public String getOriginalBody() {
+        return originalBody;
+    }
+
+    public void setOriginalBody(String originalBody) {
+        this.originalBody = originalBody;
     }
 
     @Override

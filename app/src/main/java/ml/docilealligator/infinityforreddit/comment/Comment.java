@@ -64,6 +64,9 @@ public class Comment implements Parcelable {
     private boolean loadMoreChildrenFailed;
     private long editedTimeMillis;
     private Map<String, MediaMetadata> mediaMetadataMap;
+    private boolean isTranslated;
+    private String originalCommentRawText;
+    private String originalCommentMarkdown;
 
     public Comment(String id, String fullName, String author, String authorFullName, String authorFlair,
                    String authorFlairHTML, String linkAuthor,
@@ -158,6 +161,9 @@ public class Comment implements Parcelable {
         isLoadingMoreChildren = in.readByte() != 0;
         loadMoreChildrenFailed = in.readByte() != 0;
         mediaMetadataMap = (Map<String, MediaMetadata>) in.readValue(getClass().getClassLoader());
+        isTranslated = in.readByte() != 0;
+        originalCommentRawText = in.readString();
+        originalCommentMarkdown = in.readString();
     }
 
     public String getId() {
@@ -437,6 +443,30 @@ public class Comment implements Parcelable {
         this.mediaMetadataMap = mediaMetadataMap;
     }
 
+    public boolean isTranslated() {
+        return isTranslated;
+    }
+
+    public void setIsTranslated(boolean translated) {
+        isTranslated = translated;
+    }
+
+    public String getOriginalCommentRawText() {
+        return originalCommentRawText;
+    }
+
+    public void setOriginalCommentRawText(String originalCommentRawText) {
+        this.originalCommentRawText = originalCommentRawText;
+    }
+
+    public String getOriginalCommentMarkdown() {
+        return originalCommentMarkdown;
+    }
+
+    public void setOriginalCommentMarkdown(String originalCommentMarkdown) {
+        this.originalCommentMarkdown = originalCommentMarkdown;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -479,5 +509,8 @@ public class Comment implements Parcelable {
         parcel.writeByte((byte) (isLoadingMoreChildren ? 1 : 0));
         parcel.writeByte((byte) (loadMoreChildrenFailed ? 1 : 0));
         parcel.writeValue(mediaMetadataMap);
+        parcel.writeByte((byte) (isTranslated ? 1 : 0));
+        parcel.writeString(originalCommentRawText);
+        parcel.writeString(originalCommentMarkdown);
     }
 }

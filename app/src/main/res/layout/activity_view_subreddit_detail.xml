@@ -175,7 +175,11 @@
             app:tabRippleColor="?attr/colorControlHighlight"
             app:tabUnboundedRipple="false" />
 
-        <include layout="@layout/flair_strip" />
+        <include
+            layout="@layout/flair_strip"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|enterAlways" />
 
     </com.google.android.material.appbar.AppBarLayout>
 

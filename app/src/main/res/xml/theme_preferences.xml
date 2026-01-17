@@ -3,6 +3,7 @@
     
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
         app:defaultValue="2"
+        app:entries="@array/settings_theme"
         app:entryValues="@array/settings_theme_values"
         app:key="theme"
         app:icon="@drawable/ic_color_lens_day_night_24dp"

@@ -580,8 +580,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
     private String selectedFlair;
 
     private void fetchFlairs() {
-        Retrofit retrofit = accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;
-        FetchFlairs.fetchFlairsInSubreddit(mExecutor, new Handler(), retrofit, accessToken, subredditName, new FetchFlairs.FetchFlairsInSubredditListener() {
+        FetchFlairs.FetchFlairsInSubredditListener listener = new FetchFlairs.FetchFlairsInSubredditListener() {
             @Override
             public void fetchSuccessful(java.util.List<Flair> flairs) {
                 if (flairs != null && !flairs.isEmpty()) {
@@ -590,7 +589,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                     chipGroup.setSingleSelection(true);
                     chipGroup.removeAllViews();
                     for (Flair flair : flairs) {
-                        Chip chip = new Chip(ViewSubredditDetailActivity.this, null, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
+                        Chip chip = new Chip(new android.view.ContextThemeWrapper(ViewSubredditDetailActivity.this, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice));
                         chip.setText(flair.getText());
                         chip.setTextColor(mCustomThemeWrapper.getChipTextColor());
                         chip.setCheckable(true);
@@ -616,7 +615,38 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
             public void fetchFailed() {
                 findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
             }
-        });
+        };
+
+        if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+            java.util.Map<String, String> params = new java.util.HashMap<>();
+            params.put(APIUtils.GRANT_TYPE_KEY, APIUtils.GRANT_TYPE_INSTALLED_CLIENT);
+            params.put(APIUtils.DEVICE_ID_KEY, java.util.UUID.randomUUID().toString());
+
+            mRetrofit.create(RedditAPI.class).getAccessToken(APIUtils.getHttpBasicAuthHeader(), params).enqueue(new Callback<String>() {
+                @Override
+                public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        try {
+                            org.json.JSONObject jsonObject = new org.json.JSONObject(response.body());
+                            String anonymousAccessToken = jsonObject.getString(APIUtils.ACCESS_TOKEN_KEY);
+                            FetchFlairs.fetchFlairsInSubreddit(mExecutor, new Handler(), mOauthRetrofit, anonymousAccessToken, subredditName, listener);
+                        } catch (org.json.JSONException e) {
+                            e.printStackTrace();
+                            findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+                        }
+                    } else {
+                        findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<String> call, @NonNull Throwable t) {
+                    findViewById(R.id.flair_chip_group).setVisibility(View.GONE);
+                }
+            });
+        } else {
+            FetchFlairs.fetchFlairsInSubreddit(mExecutor, new Handler(), mOauthRetrofit, accessToken, subredditName, listener);
+        }
     }
 
     @Override

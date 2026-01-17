@@ -468,7 +468,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
         return mIsNsfwSubreddit;
     }
 
-    private void editComment(Comment comment, int position) {
+    public void editComment(Comment comment, int position) {
         if (mSectionsPagerAdapter != null) {
             ViewPostDetailFragment fragment = mSectionsPagerAdapter.getCurrentFragment();
             if (fragment != null) {

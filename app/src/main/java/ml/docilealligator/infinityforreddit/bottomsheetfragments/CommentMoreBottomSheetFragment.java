@@ -80,38 +80,63 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
         boolean editAndDeleteAvailable = bundle.getBoolean(EXTRA_EDIT_AND_DELETE_AVAILABLE, false);
         boolean showReplyAndSaveOption = bundle.getBoolean(EXTRA_SHOW_REPLY_AND_SAVE_OPTION, false);
 
+        if (comment.isTranslated()) {
+            binding.translateTextViewCommentMoreBottomSheetFragment.setText(R.string.see_original);
+        }
+
         binding.translateTextViewCommentMoreBottomSheetFragment.setOnClickListener(view -> {
             dismiss();
-            SharedPreferences sharedPreferences = activity.getDefaultSharedPreferences();
-            String apiKey = sharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
-            if (!apiKey.isEmpty()) {
-                GeminiSummarizer.translateWithGemini(apiKey, comment.getCommentRawText(), new GeminiSummarizer.GeminiCallback() {
-                    @Override
-                    public void onSuccess(String result) {
-                        activity.runOnUiThread(() -> {
-                            if (activity instanceof ViewPostDetailActivity) {
-                                ((ViewPostDetailActivity) activity).editComment(result, bundle.getInt(EXTRA_POSITION));
-                            } else if (activity instanceof ViewUserDetailActivity) {
-                                ((ViewUserDetailActivity) activity).editComment(result, bundle.getInt(EXTRA_POSITION));
-                            }
-                        });
+            if (comment.isTranslated()) {
+                comment.setCommentRawText(comment.getOriginalCommentRawText());
+                comment.setCommentMarkdown(comment.getOriginalCommentMarkdown());
+                comment.setIsTranslated(false);
+                activity.runOnUiThread(() -> {
+                    if (activity instanceof ViewPostDetailActivity) {
+                        ((ViewPostDetailActivity) activity).editComment(comment, bundle.getInt(EXTRA_POSITION));
+                    } else if (activity instanceof ViewUserDetailActivity) {
+                        ((ViewUserDetailActivity) activity).editComment(comment, bundle.getInt(EXTRA_POSITION));
                     }
-
-                    @Override
-                    public void onError(String error) {
-                        activity.runOnUiThread(() -> {
-                            String errorMessage = "Error: " + error;
-                            if (activity instanceof ViewPostDetailActivity) {
-                                ((ViewPostDetailActivity) activity).editComment(errorMessage, bundle.getInt(EXTRA_POSITION));
-                            } else if (activity instanceof ViewUserDetailActivity) {
-                                ((ViewUserDetailActivity) activity).editComment(errorMessage, bundle.getInt(EXTRA_POSITION));
-                            }
-                            Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
-                        });
-                    }
+                    Toast.makeText(activity, "Original text restored", Toast.LENGTH_SHORT).show();
                 });
             } else {
-                Toast.makeText(activity, "Gemini API Key not set.", Toast.LENGTH_SHORT).show();
+                SharedPreferences sharedPreferences = activity.getDefaultSharedPreferences();
+                String apiKey = sharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                if (!apiKey.isEmpty()) {
+                    GeminiSummarizer.translateWithGemini(apiKey, comment.getCommentRawText(), new GeminiSummarizer.GeminiCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            activity.runOnUiThread(() -> {
+                                comment.setOriginalCommentRawText(comment.getCommentRawText());
+                                comment.setOriginalCommentMarkdown(comment.getCommentMarkdown());
+                                comment.setIsTranslated(true);
+                                comment.setCommentRawText(result);
+                                comment.setCommentMarkdown(result);
+
+                                if (activity instanceof ViewPostDetailActivity) {
+                                    ((ViewPostDetailActivity) activity).editComment(comment, bundle.getInt(EXTRA_POSITION));
+                                } else if (activity instanceof ViewUserDetailActivity) {
+                                    ((ViewUserDetailActivity) activity).editComment(comment, bundle.getInt(EXTRA_POSITION));
+                                }
+                                Toast.makeText(activity, "Translation complete", Toast.LENGTH_SHORT).show();
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            activity.runOnUiThread(() -> {
+                                String errorMessage = "Error: " + error;
+                                if (activity instanceof ViewPostDetailActivity) {
+                                    ((ViewPostDetailActivity) activity).editComment(errorMessage, bundle.getInt(EXTRA_POSITION));
+                                } else if (activity instanceof ViewUserDetailActivity) {
+                                    ((ViewUserDetailActivity) activity).editComment(errorMessage, bundle.getInt(EXTRA_POSITION));
+                                }
+                                Toast.makeText(activity, errorMessage, Toast.LENGTH_LONG).show();
+                            });
+                        }
+                    });
+                } else {
+                    Toast.makeText(activity, "Gemini API Key not set.", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 

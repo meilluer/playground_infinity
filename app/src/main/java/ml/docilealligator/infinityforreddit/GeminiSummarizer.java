@@ -22,7 +22,7 @@ public class GeminiSummarizer {
         OkHttpClient client = new OkHttpClient();
 
         JsonObject part = new JsonObject();
-        part.addProperty("text", "Summarize the following:\n" + inputText);
+        part.addProperty("text", " DO NOT RETURN ANYTHING ELSE OTHER THAN THE SUMMARY Summarize the following:\n" + inputText);
         JsonObject partsWrapper = new JsonObject();
         JsonArray partsArray = new JsonArray();
         partsArray.add(part);

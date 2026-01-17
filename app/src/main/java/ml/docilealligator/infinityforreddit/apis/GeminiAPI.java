@@ -8,6 +8,6 @@ import retrofit2.http.Query;
 
 public interface GeminiAPI {
     @Headers("Content-Type: application/json")
-    @POST("v1beta/models/gemini-1.5-flash:generateContent")
+    @POST("v1beta/models/gemini-3-flash-preview:generateContent")
     Call<String> generateContent(@Query("key") String apiKey, @Body String body);
 }

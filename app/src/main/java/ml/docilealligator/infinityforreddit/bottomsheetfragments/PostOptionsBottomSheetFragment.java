@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.preference.PreferenceManager;
 
@@ -202,66 +203,84 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                 dismiss();
             });
 
+            if (mPost.isTranslated()) {
+                binding.translateTextViewPostOptionsBottomSheetFragment.setText(R.string.see_original);
+            }
+
             binding.translateTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
-                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mBaseActivity);
-                String apiKey = sharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
-                if (TextUtils.isEmpty(apiKey)) {
-                    Toast.makeText(mBaseActivity, "Gemini API Key is missing", Toast.LENGTH_SHORT).show();
+                if (mPost.isTranslated()) {
+                    mPost.setTitle(mPost.getOriginalTitle());
+                    mPost.setSelfText(mPost.getOriginalBody());
+                    mPost.setIsTranslated(false);
+                    EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                    EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                    Toast.makeText(mBaseActivity, "Original text restored", Toast.LENGTH_SHORT).show();
+                    dismiss();
                 } else {
-                    Toast.makeText(mBaseActivity, "Translating...", Toast.LENGTH_SHORT).show();
-                    GeminiSummarizer.translateTitleAndBodyWithGemini(apiKey, mPost.getTitle(), mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
-                        @Override
-                        public void onSuccess(String result) {
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                // Parse the result assuming "TITLE: [Title]\nBODY: [Body]"
-                                String translatedTitle = mPost.getTitle();
-                                String translatedBody = mPost.getSelfText();
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mBaseActivity);
+                    String apiKey = sharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                    if (TextUtils.isEmpty(apiKey)) {
+                        Toast.makeText(mBaseActivity, "Gemini API Key is missing", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(mBaseActivity, "Translating...", Toast.LENGTH_SHORT).show();
+                        GeminiSummarizer.translateTitleAndBodyWithGemini(apiKey, mPost.getTitle(), mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
+                            @Override
+                            public void onSuccess(String result) {
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    mPost.setOriginalTitle(mPost.getTitle());
+                                    mPost.setOriginalBody(mPost.getSelfText());
+                                    mPost.setIsTranslated(true);
 
-                                String[] lines = result.split("\n");
-                                StringBuilder bodyBuilder = new StringBuilder();
-                                boolean isBody = false;
+                                    // Parse the result assuming "TITLE: [Title]\nBODY: [Body]"
+                                    String translatedTitle = mPost.getTitle();
+                                    String translatedBody = mPost.getSelfText();
 
-                                for (String line : lines) {
-                                    if (line.startsWith("TITLE:")) {
-                                        translatedTitle = line.substring(6).trim();
-                                    } else if (line.startsWith("BODY:")) {
-                                        isBody = true;
-                                        String bodyStart = line.substring(5).trim();
-                                        if (!bodyStart.isEmpty()) {
-                                            bodyBuilder.append(bodyStart).append("\n");
+                                    String[] lines = result.split("\n");
+                                    StringBuilder bodyBuilder = new StringBuilder();
+                                    boolean isBody = false;
+
+                                    for (String line : lines) {
+                                        if (line.startsWith("TITLE:")) {
+                                            translatedTitle = line.substring(6).trim();
+                                        } else if (line.startsWith("BODY:")) {
+                                            isBody = true;
+                                            String bodyStart = line.substring(5).trim();
+                                            if (!bodyStart.isEmpty()) {
+                                                bodyBuilder.append(bodyStart).append("\n");
+                                            }
+                                        } else if (isBody) {
+                                            bodyBuilder.append(line).append("\n");
                                         }
-                                    } else if (isBody) {
-                                        bodyBuilder.append(line).append("\n");
                                     }
-                                }
-                                
-                                if (bodyBuilder.length() > 0) {
-                                    translatedBody = bodyBuilder.toString().trim();
-                                } else if (!isBody && lines.length > 0 && !result.contains("TITLE:")) {
-                                     // Fallback if format is not respected, assume it's just the body or just the title?
-                                     // If it doesn't contain TITLE:, maybe the whole thing is the body?
-                                     // Or maybe it just failed to format. Let's leave it safe.
-                                }
+                                    
+                                    if (bodyBuilder.length() > 0) {
+                                        translatedBody = bodyBuilder.toString().trim();
+                                    } else if (!isBody && lines.length > 0 && !result.contains("TITLE:")) {
+                                         // Fallback if format is not respected, assume it's just the body or just the title?
+                                         // If it doesn't contain TITLE:, maybe the whole thing is the body?
+                                         // Or maybe it just failed to format. Let's leave it safe.
+                                    }
 
-                                mPost.setTitle(translatedTitle);
-                                if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty()) {
-                                     mPost.setSelfText(translatedBody);
-                                }
+                                    mPost.setTitle(translatedTitle);
+                                    if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty()) {
+                                         mPost.setSelfText(translatedBody);
+                                    }
 
-                                EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
-                                EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
-                                Toast.makeText(mBaseActivity, "Translation complete", Toast.LENGTH_SHORT).show();
-                                dismiss();
-                            });
-                        }
+                                    EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                    EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                                    Toast.makeText(mBaseActivity, "Translation complete", Toast.LENGTH_SHORT).show();
+                                    dismiss();
+                                });
+                            }
 
-                        @Override
-                        public void onError(String error) {
-                            new Handler(Looper.getMainLooper()).post(() -> {
-                                Toast.makeText(mBaseActivity, "Translation failed: " + error, Toast.LENGTH_SHORT).show();
-                            });
-                        }
-                    });
+                            @Override
+                            public void onError(String error) {
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    Toast.makeText(mBaseActivity, "Translation failed: " + error, Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        });
+                    }
                 }
             });
 
