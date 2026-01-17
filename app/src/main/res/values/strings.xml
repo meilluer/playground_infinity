@@ -1583,6 +1583,7 @@
     <string name="subreddit_removed">Subreddit removed</string>
 
     <string name="downloads">Downloads</string>
+    <string name="translate">Translate</string>
     <string name="gemini_summary">Gemini Summary</string>
     <string name="enable_gemini_summary">Enable Gemini Summary for Links</string>
     <string name="gemini_api_key">Gemini API Key</string>

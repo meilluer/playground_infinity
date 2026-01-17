@@ -477,7 +477,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
         }
     }
 
-    private void editComment(String commentContentMarkdown, int position) {
+    public void editComment(String commentContentMarkdown, int position) {
         if (mSectionsPagerAdapter != null) {
             ViewPostDetailFragment fragment = mSectionsPagerAdapter.getCurrentFragment();
             if (fragment != null) {

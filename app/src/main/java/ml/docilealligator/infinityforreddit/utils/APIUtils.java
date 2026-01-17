@@ -26,12 +26,10 @@ public class APIUtils {
         sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:\" + BuildConfig.VERSION_NAME + \" (by /u/Hostilenemy)");
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
-        gemini=preferences.getString("gemini_key","");
         REDIRECT_URI_key = preferences.getString("redirect_uri", "http://127.0.0.1");
         SERVER_API_BASE_URI = REDIRECT_URI_key;
         REDIRECT_URI = REDIRECT_URI_key;
     }
-    public static String gemini="";
     public static String REDIRECT_URI_key = "";
     public static final String OAUTH_URL = "https://www.reddit.com/api/v1/authorize.compact";
     public static final String OAUTH_API_BASE_URI = "https://oauth.reddit.com";

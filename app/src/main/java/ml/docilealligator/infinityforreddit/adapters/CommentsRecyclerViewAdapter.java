@@ -127,6 +127,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private final boolean mSwapTapAndLong;
     private final boolean mShowCommentDivider;
     private final int mDividerType;
+    private final SharedPreferences mSharedPreferences;
     private final boolean mShowAbsoluteNumberOfVotes;
     private final boolean mFullyCollapseComment;
     private final boolean mShowOnlyOneCommentLevelIndicator;
@@ -184,6 +185,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         mOauthRetrofit = oauthRetrofit;
         mAccessToken = accessToken;
         mAccountName = accountName;
+        mSharedPreferences = sharedPreferences;
         mGlide = Glide.with(activity);
         mSecondaryTextColor = customThemeWrapper.getSecondaryTextColor();
         mCommentTextColor = customThemeWrapper.getCommentColor();

@@ -759,7 +759,7 @@ public class ViewVideoActivity extends AppCompatActivity implements CustomFontRe
 
                             binding.getLoadingIndicator().setVisibility(View.GONE);
                             if (streamableVideo.mp4 == null && streamableVideo.mp4Mobile == null) {
-                                Toast.makeText(ViewVideoActivity.this, R.string.fetch_streamable_video_failed, Toast.LENGTH_SHORT).show();
+                                Toast.makeText(ViewVideoActivity.this, R.string.fetch_streamable_video_failed, Toast.LENGTH_LONG).show();
                                 return;
                             }
                             binding.getTitleTextView().setText(streamableVideo.title);

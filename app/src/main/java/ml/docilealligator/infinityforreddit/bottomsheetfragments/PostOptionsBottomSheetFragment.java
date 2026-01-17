@@ -4,8 +4,12 @@ import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.PersistableBundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,14 +17,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
 
 import org.greenrobot.eventbus.EventBus;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import ml.docilealligator.infinityforreddit.GeminiSummarizer;
 import ml.docilealligator.infinityforreddit.Infinity;
 import ml.docilealligator.infinityforreddit.R;
+import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.activities.BaseActivity;
 import ml.docilealligator.infinityforreddit.activities.CommentActivity;
@@ -30,6 +37,7 @@ import ml.docilealligator.infinityforreddit.activities.SubmitCrosspostActivity;
 import ml.docilealligator.infinityforreddit.customviews.LandscapeExpandedRoundedBottomSheetDialogFragment;
 import ml.docilealligator.infinityforreddit.databinding.FragmentPostOptionsBottomSheetBinding;
 import ml.docilealligator.infinityforreddit.events.PostUpdateEventToPostList;
+import ml.docilealligator.infinityforreddit.events.PostUpdateEventToPostDetailFragment;
 import ml.docilealligator.infinityforreddit.post.HidePost;
 import ml.docilealligator.infinityforreddit.post.Post;
 import ml.docilealligator.infinityforreddit.services.DownloadMediaService;
@@ -192,6 +200,69 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                 startActivity(intent);
 
                 dismiss();
+            });
+
+            binding.translateTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mBaseActivity);
+                String apiKey = sharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                if (TextUtils.isEmpty(apiKey)) {
+                    Toast.makeText(mBaseActivity, "Gemini API Key is missing", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(mBaseActivity, "Translating...", Toast.LENGTH_SHORT).show();
+                    GeminiSummarizer.translateTitleAndBodyWithGemini(apiKey, mPost.getTitle(), mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
+                        @Override
+                        public void onSuccess(String result) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                // Parse the result assuming "TITLE: [Title]\nBODY: [Body]"
+                                String translatedTitle = mPost.getTitle();
+                                String translatedBody = mPost.getSelfText();
+
+                                String[] lines = result.split("\n");
+                                StringBuilder bodyBuilder = new StringBuilder();
+                                boolean isBody = false;
+
+                                for (String line : lines) {
+                                    if (line.startsWith("TITLE:")) {
+                                        translatedTitle = line.substring(6).trim();
+                                    } else if (line.startsWith("BODY:")) {
+                                        isBody = true;
+                                        String bodyStart = line.substring(5).trim();
+                                        if (!bodyStart.isEmpty()) {
+                                            bodyBuilder.append(bodyStart).append("\n");
+                                        }
+                                    } else if (isBody) {
+                                        bodyBuilder.append(line).append("\n");
+                                    }
+                                }
+                                
+                                if (bodyBuilder.length() > 0) {
+                                    translatedBody = bodyBuilder.toString().trim();
+                                } else if (!isBody && lines.length > 0 && !result.contains("TITLE:")) {
+                                     // Fallback if format is not respected, assume it's just the body or just the title?
+                                     // If it doesn't contain TITLE:, maybe the whole thing is the body?
+                                     // Or maybe it just failed to format. Let's leave it safe.
+                                }
+
+                                mPost.setTitle(translatedTitle);
+                                if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty()) {
+                                     mPost.setSelfText(translatedBody);
+                                }
+
+                                EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                                Toast.makeText(mBaseActivity, "Translation complete", Toast.LENGTH_SHORT).show();
+                                dismiss();
+                            });
+                        }
+
+                        @Override
+                        public void onError(String error) {
+                            new Handler(Looper.getMainLooper()).post(() -> {
+                                Toast.makeText(mBaseActivity, "Translation failed: " + error, Toast.LENGTH_SHORT).show();
+                            });
+                        }
+                    });
+                }
             });
 
             if (mBaseActivity.accountName.equals(Account.ANONYMOUS_ACCOUNT)) {

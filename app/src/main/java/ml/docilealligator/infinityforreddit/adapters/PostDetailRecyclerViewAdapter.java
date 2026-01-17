@@ -556,34 +556,33 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         if (holder instanceof PostDetailBaseViewHolder) {
             if (holder instanceof PostDetailTextViewHolder) {
                 ((PostDetailTextViewHolder) holder).binding.geminiLogoItemPostDetailText.setOnClickListener(view -> {
-                    if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
-                        ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.VISIBLE);
-                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
-                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");
-                        
-                        String apiKey = ml.docilealligator.infinityforreddit.utils.APIUtils.gemini;
-                        if (apiKey != null && !apiKey.isEmpty()) {
-                            GeminiSummarizer.summarizeWithGemini(mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
-                                @Override
-                                public void onSuccess(String result) {
-                                    mActivity.runOnUiThread(() -> {
-                                        ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(result);
-                                    });
-                                }
+                    Toast.makeText(mActivity, R.string.gemini_summary, Toast.LENGTH_SHORT).show();
+                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.VISIBLE);
+                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
+                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");
 
-                                @Override
-                                public void onError(String error) {
-                                    mActivity.runOnUiThread(() -> {
-                                        ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                                        ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: " + error);
-                                    });
-                                }
-                            });
-                        } else {
-                             ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                             ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: API Key missing");
-                        }
+                    String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                    if (apiKey != null && !apiKey.isEmpty()) {
+                        GeminiSummarizer.summarizeWithGemini(apiKey, mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
+                            @Override
+                            public void onSuccess(String result) {
+                                mActivity.runOnUiThread(() -> {
+                                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(result);
+                                });
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                mActivity.runOnUiThread(() -> {
+                                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: " + error);
+                                });
+                            }
+                        });
+                    } else {
+                         ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
+                         ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: API Key missing");
                     }
                 });
             }
@@ -883,35 +882,34 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 ((PostDetailLinkViewHolder) holder).binding.linkTextViewItemPostDetailLink.setText(domain);
 
                 ((PostDetailLinkViewHolder) holder).binding.geminiLogoItemPostDetailLink.setOnClickListener(view -> {
-                    if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
-                        ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.VISIBLE);
-                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.VISIBLE);
-                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("loading...");
-                        
-                        String apiKey = ml.docilealligator.infinityforreddit.utils.APIUtils.gemini;
-                        if (apiKey != null && !apiKey.isEmpty()) {
-                            GeminiHelper.summarizeLink(apiKey, mPost.getUrl(), new GeminiHelper.SummaryCallback() {
-                                @Override
-                                public void onSuccess(String summary) {
-                                    new Handler(android.os.Looper.getMainLooper()).post(() -> {
-                                        ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
-                                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText(summary);
-                                        GeminiHelper.cacheSummary(mPost.getUrl(), summary);
-                                    });
-                                }
+                    Toast.makeText(mActivity, R.string.gemini_summary, Toast.LENGTH_SHORT).show();
+                    ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.VISIBLE);
+                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.VISIBLE);
+                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("loading...");
+                    
+                    String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                    if (apiKey != null && !apiKey.isEmpty()) {
+                        GeminiHelper.summarizeLink(apiKey, mPost.getUrl(), new GeminiHelper.SummaryCallback() {
+                            @Override
+                            public void onSuccess(String summary) {
+                                new Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                    ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
+                                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText(summary);
+                                    GeminiHelper.cacheSummary(mPost.getUrl(), summary);
+                                });
+                            }
 
-                                @Override
-                                public void onFailure(String error) {
-                                    new Handler(android.os.Looper.getMainLooper()).post(() -> {
-                                        ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
-                                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: " + error);
-                                    });
-                                }
-                            });
-                        } else {
-                             ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
-                             ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: API Key missing");
-                        }
+                            @Override
+                            public void onFailure(String error) {
+                                new Handler(android.os.Looper.getMainLooper()).post(() -> {
+                                    ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
+                                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: " + error);
+                                });
+                            }
+                        });
+                    } else {
+                         ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
+                         ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: API Key missing");
                     }
                 });
 

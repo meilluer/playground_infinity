@@ -69,7 +69,7 @@ class credit_remaining {
                             }
                         } catch (e: Exception) {
                             Handler(Looper.getMainLooper()).post {
-                                Toast.makeText(context, "Failed to parse response", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Failed to parse response", Toast.LENGTH_LONG).show()
                             }
                         }
                     }
