@@ -1,4 +1,12 @@
 <resources>
+    <string name="settings_tab_switching_sensitivity">Tab Switching Sensitivity</string>
+    <string name="settings_category_gesture_sensitivity_title">Gesture Sensitivity</string>
+    <string name="default_sensitivity">Default</string>
+    <string name="low">Low</string>
+    <string name="very_low">Very Low</string>
+    <string name="default_swipe_area">Default</string>
+    <string name="larger_swipe_area">Large</string>
+    <string name="very_larger_swipe_area">Very Large</string>
     <string name="application_name" translatable="false">Infinity</string>
     <string name="login_activity_label">Login</string>
     <string name="search_activity_label" translatable="false"> </string>
@@ -671,6 +679,16 @@
     <string name="settings_proxy_type">Proxy Type</string>
     <string name="settings_proxy_hostname">Hostname</string>
     <string name="settings_proxy_port">Port</string>
+    <string name="settings_proxy_actual_ip">Actual IP</string>
+    <string name="settings_proxy_proxy_ip">Proxy IP</string>
+    <string name="settings_proxy_actual_location">Actual Location</string>
+    <string name="settings_proxy_proxy_location">Proxy Location</string>
+    <string name="settings_proxy_connection_status">Proxy Connection Status</string>
+    <string name="settings_proxy_connection_status_reddit">Reddit Connection Status</string>
+    <string name="settings_proxy_status_fetching">Fetching...</string>
+    <string name="settings_proxy_status_connected">Connected via Proxy</string>
+    <string name="settings_proxy_status_direct">Direct Connection</string>
+    <string name="settings_proxy_status_error">Error</string>
     <string name="settings_hide_fab_in_post_details">Hide Floating Action Button</string>
     <string name="settings_category_media_title">Media</string>
 

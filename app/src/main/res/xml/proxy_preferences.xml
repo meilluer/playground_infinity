@@ -27,4 +27,34 @@
         app:title="@string/settings_proxy_port"
         app:useSimpleSummaryProvider="true" />
 
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceCategory
+        app:title="@string/settings_proxy_connection_status">
+
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+            app:key="proxy_actual_ip"
+            app:title="@string/settings_proxy_actual_ip"
+            app:summary="@string/settings_proxy_status_fetching" />
+
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+            app:key="proxy_proxy_ip"
+            app:title="@string/settings_proxy_proxy_ip"
+            app:summary="@string/settings_proxy_status_fetching" />
+
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+            app:key="proxy_actual_location"
+            app:title="@string/settings_proxy_actual_location"
+            app:summary="@string/settings_proxy_status_fetching" />
+
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+            app:key="proxy_proxy_location"
+            app:title="@string/settings_proxy_proxy_location"
+            app:summary="@string/settings_proxy_status_fetching" />
+
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+            app:key="proxy_reddit_connection_status"
+            app:title="@string/settings_proxy_connection_status_reddit"
+            app:summary="@string/settings_proxy_status_fetching" />
+
+    </ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceCategory>
+
 </PreferenceScreen>

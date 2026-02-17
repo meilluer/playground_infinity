@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
  */
 
 public class SharedPreferencesUtils {
+    public static final String TAB_SWITCHING_SENSITIVITY = "tab_switching_sensitivity";
     public static final String ENABLE_NOTIFICATION_KEY = "enable_notification";
     public static final String NOTIFICATION_INTERVAL_KEY = "notificaiton_interval";
     public static final String LAZY_MODE_INTERVAL_KEY = "lazy_mode_interval";

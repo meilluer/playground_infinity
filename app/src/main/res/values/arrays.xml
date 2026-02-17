@@ -1,4 +1,9 @@
 <resources>
+    <string-array name="settings_tab_switching_sensitivity_values">
+        <item>1</item>
+        <item>4</item>
+        <item>8</item>
+    </string-array>
     <string-array name="settings_notification_interval">
         <item>15 minutes</item>
         <item>30 minutes</item>
