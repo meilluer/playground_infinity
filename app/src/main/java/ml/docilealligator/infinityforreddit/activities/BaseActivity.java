@@ -471,6 +471,75 @@ public abstract class BaseActivity extends AppCompatActivity implements CustomFo
                 int touchSlop = (int) touchSlopBox;
                 touchSlopField.set(recyclerView, touchSlop * Integer.parseInt(getDefaultSharedPreferences().getString(SharedPreferencesUtils.TAB_SWITCHING_SENSITIVITY, "4")));
             }
+
+            if (!getDefaultSharedPreferences().getBoolean(SharedPreferencesUtils.DISABLE_SWIPING_BETWEEN_TABS, false)) {
+                viewPager2.setUserInputEnabled(false);
+                recyclerView.setOnTouchListener(new View.OnTouchListener() {
+                    private float downX, downY;
+                    private boolean longPressDetected = false;
+                    private boolean swipeStarted = false;
+                    private final Handler handler = new Handler(Looper.getMainLooper());
+
+                    private final Runnable longPressRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            longPressDetected = true;
+                            viewPager2.setUserInputEnabled(true);
+                            handler.postDelayed(waitAgainRunnable, 50);
+                        }
+                    };
+
+                    private final Runnable waitAgainRunnable = new Runnable() {
+                        @Override
+                        public void run() {
+                            if (!swipeStarted) {
+                                viewPager2.setUserInputEnabled(false);
+                                longPressDetected = false;
+                                handler.postDelayed(longPressRunnable, 50);
+                            }
+                        }
+                    };
+
+                    @SuppressLint("ClickableViewAccessibility")
+                    @Override
+                    public boolean onTouch(View v, MotionEvent event) {
+                        int action = event.getActionMasked();
+                        if (action == MotionEvent.ACTION_DOWN) {
+                            downX = event.getX();
+                            downY = event.getY();
+                            longPressDetected = false;
+                            swipeStarted = false;
+                            viewPager2.setUserInputEnabled(false);
+                            handler.removeCallbacks(longPressRunnable);
+                            handler.removeCallbacks(waitAgainRunnable);
+                            handler.postDelayed(longPressRunnable, 50);
+                        } else if (action == MotionEvent.ACTION_MOVE) {
+                            if (longPressDetected && !swipeStarted) {
+                                float dx = Math.abs(event.getX() - downX);
+                                float dy = Math.abs(event.getY() - downY);
+                                if (dx > 10 || dy > 10) {
+                                    swipeStarted = true;
+                                    handler.removeCallbacks(waitAgainRunnable);
+                                }
+                            } else if (!longPressDetected) {
+                                float dx = Math.abs(event.getX() - downX);
+                                float dy = Math.abs(event.getY() - downY);
+                                if (dx > 10 || dy > 10) {
+                                    downX = event.getX();
+                                    downY = event.getY();
+                                    handler.removeCallbacks(longPressRunnable);
+                                    handler.postDelayed(longPressRunnable, 50);
+                                }
+                            }
+                        } else if (action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL) {
+                            handler.removeCallbacks(longPressRunnable);
+                            handler.removeCallbacks(waitAgainRunnable);
+                            viewPager2.setUserInputEnabled(false);
+                        }
+                        return false;
+                    }
+                });
+            }
         } catch (NoSuchFieldException | IllegalAccessException ignore) {}
     }
 

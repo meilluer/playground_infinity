@@ -495,6 +495,15 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
         }
     }
 
+    public void onTtsClick(Comment comment, int position) {
+        if (mSectionsPagerAdapter != null) {
+            ViewPostDetailFragment fragment = mSectionsPagerAdapter.getCurrentFragment();
+            if (fragment != null) {
+                fragment.onTtsClick(comment, position);
+            }
+        }
+    }
+
     public void toggleReplyNotifications(Comment comment, int position) {
         if (mSectionsPagerAdapter != null) {
             ViewPostDetailFragment fragment = mSectionsPagerAdapter.getCurrentFragment();

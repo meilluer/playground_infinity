@@ -603,7 +603,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                                                     if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
 
-                                                        if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty()) {
+                                                        if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty() && comment.getDepth() == 0) {
 
                                                             ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
 

@@ -638,50 +638,12 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
 
                         @Override
                         public void onTtsClick(Comment comment, View itemView) {
-                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
-                                mSequentialTtsManager.stop();
-                                unhighlightCurrentSentence();
-                                mIsReadingAll = false;
-                                return;
-                            }
-                            if (mSequentialTtsManager == null) {
-                                mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
-                            }
-                            mIsReadingAll = false;
-                            mSequentialTtsManager.speak(comment.getCommentRawText(), () -> {
-                                unhighlightCurrentSentence();
-                            }, new ml.docilealligator.infinityforreddit.utils.TtsManager.OnTtsUpdateListener() {
-                                @Override
-                                public void onSentenceStart(String text, int start, int end) {
-                                }
-
-                                @Override
-                                public void onWordStart(String text, int start, int end) {
-                                    highlightWord(itemView, text, start, end);
-                                }
-                            });
+                            ViewPostDetailFragment.this.onTtsClick(comment, itemView);
                         }
 
                         @Override
                         public void onTtsLongClick(Comment comment) {
-                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
-                                mSequentialTtsManager.stop();
-                                mIsReadingAll = false;
-                                unhighlightCurrentSentence();
-                            }
-
-                            mIsReadingAll = true;
-                            // Find index of comment
-                            int index = -1;
-                            if (mCommentsAdapter != null && mCommentsAdapter.getVisibleComments() != null) {
-                                index = mCommentsAdapter.getVisibleComments().indexOf(comment);
-                            }
-                            if (index != -1) {
-                                mCurrentCommentIndex = index;
-                                readNextComment();
-                            } else {
-                                mIsReadingAll = false;
-                            }
+                            ViewPostDetailFragment.this.onTtsLongClick(comment);
                         }
                     });
             if (mCommentsRecyclerView != null) {
@@ -1465,99 +1427,25 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                             return sortType;
                                         }
 
-                                                                                        @Override
+                                                                                                                @Override
 
-                                                                                        public void onTtsClick(Comment comment, View itemView) {
+                                                                                                                public void onTtsClick(Comment comment, View itemView) {
 
-                                                                                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+                                                                                                                    ViewPostDetailFragment.this.onTtsClick(comment, itemView);
 
-                                                                                                mSequentialTtsManager.stop();
+                                                                                                                }
 
-                                                                                                unhighlightCurrentSentence();
+                                                                                        
 
-                                                                                                mIsReadingAll = false;
+                                                                                                                @Override
 
-                                                                                                return;
+                                                                                                                public void onTtsLongClick(Comment comment) {
 
-                                                                                            }
+                                                                                                                    ViewPostDetailFragment.this.onTtsLongClick(comment);
 
-                                                                                            if (mSequentialTtsManager == null) {
+                                                                                                                }
 
-                                                                                                mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
-
-                                                                                            }
-
-                                                                                            mIsReadingAll = false;
-
-                                                                                            mSequentialTtsManager.speak(comment.getCommentRawText(), () -> {
-
-                                                                                                unhighlightCurrentSentence();
-
-                                                                                            }, new ml.docilealligator.infinityforreddit.utils.TtsManager.OnTtsUpdateListener() {
-
-                                                                                                @Override
-
-                                                                                                public void onSentenceStart(String text, int start, int end) {
-
-                                                                                                }
-
-                                                                
-
-                                                                                                @Override
-
-                                                                                                public void onWordStart(String text, int start, int end) {
-
-                                                                                                    highlightWord(itemView, text, start, end);
-
-                                                                                                }
-
-                                                                                            });
-
-                                                                                        }
-
-                                                                
-
-                                                                                        @Override
-
-                                                                                        public void onTtsLongClick(Comment comment) {
-
-                                                                                            if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
-
-                                                                                                mSequentialTtsManager.stop();
-
-                                                                                                mIsReadingAll = false;
-
-                                                                                                unhighlightCurrentSentence();
-
-                                                                                            }
-
-                                                                
-
-                                                                                            mIsReadingAll = true;
-
-                                                                                            // Find index of comment
-
-                                                                                            int index = -1;
-
-                                                                                            if (mCommentsAdapter != null && mCommentsAdapter.getVisibleComments() != null) {
-
-                                                                                                index = mCommentsAdapter.getVisibleComments().indexOf(comment);
-
-                                                                                            }
-
-                                                                                            if (index != -1) {
-
-                                                                                                mCurrentCommentIndex = index;
-
-                                                                                                readNextComment();
-
-                                                                                            } else {
-
-                                                                                                mIsReadingAll = false;
-
-                                                                                            }
-
-                                                                                        }                                    });
+                                                                                                            });
                             if (mCommentsRecyclerView != null) {
                                 binding.postDetailRecyclerViewViewPostDetailFragment.setAdapter(mPostAdapter);
                                 mCommentsRecyclerView.setAdapter(mCommentsAdapter);
@@ -2366,6 +2254,63 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     private ml.docilealligator.infinityforreddit.utils.TtsManager mSequentialTtsManager;
     private boolean mIsReadingAll = false;
     private int mCurrentCommentIndex = -1;
+
+    public void onTtsClick(Comment comment, View itemView) {
+        if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+            mSequentialTtsManager.stop();
+            unhighlightCurrentSentence();
+            mIsReadingAll = false;
+            return;
+        }
+        if (mSequentialTtsManager == null) {
+            mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+        }
+        mIsReadingAll = false;
+        mSequentialTtsManager.speak(comment.getCommentRawText(), () -> {
+            unhighlightCurrentSentence();
+        }, new ml.docilealligator.infinityforreddit.utils.TtsManager.OnTtsUpdateListener() {
+            @Override
+            public void onSentenceStart(String text, int start, int end) {
+            }
+
+            @Override
+            public void onWordStart(String text, int start, int end) {
+                highlightWord(itemView, text, start, end);
+            }
+        });
+    }
+
+    public void onTtsClick(Comment comment, int position) {
+        RecyclerView rv = mCommentsRecyclerView != null ? mCommentsRecyclerView : binding.postDetailRecyclerViewViewPostDetailFragment;
+        int positionInRv = position;
+        if (mConcatAdapter != null) {
+            positionInRv += mPostAdapter.getItemCount();
+        }
+        RecyclerView.ViewHolder vh = rv.findViewHolderForAdapterPosition(positionInRv);
+        View itemView = vh != null ? vh.itemView : null;
+        onTtsClick(comment, itemView);
+    }
+
+    public void onTtsLongClick(Comment comment) {
+        if (mSequentialTtsManager != null && mSequentialTtsManager.isSpeaking()) {
+            mSequentialTtsManager.stop();
+            mIsReadingAll = false;
+            unhighlightCurrentSentence();
+        }
+
+        mIsReadingAll = true;
+        // Find index of comment
+        int index = -1;
+        if (mCommentsAdapter != null && mCommentsAdapter.getVisibleComments() != null) {
+            index = mCommentsAdapter.getVisibleComments().indexOf(comment);
+        }
+        if (index != -1) {
+            mCurrentCommentIndex = index;
+            readNextComment();
+        } else {
+            mIsReadingAll = false;
+        }
+    }
 
     @Override
     public void onTtsClick(Post post) {

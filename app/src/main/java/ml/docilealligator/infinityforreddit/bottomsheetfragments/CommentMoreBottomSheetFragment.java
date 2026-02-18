@@ -266,6 +266,14 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
         });
 
         if (comment.getDepth() > 0 && activity instanceof ViewPostDetailActivity) {
+            binding.textToSpeechTextViewCommentMoreBottomSheetFragment.setVisibility(View.VISIBLE);
+            binding.textToSpeechTextViewCommentMoreBottomSheetFragment.setOnClickListener(view -> {
+                dismiss();
+                ((ViewPostDetailActivity) activity).onTtsClick(comment, bundle.getInt(EXTRA_POSITION));
+            });
+        }
+
+        if (comment.getDepth() > 0 && activity instanceof ViewPostDetailActivity) {
             binding.jumpToParentCommentCommentMoreBottomSheetFragment.setVisibility(View.VISIBLE);
             binding.jumpToParentCommentCommentMoreBottomSheetFragment.setOnClickListener(view -> {
                 if (activity instanceof ViewPostDetailActivity) {
