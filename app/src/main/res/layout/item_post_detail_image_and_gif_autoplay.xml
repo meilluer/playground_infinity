@@ -364,6 +364,15 @@
             app:layout_constraintBottom_toBottomOf="@+id/gemini_logo_item_post_detail_image_and_gif_autoplay"
             app:layout_constraintStart_toEndOf="@+id/gemini_logo_item_post_detail_image_and_gif_autoplay" />
 
+        <View
+            android:id="@+id/placeholder_item_post_detail_image_and_gif_autoplay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/gemini_progress_indicator_item_post_detail_image_and_gif_autoplay"
+            app:layout_constraintEnd_toStartOf="@id/save_button_item_post_detail_image_and_gif_autoplay" />
+
         <com.google.android.material.button.MaterialButton
             android:id="@+id/save_button_item_post_detail_image_and_gif_autoplay"
             android:layout_width="wrap_content"
@@ -373,7 +382,7 @@
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/gemini_progress_indicator_item_post_detail_image_and_gif_autoplay"
+            app:layout_constraintStart_toEndOf="@id/placeholder_item_post_detail_image_and_gif_autoplay"
             app:layout_constraintEnd_toStartOf="@id/share_button_item_post_detail_image_and_gif_autoplay"
             style="?attr/materialIconButtonOutlinedStyle" />
 
