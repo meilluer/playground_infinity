@@ -7,6 +7,7 @@ import android.os.Parcelable;
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
 import androidx.room.Entity;
+import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
 
 import com.google.gson.Gson;
@@ -211,10 +212,12 @@ public class CustomTheme implements Parcelable {
 
     public CustomTheme() {}
 
+    @Ignore
     public CustomTheme(@NonNull String name) {
         this.name = name;
     }
 
+    @Ignore
     protected CustomTheme(Parcel in) {
         name = in.readString();
         isLightTheme = in.readByte() != 0;

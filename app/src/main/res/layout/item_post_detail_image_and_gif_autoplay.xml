@@ -352,7 +352,7 @@
             app:layout_constraintStart_toEndOf="@+id/text_to_speech_button_item_post_detail_image_and_gif_autoplay" />
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
-            android:id="@+id/gemini_progress_indicator_image_and_gif_autoplay"
+            android:id="@+id/gemini_progress_indicator_item_post_detail_image_and_gif_autoplay"
             android:layout_width="20dp"
             android:layout_height="20dp"
             android:layout_marginStart="4dp"
@@ -373,7 +373,7 @@
             app:layout_constraintHorizontal_bias="1"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@id/gemini_progress_indicator_image_and_gif_autoplay"
+            app:layout_constraintStart_toEndOf="@id/gemini_progress_indicator_item_post_detail_image_and_gif_autoplay"
             app:layout_constraintEnd_toStartOf="@id/share_button_item_post_detail_image_and_gif_autoplay"
             style="?attr/materialIconButtonOutlinedStyle" />
 
