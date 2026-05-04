@@ -8,6 +8,11 @@
         <item name="android:navigationBarColor">@android:color/black</item>
         <item name="android:textColorPrimary">@android:color/white</item>
         <item name="font_family_bold">@font/balsamiq_sans_bold_version</item>
+        <item name="shapeAppearanceExtraSmallComponent">@style/ShapeAppearance.App.ExtraSmallComponent</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.App.LargeComponent</item>
+        <item name="materialAlertDialogTheme">@style/MaterialAlertDialogTheme</item>
     </style>
 
     <style name="AppTheme.Launcher" parent="@style/AppTheme.NoActionBarWithTransparentStatusBar">
@@ -56,6 +61,8 @@
         <item name="android:backgroundTint">?attr/cardViewBackgroundColor</item>
         <item name="colorBackgroundFloating">?attr/cardViewBackgroundColor</item>
         <item name="android:textSize">?attr/font_default</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.App.LargeComponent</item>
         <item name="materialAlertDialogTitleTextStyle">@style/MaterialAlertDialogTitleTextStyle
         </item>
         <item name="materialAlertDialogBodyTextStyle">@style/MaterialAlertDialogBodyTextStyle</item>
@@ -96,6 +103,9 @@
         <item name="android:textAppearanceListItemSecondary">@style/PreferenceSubtitleTextStyle
         </item>
         <item name="android:textColorPrimary">?attr/primaryTextColor</item>
+        <item name="shapeAppearanceSmallComponent">@style/ShapeAppearance.App.SmallComponent</item>
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance.App.MediumComponent</item>
+        <item name="shapeAppearanceLargeComponent">@style/ShapeAppearance.App.LargeComponent</item>
         <item name="buttonBarPositiveButtonStyle">@style/MaterialAlertDialogPositiveButtonStyle
         </item>
         <item name="buttonBarNegativeButtonStyle">@style/MaterialAlertDialogNegativeButtonStyle
@@ -120,6 +130,25 @@
         <item name="colorBackgroundFloating">?attr/cardViewBackgroundColor</item>
     </style>
     
+    <style name="ShapeAppearance.App.ExtraSmallComponent" parent="ShapeAppearance.Material3.Corner.None">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/shape_corner_extra_small</item>
+    </style>
+
+    <style name="ShapeAppearance.App.SmallComponent" parent="ShapeAppearance.Material3.Corner.None">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/shape_corner_small</item>
+    </style>
+
+    <style name="ShapeAppearance.App.MediumComponent" parent="ShapeAppearance.Material3.Corner.None">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/shape_corner_medium</item>
+    </style>
+
+    <style name="ShapeAppearance.App.LargeComponent" parent="ShapeAppearance.Material3.Corner.None">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">@dimen/shape_corner_large</item>
+    </style>
     <style name="Widget.App.CheckBox.Dark" parent="Widget.Material3.CompoundButton.CheckBox">
         <item name="materialThemeOverlay">@style/ThemeOverlay.App.CheckBox.Dark</item>
     </style>

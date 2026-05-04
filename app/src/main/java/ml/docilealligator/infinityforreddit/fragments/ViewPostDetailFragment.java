@@ -2327,15 +2327,15 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         }
 
         mIsReadingAll = false;
-        
+
         RecyclerView targetRv = binding.postDetailRecyclerViewViewPostDetailFragment;
         RecyclerView.ViewHolder vh = targetRv.findViewHolderForAdapterPosition(0);
         View itemView = vh != null ? vh.itemView : null;
 
-        mSequentialTtsManager.speak(post.getSelfTextPlain(), () -> {
+        String textToSpeak = Utils.removeLinks(post.getSelfTextPlain());
+        mSequentialTtsManager.speak(textToSpeak, () -> {
             unhighlightCurrentSentence();
-        }, new ml.docilealligator.infinityforreddit.utils.TtsManager.OnTtsUpdateListener() {
-            @Override
+        }, new ml.docilealligator.infinityforreddit.utils.TtsManager.OnTtsUpdateListener() {            @Override
             public void onSentenceStart(String text, int start, int end) {
                 // Optional: Scroll to sentence?
             }
@@ -2366,7 +2366,8 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         RecyclerView.ViewHolder vh = targetRv.findViewHolderForAdapterPosition(0);
         View itemView = vh != null ? vh.itemView : null;
 
-        mSequentialTtsManager.speak(post.getSelfTextPlain(), () -> {
+        String textToSpeak = Utils.removeLinks(post.getSelfTextPlain());
+        mSequentialTtsManager.speak(textToSpeak, () -> {
             unhighlightCurrentSentence();
             if (mIsReadingAll) {
                 mCurrentCommentIndex = 0;

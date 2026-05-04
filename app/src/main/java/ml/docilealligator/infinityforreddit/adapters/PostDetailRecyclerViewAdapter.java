@@ -554,39 +554,70 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof PostDetailBaseViewHolder) {
-            if (holder instanceof PostDetailTextViewHolder) {
-                ((PostDetailTextViewHolder) holder).binding.geminiLogoItemPostDetailText.setOnClickListener(view -> {
-                    Toast.makeText(mActivity, R.string.gemini_summary, Toast.LENGTH_SHORT).show();
-                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.VISIBLE);
-                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setVisibility(View.VISIBLE);
-                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("loading...");
+            PostDetailBaseViewHolder baseViewHolder = (PostDetailBaseViewHolder) holder;
 
-                    String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
-                    if (apiKey != null && !apiKey.isEmpty()) {
-                        GeminiSummarizer.summarizeWithGemini(apiKey, mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
-                            @Override
-                            public void onSuccess(String result) {
-                                mActivity.runOnUiThread(() -> {
-                                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText(result);
-                                });
-                            }
+            if (baseViewHolder.geminiLogo != null) {
+                if (mPost.getSelfTextPlain() != null && !mPost.getSelfTextPlain().isEmpty()) {
+                    baseViewHolder.geminiLogo.setVisibility(View.VISIBLE);
+                    baseViewHolder.geminiLogo.setOnClickListener(view -> {
+                        Toast.makeText(mActivity, R.string.gemini_summary, Toast.LENGTH_SHORT).show();
+                        if (baseViewHolder.geminiProgressBar != null) {
+                            baseViewHolder.geminiProgressBar.setVisibility(View.VISIBLE);
+                        }
+                        if (baseViewHolder.geminiSummaryTextView != null) {
+                            baseViewHolder.geminiSummaryTextView.setVisibility(View.VISIBLE);
+                            baseViewHolder.geminiSummaryTextView.setText("loading...");
+                        }
 
-                            @Override
-                            public void onError(String error) {
-                                mActivity.runOnUiThread(() -> {
-                                    ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                                    ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: " + error);
-                                });
+                        String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                        if (apiKey != null && !apiKey.isEmpty()) {
+                            String textToSummarize = Utils.removeLinks(mPost.getSelfTextPlain());
+                            GeminiSummarizer.summarizeWithGemini(apiKey, textToSummarize, new GeminiSummarizer.GeminiCallback() {
+                                @Override
+                                public void onSuccess(String result) {
+                                    mActivity.runOnUiThread(() -> {
+                                        if (baseViewHolder.geminiProgressBar != null) {
+                                            baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                                        }
+                                        if (baseViewHolder.geminiSummaryTextView != null) {
+                                            baseViewHolder.geminiSummaryTextView.setText(result);
+                                        }
+                                    });
+                                }
+
+                                @Override
+                                public void onError(String error) {
+                                    mActivity.runOnUiThread(() -> {
+                                        if (baseViewHolder.geminiProgressBar != null) {
+                                            baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                                        }
+                                        if (baseViewHolder.geminiSummaryTextView != null) {
+                                            baseViewHolder.geminiSummaryTextView.setText("Error: " + error);
+                                        }
+                                    });
+                                }
+                            });
+                        } else {
+                            if (baseViewHolder.geminiProgressBar != null) {
+                                baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
                             }
-                        });
-                    } else {
-                         ((PostDetailTextViewHolder) holder).binding.geminiProgressIndicator.setVisibility(View.GONE);
-                         ((PostDetailTextViewHolder) holder).binding.geminiSummaryTextView.setText("Error: API Key missing");
+                            if (baseViewHolder.geminiSummaryTextView != null) {
+                                baseViewHolder.geminiSummaryTextView.setText("Error: API Key missing");
+                            }
+                        }
+                    });
+                } else {
+                    baseViewHolder.geminiLogo.setVisibility(View.GONE);
+                    if (baseViewHolder.geminiProgressBar != null) {
+                        baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
                     }
-                });
+                    if (baseViewHolder.geminiSummaryTextView != null) {
+                        baseViewHolder.geminiSummaryTextView.setVisibility(View.GONE);
+                    }
+                }
             }
-            ((PostDetailBaseViewHolder) holder).titleTextView.setText(mPost.getTitle());
+
+            baseViewHolder.titleTextView.setText(mPost.getTitle());
             if (mPost.getSubredditNamePrefixed().startsWith("u/")) {
                 if (mPost.getAuthorIconUrl() == null) {
                     String authorName = mPost.isAuthorDeleted() ? mPost.getSubredditNamePrefixed().substring(2) : mPost.getAuthor();
@@ -880,48 +911,6 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             } else if (holder instanceof PostDetailLinkViewHolder) {
                 String domain = Uri.parse(mPost.getUrl()).getHost();
                 ((PostDetailLinkViewHolder) holder).binding.linkTextViewItemPostDetailLink.setText(domain);
-
-                ((PostDetailLinkViewHolder) holder).binding.geminiLogoItemPostDetailLink.setOnClickListener(view -> {
-                    Toast.makeText(mActivity, R.string.gemini_summary, Toast.LENGTH_SHORT).show();
-                    ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.VISIBLE);
-                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.VISIBLE);
-                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("loading...");
-                    
-                    String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
-                    if (apiKey != null && !apiKey.isEmpty()) {
-                        GeminiHelper.summarizeLink(apiKey, mPost.getUrl(), new GeminiHelper.SummaryCallback() {
-                            @Override
-                            public void onSuccess(String summary) {
-                                new Handler(android.os.Looper.getMainLooper()).post(() -> {
-                                    ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
-                                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText(summary);
-                                    GeminiHelper.cacheSummary(mPost.getUrl(), summary);
-                                });
-                            }
-
-                            @Override
-                            public void onFailure(String error) {
-                                new Handler(android.os.Looper.getMainLooper()).post(() -> {
-                                    ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
-                                    ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: " + error);
-                                });
-                            }
-                        });
-                    } else {
-                         ((PostDetailLinkViewHolder) holder).binding.geminiProgressIndicatorLink.setVisibility(View.GONE);
-                         ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText("Error: API Key missing");
-                    }
-                });
-
-                if (mSharedPreferences.getBoolean(SharedPreferencesUtils.GEMINI_ENABLED, false)) {
-                    String summary = GeminiHelper.getSummary(mPost.getUrl());
-                    if (summary != null) {
-                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setText(summary);
-                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.VISIBLE);
-                    } else {
-                        ((PostDetailLinkViewHolder) holder).binding.geminiSummaryTextViewItemPostDetailLink.setVisibility(View.GONE);
-                    }
-                }
 
                 Post.Preview preview = getSuitablePreview(mPost.getPreviews());
                 if (preview != null) {
@@ -1325,6 +1314,8 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
         TextView titleTextView;
         @Nullable
         TextView geminiSummaryTextView;
+        ImageView geminiLogo;
+        View geminiProgressBar;
         CustomTextView typeTextView;
         ImageView crosspostImageView;
         ImageView archivedImageView;
@@ -1368,6 +1359,9 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                          MaterialButton downvoteButton,
                          MaterialButton commentsCountButton,
                          MaterialButton textToSpeechButton,
+                         ImageView geminiLogo,
+                         View geminiProgressBar,
+                         TextView geminiSummaryTextView,
                          MaterialButton saveButton,
                          MaterialButton shareButton) {
             this.iconGifImageView = iconGifImageView;
@@ -1391,6 +1385,9 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             this.downvoteButton = downvoteButton;
             this.commentsCountButton = commentsCountButton;
             this.textToSpeechButton = textToSpeechButton;
+            this.geminiLogo = geminiLogo;
+            this.geminiProgressBar = geminiProgressBar;
+            this.geminiSummaryTextView = geminiSummaryTextView;
             this.saveButton = saveButton;
             this.shareButton = shareButton;
 
@@ -1895,6 +1892,9 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                                                      MaterialButton downvoteButton,
                                                      MaterialButton commentsCountButton,
                                                      MaterialButton textToSpeechButton,
+                                                     ImageView geminiLogo,
+                                                     View geminiProgressBar,
+                                                     TextView geminiSummaryTextView,
                                                      MaterialButton saveButton,
                                                      MaterialButton shareButton) {
             super(itemView);
@@ -1919,6 +1919,9 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     downvoteButton,
                     commentsCountButton,
                     textToSpeechButton,
+                    geminiLogo,
+                    geminiProgressBar,
+                    geminiSummaryTextView,
                     saveButton,
                     shareButton);
 
@@ -2174,7 +2177,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailVideoAutoplay,
                     binding.downvoteButtonItemPostDetailVideoAutoplay,
                     binding.commentsCountButtonItemPostDetailVideoAutoplay,
-                    null,
+                    binding.textToSpeechButtonItemPostDetailVideoAutoplay,
+                    binding.geminiLogoItemPostDetailVideoAutoplay,
+                    binding.geminiProgressIndicatorItemPostDetailVideoAutoplay,
+                    binding.geminiSummaryTextViewItemPostDetailVideoAutoplay,
                     binding.saveButtonItemPostDetailVideoAutoplay,
                     binding.shareButtonItemPostDetailVideoAutoplay);
         }
@@ -2212,7 +2218,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailVideoAutoplay,
                     binding.downvoteButtonItemPostDetailVideoAutoplay,
                     binding.commentsCountButtonItemPostDetailVideoAutoplay,
-                    null,
+                    binding.textToSpeechButtonItemPostDetailVideoAutoplay,
+                    binding.geminiLogoItemPostDetailVideoAutoplay,
+                    binding.geminiProgressIndicatorItemPostDetailVideoAutoplay,
+                    binding.geminiSummaryTextViewItemPostDetailVideoAutoplay,
                     binding.saveButtonItemPostDetailVideoAutoplay,
                     binding.shareButtonItemPostDetailVideoAutoplay);
         }
@@ -2244,7 +2253,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailVideoAndGifPreview,
                     binding.downvoteButtonItemPostDetailVideoAndGifPreview,
                     binding.commentsCountButtonItemPostDetailVideoAndGifPreview,
-                    null,
+                    binding.textToSpeechButtonItemPostDetailVideoAndGifPreview,
+                    binding.geminiLogoItemPostDetailVideoAndGifPreview,
+                    binding.geminiProgressIndicatorItemPostDetailVideoAndGifPreview,
+                    binding.geminiSummaryTextViewItemPostDetailVideoAndGifPreview,
                     binding.saveButtonItemPostDetailVideoAndGifPreview,
                     binding.shareButtonItemPostDetailVideoAndGifPreview);
 
@@ -2290,7 +2302,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailImageAndGifAutoplay,
                     binding.downvoteButtonItemPostDetailImageAndGifAutoplay,
                     binding.commentsCountButtonItemPostDetailImageAndGifAutoplay,
-                    null,
+                    binding.textToSpeechButtonItemPostDetailImageAndGifAutoplay,
+                    binding.geminiLogoItemPostDetailImageAndGifAutoplay,
+                    binding.geminiProgressIndicatorItemPostDetailImageAndGifAutoplay,
+                    binding.geminiSummaryTextViewItemPostDetailImageAndGifAutoplay,
                     binding.saveButtonItemPostDetailImageAndGifAutoplay,
                     binding.shareButtonItemPostDetailImageAndGifAutoplay);
 
@@ -2334,10 +2349,12 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailLink,
                     binding.downvoteButtonItemPostDetailLink,
                     binding.commentsCountButtonItemPostDetailLink,
-                    null,
+                    binding.textToSpeechButtonItemPostDetailLink,
+                    binding.geminiLogoItemPostDetailLink,
+                    binding.geminiProgressIndicatorLink,
+                    binding.geminiSummaryTextViewItemPostDetailLink,
                     binding.saveButtonItemPostDetailLink,
                     binding.shareButtonItemPostDetailLink);
-            geminiSummaryTextView = binding.geminiSummaryTextViewItemPostDetailLink;
 
             if (mActivity.typeface != null) {
                 binding.linkTextViewItemPostDetailLink.setTypeface(mActivity.typeface);
@@ -2387,7 +2404,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailNoPreview,
                     binding.downvoteButtonItemPostDetailNoPreview,
                     binding.commentsCountButtonItemPostDetailNoPreview,
-                    null,
+                    binding.textToSpeechButtonItemPostDetailNoPreview,
+                    binding.geminiLogoItemPostDetailNoPreview,
+                    binding.geminiProgressIndicatorItemPostDetailNoPreview,
+                    binding.geminiSummaryTextViewItemPostDetailNoPreview,
                     binding.saveButtonItemPostDetailNoPreview,
                     binding.shareButtonItemPostDetailNoPreview);
 
@@ -2436,7 +2456,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.scoreTextViewItemPostDetailGallery,
                     binding.downvoteButtonItemPostDetailGallery,
                     binding.commentsCountButtonItemPostDetailGallery,
-                    null,
+                    binding.textToSpeechButtonItemPostDetailGallery,
+                    binding.geminiLogoItemPostDetailGallery,
+                    binding.geminiProgressIndicatorItemPostDetailGallery,
+                    binding.geminiSummaryTextViewItemPostDetailGallery,
                     binding.saveButtonItemPostDetailGallery,
                     binding.shareButtonItemPostDetailGallery);
 
@@ -2589,6 +2612,9 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     binding.downvoteButtonItemPostDetailText,
                     binding.commentsCountButtonItemPostDetailText,
                     binding.textToSpeechButtonItemPostDetailText,
+                    binding.geminiLogoItemPostDetailText,
+                    binding.geminiProgressIndicator,
+                    binding.geminiSummaryTextView,
                     binding.saveButtonItemPostDetailText,
                     binding.shareButtonItemPostDetailText);
         }

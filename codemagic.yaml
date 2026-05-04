@@ -1,0 +1,17 @@
+workflows:
+  android-manual-build:
+    name: Android Manual Build
+
+    environment:
+      java: 17
+
+    scripts:
+      - name: Make gradlew executable
+        script: chmod +x ./gradlew
+
+      - name: Build debug APK
+        script: ./gradlew assembleDebug
+
+    artifacts:
+      - app/build/outputs/**/*.apk
+      - app/build/outputs/**/mapping.txt
