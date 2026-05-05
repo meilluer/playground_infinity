@@ -3034,7 +3034,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                     downvoteButton,
                     commentsCountButton,
                     saveButton,
-                    shareButton);
+                    shareButton,
+                    null,
+                    null);
 
             this.subredditTextView = subredditTextView;
             this.userTextView = userTextView;
