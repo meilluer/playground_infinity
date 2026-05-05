@@ -1952,6 +1952,10 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
         TextView titleTextView;
         @Nullable
         TextView geminiSummaryTextView;
+        @Nullable
+        ImageView geminiLogo;
+        @Nullable
+        View geminiProgressBar;
 
         @Nullable
         CustomTextView typeTextView;
@@ -2004,7 +2008,9 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
                          MaterialButton downvoteButton,
                          @Nullable MaterialButton commentsCountButton,
                          @Nullable MaterialButton saveButton,
-                         @Nullable MaterialButton shareButton) {
+                         @Nullable MaterialButton shareButton,
+                         @Nullable ImageView geminiLogo,
+                         @Nullable View geminiProgressBar) {
             this.iconGifImageView = iconGifImageView;
             this.stickiedPostImageView = stickiedPostImageView;
             this.postTimeTextView = postTimeTextView;
@@ -2024,6 +2030,8 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
             this.commentsCountButton = commentsCountButton;
             this.saveButton = saveButton;
             this.shareButton = shareButton;
+            this.geminiLogo = geminiLogo;
+            this.geminiProgressBar = geminiProgressBar;
 
             if (mDisplaySubredditName) {
                 subredditTextView.setOnClickListener(view -> {

@@ -557,7 +557,13 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
             PostDetailBaseViewHolder baseViewHolder = (PostDetailBaseViewHolder) holder;
 
             if (baseViewHolder.geminiLogo != null) {
-                if (mPost.getSelfTextPlain() != null && !mPost.getSelfTextPlain().isEmpty()) {
+                boolean canSummarizeText = mPost.getSelfTextPlain() != null && !mPost.getSelfTextPlain().isEmpty();
+                boolean canSummarizeLink = (mPost.getPostType() == Post.LINK_TYPE
+                        || mPost.getPostType() == Post.NO_PREVIEW_LINK_TYPE)
+                        && mPost.getUrl() != null
+                        && !mPost.getUrl().isEmpty();
+
+                if (canSummarizeText || canSummarizeLink) {
                     baseViewHolder.geminiLogo.setVisibility(View.VISIBLE);
                     baseViewHolder.geminiLogo.setOnClickListener(view -> {
                         Toast.makeText(mActivity, R.string.gemini_summary, Toast.LENGTH_SHORT).show();
@@ -571,32 +577,71 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
 
                         String apiKey = mSharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
                         if (apiKey != null && !apiKey.isEmpty()) {
-                            String textToSummarize = Utils.removeLinks(mPost.getSelfTextPlain());
-                            GeminiSummarizer.summarizeWithGemini(apiKey, textToSummarize, new GeminiSummarizer.GeminiCallback() {
-                                @Override
-                                public void onSuccess(String result) {
-                                    mActivity.runOnUiThread(() -> {
-                                        if (baseViewHolder.geminiProgressBar != null) {
-                                            baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                            if (canSummarizeLink) {
+                                String cachedSummary = GeminiHelper.getSummary(mPost.getUrl());
+                                if (cachedSummary != null && !cachedSummary.isEmpty()) {
+                                    if (baseViewHolder.geminiProgressBar != null) {
+                                        baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                                    }
+                                    if (baseViewHolder.geminiSummaryTextView != null) {
+                                        baseViewHolder.geminiSummaryTextView.setText(cachedSummary);
+                                    }
+                                } else {
+                                    GeminiHelper.summarizeLink(apiKey, mPost.getUrl(), new GeminiHelper.SummaryCallback() {
+                                        @Override
+                                        public void onSuccess(String summary) {
+                                            GeminiHelper.cacheSummary(mPost.getUrl(), summary);
+                                            mActivity.runOnUiThread(() -> {
+                                                if (baseViewHolder.geminiProgressBar != null) {
+                                                    baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                                                }
+                                                if (baseViewHolder.geminiSummaryTextView != null) {
+                                                    baseViewHolder.geminiSummaryTextView.setText(summary);
+                                                }
+                                            });
                                         }
-                                        if (baseViewHolder.geminiSummaryTextView != null) {
-                                            baseViewHolder.geminiSummaryTextView.setText(result);
-                                        }
-                                    });
-                                }
 
-                                @Override
-                                public void onError(String error) {
-                                    mActivity.runOnUiThread(() -> {
-                                        if (baseViewHolder.geminiProgressBar != null) {
-                                            baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
-                                        }
-                                        if (baseViewHolder.geminiSummaryTextView != null) {
-                                            baseViewHolder.geminiSummaryTextView.setText("Error: " + error);
+                                        @Override
+                                        public void onFailure(String error) {
+                                            mActivity.runOnUiThread(() -> {
+                                                if (baseViewHolder.geminiProgressBar != null) {
+                                                    baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                                                }
+                                                if (baseViewHolder.geminiSummaryTextView != null) {
+                                                    baseViewHolder.geminiSummaryTextView.setText("Error: " + error);
+                                                }
+                                            });
                                         }
                                     });
                                 }
-                            });
+                            } else {
+                                String textToSummarize = Utils.removeLinks(mPost.getSelfTextPlain());
+                                GeminiSummarizer.summarizeWithGemini(apiKey, textToSummarize, new GeminiSummarizer.GeminiCallback() {
+                                    @Override
+                                    public void onSuccess(String result) {
+                                        mActivity.runOnUiThread(() -> {
+                                            if (baseViewHolder.geminiProgressBar != null) {
+                                                baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                                            }
+                                            if (baseViewHolder.geminiSummaryTextView != null) {
+                                                baseViewHolder.geminiSummaryTextView.setText(result);
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onError(String error) {
+                                        mActivity.runOnUiThread(() -> {
+                                            if (baseViewHolder.geminiProgressBar != null) {
+                                                baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
+                                            }
+                                            if (baseViewHolder.geminiSummaryTextView != null) {
+                                                baseViewHolder.geminiSummaryTextView.setText("Error: " + error);
+                                            }
+                                        });
+                                    }
+                                });
+                            }
                         } else {
                             if (baseViewHolder.geminiProgressBar != null) {
                                 baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
