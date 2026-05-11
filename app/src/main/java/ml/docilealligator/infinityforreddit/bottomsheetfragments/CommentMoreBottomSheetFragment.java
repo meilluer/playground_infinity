@@ -48,6 +48,7 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
     public static final String EXTRA_EDIT_AND_DELETE_AVAILABLE = "EEADA";
     public static final String EXTRA_POSITION = "EP";
     public static final String EXTRA_SHOW_REPLY_AND_SAVE_OPTION = "ESSARO";
+    public static final String EXTRA_SHOW_TEXT_TO_SPEECH_OPTION = "ESTTSO";
     public static final String EXTRA_IS_NSFW = "EIN";
 
     private FragmentCommentMoreBottomSheetBinding binding;
@@ -265,7 +266,8 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
             dismiss();
         });
 
-        if (comment.getDepth() > 0 && activity instanceof ViewPostDetailActivity) {
+        if (bundle.getBoolean(EXTRA_SHOW_TEXT_TO_SPEECH_OPTION, false)
+                && activity instanceof ViewPostDetailActivity) {
             binding.textToSpeechTextViewCommentMoreBottomSheetFragment.setVisibility(View.VISIBLE);
             binding.textToSpeechTextViewCommentMoreBottomSheetFragment.setOnClickListener(view -> {
                 dismiss();

@@ -601,32 +601,31 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     }
                 }
 
-                                                    if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
+                if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
+                    boolean hasCommentText = comment.getCommentRawText() != null
+                            && !comment.getCommentRawText().isEmpty();
+                    boolean showInlineTts = hasCommentText && comment.getDepth() > 0;
 
-                                                        if (comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty() && comment.getDepth() == 0) {
-
-                                                            ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
-
-                                                            ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
-                                                                if (mCommentRecyclerViewAdapterCallback != null) {
-                                                                    mCommentRecyclerViewAdapterCallback.onTtsClick(comment, ((CommentBaseViewHolder) holder).itemView);
-                                                                }
-                                                            });
-
-                                                            ((CommentBaseViewHolder) holder).textToSpeechButton.setOnLongClickListener(v -> {
-                                                                if (mCommentRecyclerViewAdapterCallback != null) {
-                                                                    mCommentRecyclerViewAdapterCallback.onTtsLongClick(comment);
-                                                                }
-                                                                return true;
-                                                            });
-
-                                                        } else {
-
-                                                            ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);
-
-                                                        }
-
-                                                    }            }
+                    if (showInlineTts) {
+                        ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
+                        ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(v -> {
+                            if (mCommentRecyclerViewAdapterCallback != null) {
+                                mCommentRecyclerViewAdapterCallback.onTtsClick(comment, ((CommentBaseViewHolder) holder).itemView);
+                            }
+                        });
+                        ((CommentBaseViewHolder) holder).textToSpeechButton.setOnLongClickListener(v -> {
+                            if (mCommentRecyclerViewAdapterCallback != null) {
+                                mCommentRecyclerViewAdapterCallback.onTtsLongClick(comment);
+                            }
+                            return true;
+                        });
+                    } else {
+                        ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.GONE);
+                        ((CommentBaseViewHolder) holder).textToSpeechButton.setOnClickListener(null);
+                        ((CommentBaseViewHolder) holder).textToSpeechButton.setOnLongClickListener(null);
+                    }
+                }
+            }
         } else if (holder instanceof CommentFullyCollapsedViewHolder) {
             Comment comment = getCurrentComment(position);
             if (comment != null) {
@@ -1287,6 +1286,9 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             cbh.downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
             cbh.expandButton.setText("");
             cbh.replyButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+            cbh.textToSpeechButton.setVisibility(View.GONE);
+            cbh.textToSpeechButton.setOnClickListener(null);
+            cbh.textToSpeechButton.setOnLongClickListener(null);
 
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) cbh.itemView.getLayoutParams();
             params.setMargins(0, 0, 0, 0);
@@ -1525,6 +1527,11 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         bundle.putInt(CommentMoreBottomSheetFragment.EXTRA_POSITION, getBindingAdapterPosition());
                     }
                     bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_IS_NSFW, mPost.isNSFW());
+                    boolean showTtsInMoreMenu = comment.getCommentRawText() != null
+                            && !comment.getCommentRawText().isEmpty()
+                            && comment.getDepth() == 0;
+                    bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_TEXT_TO_SPEECH_OPTION,
+                            showTtsInMoreMenu);
                     if (comment.getDepth() >= mDepthThreshold) {
                         bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_REPLY_AND_SAVE_OPTION, true);
                     }
