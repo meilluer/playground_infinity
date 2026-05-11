@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+        app:title="@string/settings_preview_font_title"
+        app:fragment="ml.docilealligator.infinityforreddit.settings.FontPreviewFragment" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceCategory
+        app:title="@string/settings_font_summary" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        app:defaultValue="Default"
+        android:entries="@array/settings_font_family"
+        app:entryValues="@array/settings_font_family_values"
+        app:key="font_family"
+        app:title="@string/settings_font_family_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+        app:title="@string/settings_custom_font_family_title"
+        app:key="custom_font_family"
+        app:isPreferenceVisible="false" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        app:defaultValue="Normal"
+        android:entries="@array/settings_font_size"
+        app:entryValues="@array/settings_font_size_values"
+        app:key="font_size"
+        app:title="@string/settings_font_size_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceCategory
+        app:title="@string/settings_title_font_summary" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        app:defaultValue="Default"
+        android:entries="@array/settings_font_family"
+        app:entryValues="@array/settings_font_family_values"
+        app:key="title_font_family"
+        app:title="@string/settings_title_font_family_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+        app:title="@string/settings_custom_title_font_family_title"
+        app:key="custom_title_font_family"
+        app:isPreferenceVisible="false" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        app:defaultValue="Normal"
+        android:entries="@array/settings_title_font_size"
+        app:entryValues="@array/settings_title_font_size_values"
+        app:key="title_font_size"
+        app:title="@string/settings_title_font_size_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreferenceCategory
+        app:title="@string/settings_content_font_summary" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        app:defaultValue="Default"
+        android:entries="@array/settings_font_family"
+        app:entryValues="@array/settings_font_family_values"
+        app:key="content_font_family"
+        app:title="@string/settings_content_font_family_title"
+        app:useSimpleSummaryProvider="true" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+        app:title="@string/settings_custom_content_font_family_title"
+        app:key="custom_content_font_family"
+        app:isPreferenceVisible="false" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        app:defaultValue="Normal"
+        android:entries="@array/settings_content_font_size"
+        app:entryValues="@array/settings_content_font_size_values"
+        app:key="content_font_size"
+        app:title="@string/settings_content_font_size_title"
+        app:useSimpleSummaryProvider="true" />
+
+</PreferenceScreen>

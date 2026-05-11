@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:application="ml.docilealligator.infinityforreddit.activities.ViewSubredditDetailActivity">
+    <item
+        android:id="@+id/action_search_view_subreddit_detail_activity"
+        android:orderInCategory="1"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_search_toolbar_24dp"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_sort_view_subreddit_detail_activity"
+        android:orderInCategory="2"
+        android:title="@string/action_sort"
+        android:icon="@drawable/ic_sort_toolbar_24dp"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_refresh_view_subreddit_detail_activity"
+        android:orderInCategory="3"
+        android:title="@string/action_refresh"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_change_post_layout_view_subreddit_detail_activity"
+        android:orderInCategory="4"
+        android:title="@string/action_change_post_layout"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_select_user_flair_view_subreddit_detail_activity"
+        android:orderInCategory="5"
+        android:title="@string/action_select_user_flair"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_add_to_home_screen_view_subreddit_detail_activity"
+        android:orderInCategory="6"
+        android:title="@string/action_add_to_home_screen"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_add_to_multireddit_view_subreddit_detail_activity"
+        android:orderInCategory="7"
+        android:title="@string/action_add_to_multireddit"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_add_to_post_filter_view_subreddit_detail_activity"
+        android:orderInCategory="8"
+        android:title="@string/action_add_to_post_filter"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_share_view_subreddit_detail_activity"
+        android:orderInCategory="9"
+        android:title="@string/action_share"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_go_to_wiki_view_subreddit_detail_activity"
+        android:orderInCategory="10"
+        android:title="@string/action_go_to_wiki"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_contact_mods_view_subreddit_detail_activity"
+        android:orderInCategory="11"
+        android:title="@string/action_contact_mods"
+        app:showAsAction="never" />
+</menu>

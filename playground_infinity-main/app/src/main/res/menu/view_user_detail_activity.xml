@@ -1,0 +1,67 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:application="ml.docilealligator.infinityforreddit.activities.ViewUserDetailActivity">
+    <item
+        android:id="@+id/action_search_view_user_detail_activity"
+        android:orderInCategory="1"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_search_toolbar_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_sort_view_user_detail_activity"
+        android:orderInCategory="2"
+        android:title="@string/action_search"
+        android:icon="@drawable/ic_sort_toolbar_24dp"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_refresh_view_user_detail_activity"
+        android:orderInCategory="3"
+        android:title="@string/action_refresh"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_change_post_layout_view_user_detail_activity"
+        android:orderInCategory="4"
+        android:title="@string/action_change_post_layout"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_send_private_message_view_user_detail_activity"
+        android:orderInCategory="5"
+        android:title="@string/action_send_private_message"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_share_view_user_detail_activity"
+        android:orderInCategory="6"
+        android:title="@string/action_share"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_add_to_multireddit_view_user_detail_activity"
+        android:orderInCategory="7"
+        android:title="@string/action_add_to_multireddit"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_add_to_post_filter_view_user_detail_activity"
+        android:orderInCategory="8"
+        android:title="@string/action_add_to_post_filter"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_report_view_user_detail_activity"
+        android:orderInCategory="9"
+        android:title="@string/action_report" />
+
+    <item
+        android:id="@+id/action_block_user_view_user_detail_activity"
+        android:orderInCategory="10"
+        android:title="@string/action_block_user" />
+
+    <item
+        android:id="@+id/action_edit_profile_view_user_detail_activity"
+        android:orderInCategory="11"
+        android:title="@string/action_edit_profile" />
+</menu>

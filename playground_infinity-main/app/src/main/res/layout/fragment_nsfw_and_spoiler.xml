@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".settings.NsfwAndSpoilerFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:animateLayoutChanges="true">
+
+        <LinearLayout
+            android:id="@+id/enable_nsfw_linear_layout_nsfw_and_spoiler_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/enable_nsfw_text_view_nsfw_and_spoiler_fragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center_vertical"
+                android:drawablePadding="32dp"
+                android:text="@string/settings_over_18_title"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="?attr/font_16"
+                android:fontFamily="?attr/font_family" />
+
+            <ml.docilealligator.infinityforreddit.customviews.ThemedMaterialSwitch
+                android:id="@+id/enable_nsfw_switch_nsfw_and_spoiler_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/blur_nsfw_linear_layout_nsfw_and_spoiler_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="72dp"
+            android:paddingEnd="16dp"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/blur_nsfw_text_view_nsfw_and_spoiler_fragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center_vertical"
+                android:text="@string/settings_blur_over_18_title"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="?attr/font_16"
+                android:fontFamily="?attr/font_family" />
+
+            <ml.docilealligator.infinityforreddit.customviews.ThemedMaterialSwitch
+                android:id="@+id/blur_nsfw_switch_nsfw_and_spoiler_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/do_not_blur_nsfw_in_nsfw_subreddits_linear_layout_nsfw_and_spoiler_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="72dp"
+            android:paddingEnd="16dp"
+            android:visibility="gone"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/do_not_blur_nsfw_text_view_nsfw_and_spoiler_fragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center_vertical"
+                android:text="@string/settings_do_not_blur_over_18_in_over_18_subreddits_title"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="?attr/font_16"
+                android:fontFamily="?attr/font_family" />
+
+            <ml.docilealligator.infinityforreddit.customviews.ThemedMaterialSwitch
+                android:id="@+id/do_not_blur_nsfw_in_nsfw_subreddits_switch_nsfw_and_spoiler_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/blur_spoiler_linear_layout_nsfw_and_spoiler_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="72dp"
+            android:paddingEnd="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/blur_spoiler_text_view_nsfw_and_spoiler_fragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center_vertical"
+                android:text="@string/settings_blur_spoiler_title"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="?attr/font_16"
+                android:fontFamily="?attr/font_family" />
+
+            <ml.docilealligator.infinityforreddit.customviews.ThemedMaterialSwitch
+                android:id="@+id/blur_spoiler_switch_nsfw_and_spoiler_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dividerColor" />
+
+        <TextView
+            android:id="@+id/dangerous_text_view_nsfw_and_spoiler_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="16dp"
+            android:paddingStart="72dp"
+            android:paddingEnd="16dp"
+            android:text="@string/settings_nsfw_and_spoiler_dangerous_group_title"
+            android:textColor="@color/colorAccent"
+            android:textSize="?attr/font_default"
+            android:fontFamily="?attr/font_family" />
+
+        <LinearLayout
+            android:id="@+id/disable_nsfw_forever_linear_layout_nsfw_and_spoiler_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:paddingStart="72dp"
+            android:paddingEnd="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground">
+
+            <TextView
+                android:id="@+id/disable_nsfw_forever_text_view_nsfw_and_spoiler_fragment"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="16dp"
+                android:layout_gravity="center_vertical"
+                android:text="@string/settings_disable_over_18_forever_title"
+                android:textColor="?attr/primaryTextColor"
+                android:textSize="?attr/font_16"
+                android:fontFamily="?attr/font_family" />
+
+            <ml.docilealligator.infinityforreddit.customviews.ThemedMaterialSwitch
+                android:id="@+id/disable_nsfw_forever_switch_nsfw_and_spoiler_fragment"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

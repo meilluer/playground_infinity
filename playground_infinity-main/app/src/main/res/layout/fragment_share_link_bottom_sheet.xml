@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingBottom="8dp"
+    android:overScrollMode="never">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <com.google.android.material.bottomsheet.BottomSheetDragHandleView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <TextView
+            android:id="@+id/post_link_text_view_share_link_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="?attr/font_12"
+            android:fontFamily="?attr/font_family"
+            android:drawablePadding="48dp" />
+
+        <TextView
+            android:id="@+id/share_post_link_text_view_share_link_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/share_post_link"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            android:fontFamily="?attr/font_family"
+            android:drawableStart="@drawable/ic_link_day_night_24dp"
+            android:drawablePadding="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/copy_post_link_text_view_share_link_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/copy_post_link"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            android:fontFamily="?attr/font_family"
+            android:drawableStart="@drawable/ic_copy_day_night_24dp"
+            android:drawablePadding="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground" />
+
+        <TextView
+            android:id="@+id/share_as_image_text_view_share_link_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/share_as_image"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            android:fontFamily="?attr/font_family"
+            android:drawableStart="@drawable/ic_image_day_night_24dp"
+            android:drawablePadding="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/media_link_text_view_share_link_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:textColor="?attr/secondaryTextColor"
+            android:textSize="?attr/font_12"
+            android:fontFamily="?attr/font_family"
+            android:drawablePadding="48dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/share_media_link_text_view_share_link_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            android:fontFamily="?attr/font_family"
+            android:drawableStart="@drawable/ic_link_day_night_24dp"
+            android:drawablePadding="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/copy_media_link_text_view_share_link_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            android:fontFamily="?attr/font_family"
+            android:drawableStart="@drawable/ic_copy_day_night_24dp"
+            android:drawablePadding="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/share_video_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:paddingStart="32dp"
+            android:paddingEnd="32dp"
+            android:text="@string/share_video"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            android:fontFamily="?attr/font_family"
+            android:drawableStart="@drawable/ic_baseline_video_library_24"
+            android:drawablePadding="48dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackground"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>

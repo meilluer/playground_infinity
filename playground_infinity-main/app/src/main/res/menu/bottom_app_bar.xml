@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/bottom_app_bar_option_1"
+        android:enabled="true"
+        android:title="Option 1"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/bottom_app_bar_option_2"
+        android:enabled="true"
+        android:title="Option 2"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/bottom_app_bar_option_3"
+        android:enabled="true"
+        android:title="Option 3"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/bottom_app_bar_option_4"
+        android:enabled="true"
+        android:title="Option 4"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/bottom_app_bar_option_offline"
+        android:enabled="true"
+        android:icon="@drawable/ic_offline_24dp"
+        android:title="Offline"
+        app:showAsAction="always" />
+</menu>

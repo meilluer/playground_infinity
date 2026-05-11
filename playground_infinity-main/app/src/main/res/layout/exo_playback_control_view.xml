@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linear_layout_exo_playback_control_view"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:paddingStart="16dp"
+    android:paddingEnd="16dp"
+    android:paddingBottom="16dp"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/title_text_view_exo_playback_control_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:textColor="#FFFFFF"
+        android:textSize="?attr/font_default"
+        android:fontFamily="?attr/font_family" />
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:paddingTop="4dp">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/mute_exo_playback_control_view"
+            style="?attr/materialIconButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:backgroundTint="#444141"
+            app:iconSize="24dp"
+            app:iconTint="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/button_group_exo_playback_control_view"
+            app:layout_constraintHorizontal_chainStyle="spread_inside"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="0"
+            app:strokeWidth="0dp"
+            tools:visibility="visible" />
+
+        <com.google.android.material.button.MaterialButtonGroup
+            android:id="@+id/button_group_exo_playback_control_view"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:spacing="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/endBarrier"
+            app:layout_constraintHorizontal_bias="0.5"
+            app:layout_constraintStart_toEndOf="@id/startBarrier"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@id/exo_rew"
+                style="?attr/materialIconButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="#444141"
+                app:icon="@drawable/ic_fast_rewind_24dp"
+                app:iconSize="24dp"
+                app:iconTint="@null"
+                app:strokeWidth="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/exo_play_pause_button_exo_playback_control_view"
+                style="?attr/materialIconButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="@color/colorAccent"
+                app:icon="@drawable/ic_play_arrow_24dp"
+                app:iconSize="36dp"
+                app:iconTint="@null"
+                app:strokeWidth="0dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@id/exo_ffwd"
+                style="?attr/materialIconButtonOutlinedStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:backgroundTint="#444141"
+                app:icon="@drawable/ic_fast_forward_24dp"
+                app:iconSize="24dp"
+                app:iconTint="@null"
+                app:strokeWidth="0dp" />
+
+        </com.google.android.material.button.MaterialButtonGroup>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/video_quality_exo_playback_control_view"
+            style="?attr/materialIconButtonOutlinedStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            app:backgroundTint="#444141"
+            app:icon="@drawable/ic_video_quality_24dp"
+            app:iconSize="24dp"
+            app:iconTint="@null"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/button_group_exo_playback_control_view"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintHorizontal_bias="1"
+            app:strokeWidth="0dp"
+            tools:visibility="visible" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/startBarrier"
+            app:barrierDirection="start"
+            app:constraint_referenced_ids="mute_exo_playback_control_view"
+            app:barrierAllowsGoneWidgets="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <androidx.constraintlayout.widget.Barrier
+            android:id="@+id/endBarrier"
+            app:barrierDirection="end"
+            app:constraint_referenced_ids="video_quality_exo_playback_control_view"
+            app:barrierAllowsGoneWidgets="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView android:id="@id/exo_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:includeFontPadding="false"
+            android:textColor="#FFFFFF"
+            android:fontFamily="?attr/font_family" />
+
+        <androidx.media3.ui.DefaultTimeBar
+            android:id="@id/exo_progress"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:bar_height="2dp"
+            app:scrubber_color="#FFFFFF"
+            app:played_color="#FFFFFF" />
+
+        <TextView android:id="@id/exo_duration"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:includeFontPadding="false"
+            android:textColor="#FFFFFF"
+            android:fontFamily="?attr/font_family" />
+
+    </LinearLayout>
+
+    <com.google.android.material.bottomappbar.BottomAppBar
+        android:id="@+id/bottom_navigation_exo_playback_control_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        app:contentInsetStart="0dp"
+        android:backgroundTint="#00000000"
+        app:elevation="0dp"
+        android:visibility="gone"
+        style="@style/Widget.MaterialComponents.BottomAppBar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/back_button_exo_playback_control_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:strokeWidth="0dp"
+                app:icon="@drawable/ic_arrow_back_24dp"
+                app:iconSize="24dp"
+                app:iconTint="@null"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                style="?attr/materialIconButtonOutlinedStyle" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/download_image_view_exo_playback_control_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:strokeWidth="0dp"
+                app:icon="@drawable/ic_file_download_toolbar_white_24dp"
+                app:iconSize="24dp"
+                app:iconTint="@null"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/playback_speed_image_view_exo_playback_control_view"
+                style="?attr/materialIconButtonOutlinedStyle" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/playback_speed_image_view_exo_playback_control_view"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:strokeWidth="0dp"
+                app:icon="@drawable/ic_playback_speed_toolbar_24dp"
+                app:iconSize="24dp"
+                app:iconTint="@null"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                style="?attr/materialIconButtonOutlinedStyle" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </com.google.android.material.bottomappbar.BottomAppBar>
+
+</LinearLayout>

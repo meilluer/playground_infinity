@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:application=".ViewPostDetailActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:id="@+id/appbar_layout_view_post_detail_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:theme="@style/AppTheme.AppBarOverlay">
+
+        <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/collapsing_toolbar_layout_view_post_detail_activity"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:titleEnabled="false"
+            app:toolbarId="@+id/toolbar_view_post_detail_activity">
+
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar_view_post_detail_activity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:minHeight="?attr/actionBarSize"
+                app:popupTheme="@style/AppTheme.PopupOverlay"
+                app:navigationIcon="?attr/homeAsUpIndicator" />
+
+        </com.google.android.material.appbar.CollapsingToolbarLayout>
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/view_pager_2_view_post_detail_activity"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+    <ml.docilealligator.infinityforreddit.customviews.MovableFloatingActionButton
+        android:id="@+id/fab_view_post_detail_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="@dimen/fab_margin"
+        app:tint="@android:color/white"
+        app:srcCompat="@drawable/ic_keyboard_arrow_down_24dp" />
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/search_panel_material_card_view_view_post_detail_activity"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom"
+        android:visibility="gone"
+        app:cardElevation="16dp"
+        style="?attr/materialCardViewElevatedStyle">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="0dp"
+            android:paddingEnd="8dp">
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/search_text_input_layout_view_post_detail_activity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/search_text_input_edit_text_view_post_detail_activity"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="?attr/font_family"
+                    android:textSize="?attr/font_default"
+                    android:hint="@string/search_comments"
+                    android:maxLines="1" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/previous_result_image_view_view_post_detail_activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_upward_day_night_24dp"
+                android:background="?actionBarItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/content_description_previous_result" />
+
+            <ImageView
+                android:id="@+id/next_result_image_view_view_post_detail_activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:src="@drawable/ic_arrow_downward_day_night_24dp"
+                android:background="?actionBarItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/content_description_next_result" />
+
+            <ImageView
+                android:id="@+id/close_search_panel_image_view_view_post_detail_activity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:padding="8dp"
+                android:src="@drawable/ic_close_24dp"
+                android:background="?actionBarItemBackground"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="@string/content_description_close_search_panel" />
+
+        </LinearLayout>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
