@@ -604,7 +604,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
                     boolean hasCommentText = comment.getCommentRawText() != null
                             && !comment.getCommentRawText().isEmpty();
-                    boolean showInlineTts = hasCommentText && comment.getDepth() > 0;
+                    boolean showInlineTts = hasCommentText && comment.getDepth() == 0;
 
                     if (showInlineTts) {
                         ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
@@ -1529,7 +1529,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_IS_NSFW, mPost.isNSFW());
                     boolean showTtsInMoreMenu = comment.getCommentRawText() != null
                             && !comment.getCommentRawText().isEmpty()
-                            && comment.getDepth() == 0;
+                            && comment.getDepth() > 0;
                     bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_TEXT_TO_SPEECH_OPTION,
                             showTtsInMoreMenu);
                     if (comment.getDepth() >= mDepthThreshold) {
