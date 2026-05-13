@@ -78,6 +78,7 @@ import ml.docilealligator.infinityforreddit.services.SubmitPostService;
 import ml.docilealligator.infinityforreddit.subreddit.FetchSubredditData;
 import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
+import ml.docilealligator.infinityforreddit.utils.Utils;
 import retrofit2.Retrofit;
 
 public class PostPollActivity extends BaseActivity implements FlairBottomSheetFragment.FlairSelectionCallback,

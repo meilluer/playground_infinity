@@ -61,6 +61,8 @@ import ml.docilealligator.infinityforreddit.databinding.ActivityPostTextBinding;
 import ml.docilealligator.infinityforreddit.events.SubmitTextOrLinkPostEvent;
 import ml.docilealligator.infinityforreddit.events.SwitchAccountEvent;
 import ml.docilealligator.infinityforreddit.services.SubmitPostService;
+import ml.docilealligator.infinityforreddit.subreddit.FetchSubredditData;
+import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
 import ml.docilealligator.infinityforreddit.subreddit.Flair;
 import ml.docilealligator.infinityforreddit.thing.SelectThingReturnKey;
 import ml.docilealligator.infinityforreddit.thing.UploadedImage;
