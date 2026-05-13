@@ -5,6 +5,14 @@ workflows:
     environment:
       java: 17
 
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+
     scripts:
       - name: Make gradlew executable
         script: chmod +x ./gradlew

@@ -214,6 +214,9 @@ public class JSONUtils {
     public static final String ALLOW_IMAGES_KEY = "allow_images";
     public static final String ALLOW_POLLS_KEY = "allow_polls";
     public static final String ALLOW_GALLERIES_KEY = "allow_galleries";
+    public static final String COMMENT_GIFS_ENABLED_KEY = "comment_gifs_enabled";
+    public static final String COMMENT_IMAGES_ENABLED_KEY = "comment_images_enabled";
+    public static final String ALLOWED_MEDIA_TYPES_KEY = "allowed_media_types";
 
 
     @Nullable

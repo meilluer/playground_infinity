@@ -152,6 +152,8 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
     private ArrayList<UploadedImage> uploadedImages = new ArrayList<>();
     private GiphyGif giphyGif;
     private Menu mMenu;
+    private String subredditName;
+    private MarkdownBottomBarRecyclerViewAdapter markdownBottomBarRecyclerViewAdapter;
     public CommentActivityViewModel commentActivityViewModel;
 
     /**
@@ -191,6 +193,7 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
 
         Intent intent = getIntent();
         isReplying = intent.getExtras().getBoolean(EXTRA_IS_REPLYING_KEY);
+        subredditName = intent.getStringExtra(EXTRA_SUBREDDIT_NAME_KEY);
         applyCustomTheme();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -353,7 +356,7 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
             loadCurrentAccount();
         }
 
-        MarkdownBottomBarRecyclerViewAdapter adapter = new MarkdownBottomBarRecyclerViewAdapter(
+        markdownBottomBarRecyclerViewAdapter = new MarkdownBottomBarRecyclerViewAdapter(
                 mCustomThemeWrapper, true, true,
                 new MarkdownBottomBarRecyclerViewAdapter.ItemClickListener() {
                     @Override
@@ -382,7 +385,11 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
 
         binding.commentMarkdownBottomBarRecyclerView.setLayoutManager(new LinearLayoutManagerBugFixed(this,
                 LinearLayoutManagerBugFixed.HORIZONTAL, true).setStackFromEndAndReturnCurrentObject());
-        binding.commentMarkdownBottomBarRecyclerView.setAdapter(adapter);
+        binding.commentMarkdownBottomBarRecyclerView.setAdapter(markdownBottomBarRecyclerViewAdapter);
+
+        if (subredditName != null) {
+            loadSubredditData();
+        }
 
         binding.commentAccountLinearLayout.setOnClickListener(view -> {
             AccountChooserBottomSheetFragment fragment = new AccountChooserBottomSheetFragment();
@@ -444,6 +451,24 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
                 }
             });
         });
+    }
+
+    private void loadSubredditData() {
+        FetchSubredditData.fetchSubredditData(mExecutor, new Handler(),
+                accountName.equals(Account.ANONYMOUS_ACCOUNT) ? null : mOauthRetrofit, mRetrofit,
+                subredditName, accessToken, new FetchSubredditData.FetchSubredditDataListener() {
+                    @Override
+                    public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
+                        if (markdownBottomBarRecyclerViewAdapter != null) {
+                            markdownBottomBarRecyclerViewAdapter.setMediaEnabled(subredditData.isCommentImagesEnabled(),
+                                    subredditData.isCommentGifsEnabled());
+                        }
+                    }
+
+                    @Override
+                    public void onFetchSubredditDataFail(boolean isQuarantined) {
+                    }
+                });
     }
 
     @Override

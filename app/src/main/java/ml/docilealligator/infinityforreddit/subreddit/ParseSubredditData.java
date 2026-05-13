@@ -149,6 +149,26 @@ public class ParseSubredditData {
         subredditData.setAllowPolls(subredditDataJsonObject.optBoolean(JSONUtils.ALLOW_POLLS_KEY, true));
         subredditData.setAllowGalleries(subredditDataJsonObject.optBoolean(JSONUtils.ALLOW_GALLERIES_KEY, true));
 
+        boolean commentGifsEnabled = subredditDataJsonObject.optBoolean(JSONUtils.COMMENT_GIFS_ENABLED_KEY, false);
+        boolean commentImagesEnabled = subredditDataJsonObject.optBoolean(JSONUtils.COMMENT_IMAGES_ENABLED_KEY, false);
+
+        if (subredditDataJsonObject.has(JSONUtils.ALLOWED_MEDIA_TYPES_KEY) && !subredditDataJsonObject.isNull(JSONUtils.ALLOWED_MEDIA_TYPES_KEY)) {
+            org.json.JSONArray allowedMediaTypes = subredditDataJsonObject.optJSONArray(JSONUtils.ALLOWED_MEDIA_TYPES_KEY);
+            if (allowedMediaTypes != null) {
+                for (int i = 0; i < allowedMediaTypes.length(); i++) {
+                    String type = allowedMediaTypes.optString(i);
+                    if (type.equalsIgnoreCase("giphy")) {
+                        commentGifsEnabled = true;
+                    } else if (type.equalsIgnoreCase("static")) {
+                        commentImagesEnabled = true;
+                    }
+                }
+            }
+        }
+
+        subredditData.setCommentGifsEnabled(commentGifsEnabled);
+        subredditData.setCommentImagesEnabled(commentImagesEnabled);
+
         return subredditData;
     }
 

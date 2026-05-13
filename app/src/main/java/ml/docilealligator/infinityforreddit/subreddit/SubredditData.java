@@ -43,6 +43,10 @@ public class SubredditData {
     @Ignore
     private boolean allowGalleries;
     @Ignore
+    private boolean isCommentGifsEnabled;
+    @Ignore
+    private boolean isCommentImagesEnabled;
+    @Ignore
     private boolean isSelected;
 
     public SubredditData(@NonNull String id, String name, String iconUrl, String bannerUrl,
@@ -148,6 +152,22 @@ public class SubredditData {
 
     public void setAllowGalleries(boolean allowGalleries) {
         this.allowGalleries = allowGalleries;
+    }
+
+    public boolean isCommentGifsEnabled() {
+        return isCommentGifsEnabled;
+    }
+
+    public void setCommentGifsEnabled(boolean commentGifsEnabled) {
+        isCommentGifsEnabled = commentGifsEnabled;
+    }
+
+    public boolean isCommentImagesEnabled() {
+        return isCommentImagesEnabled;
+    }
+
+    public void setCommentImagesEnabled(boolean commentImagesEnabled) {
+        isCommentImagesEnabled = commentImagesEnabled;
     }
 
     public boolean isSelected() {
