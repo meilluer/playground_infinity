@@ -534,13 +534,35 @@ public class PostImageActivity extends BaseActivity implements FlairBottomSheetF
                                 binding.flairCustomTextViewPostImageActivity.setText(R.string.flair);
                             }
                         }
+                        loadPostRequirements();
                     }
 
                     @Override
                     public void onFetchSubredditDataFail(boolean isQuarantined) {
                         loadSubredditIconSuccessful = false;
+                        loadPostRequirements();
                     }
                 });
+    }
+
+    private void loadPostRequirements() {
+        if (!accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+            FetchSubredditData.fetchPostRequirements(mExecutor, new Handler(), mOauthRetrofit, subredditName, accessToken,
+                    new FetchSubredditData.FetchPostRequirementsListener() {
+                        @Override
+                        public void onFetchPostRequirementsSuccess(boolean isFlairRequired) {
+                            if (isFlairRequired) {
+                                if (flair == null) {
+                                    binding.flairCustomTextViewPostImageActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                                }
+                            }
+                        }
+
+                        @Override
+                        public void onFetchPostRequirementsFail() {
+                        }
+                    });
+        }
     }
 
     private void promptAlertDialog(int titleResId, int messageResId) {

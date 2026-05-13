@@ -874,14 +874,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
     }
 
     private void showPostTypeBottomSheet() {
-        PostTypeBottomSheetFragment postTypeBottomSheetFragment;
-        if (mSubredditData != null) {
-            postTypeBottomSheetFragment = PostTypeBottomSheetFragment.newInstance(mSubredditData.getSubmissionType(),
-                    mSubredditData.isAllowVideos(), mSubredditData.isAllowImages(), mSubredditData.isAllowPolls(),
-                    mSubredditData.isAllowGalleries());
-        } else {
-            postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
-        }
+        PostTypeBottomSheetFragment postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
         postTypeBottomSheetFragment.show(getSupportFragmentManager(), postTypeBottomSheetFragment.getTag());
     }
 

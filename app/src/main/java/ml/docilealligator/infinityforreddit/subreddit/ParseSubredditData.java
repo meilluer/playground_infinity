@@ -140,12 +140,14 @@ public class ParseSubredditData {
         SubredditData subredditData = new SubredditData(id, subredditFullName, iconUrl, bannerImageUrl, description,
                 sidebarDescription, nSubscribers, createdUTC, suggestedCommentSort, isNSFW);
 
-        subredditData.setFlairRequired(!subredditDataJsonObject.isNull(JSONUtils.LINK_FLAIR_REQUIRED_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.LINK_FLAIR_REQUIRED_KEY));
+        subredditData.setFlairRequired(subredditDataJsonObject.optBoolean(JSONUtils.LINK_FLAIR_REQUIRED_KEY, false) ||
+                subredditDataJsonObject.optBoolean("flair_required", false) ||
+                subredditDataJsonObject.optBoolean("is_flair_required", false));
         subredditData.setSubmissionType(subredditDataJsonObject.optString(JSONUtils.SUBMISSION_TYPE_KEY, "any"));
-        subredditData.setAllowVideos(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_VIDEOGIFS_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_VIDEOGIFS_KEY));
-        subredditData.setAllowImages(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_IMAGES_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_IMAGES_KEY));
-        subredditData.setAllowPolls(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_POLLS_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_POLLS_KEY));
-        subredditData.setAllowGalleries(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_GALLERIES_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_GALLERIES_KEY));
+        subredditData.setAllowVideos(subredditDataJsonObject.optBoolean(JSONUtils.ALLOW_VIDEOGIFS_KEY, true));
+        subredditData.setAllowImages(subredditDataJsonObject.optBoolean(JSONUtils.ALLOW_IMAGES_KEY, true));
+        subredditData.setAllowPolls(subredditDataJsonObject.optBoolean(JSONUtils.ALLOW_POLLS_KEY, true));
+        subredditData.setAllowGalleries(subredditDataJsonObject.optBoolean(JSONUtils.ALLOW_GALLERIES_KEY, true));
 
         return subredditData;
     }

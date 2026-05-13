@@ -46,6 +46,36 @@ public class FetchSubredditData {
         });
     }
 
+    public static void fetchPostRequirements(Executor executor, Handler handler, Retrofit oauthRetrofit,
+                                             String subredditName, String accessToken,
+                                             final FetchPostRequirementsListener fetchPostRequirementsListener) {
+        if (oauthRetrofit == null) {
+            handler.post(fetchPostRequirementsListener::onFetchPostRequirementsFail);
+            return;
+        }
+
+        executor.execute(() -> {
+            RedditAPI api = oauthRetrofit.create(RedditAPI.class);
+            Call<String> postRequirements = api.getPostRequirements(subredditName, APIUtils.getOAuthHeader(accessToken));
+            try {
+                Response<String> response = postRequirements.execute();
+                if (response.isSuccessful()) {
+                    try {
+                        org.json.JSONObject jsonObject = new org.json.JSONObject(response.body());
+                        boolean isFlairRequired = jsonObject.optBoolean("is_flair_required", false);
+                        handler.post(() -> fetchPostRequirementsListener.onFetchPostRequirementsSuccess(isFlairRequired));
+                    } catch (org.json.JSONException e) {
+                        handler.post(fetchPostRequirementsListener::onFetchPostRequirementsFail);
+                    }
+                } else {
+                    handler.post(fetchPostRequirementsListener::onFetchPostRequirementsFail);
+                }
+            } catch (IOException e) {
+                handler.post(fetchPostRequirementsListener::onFetchPostRequirementsFail);
+            }
+        });
+    }
+
     static void fetchSubredditListingData(Executor executor, Handler handler, Retrofit retrofit, String query,
                                           String after, SortType.Type sortType, @Nullable String accessToken,
                                           @NonNull String accountName, boolean nsfw,
@@ -81,5 +111,11 @@ public class FetchSubredditData {
         void onFetchSubredditListingDataSuccess(ArrayList<SubredditData> subredditData, String after);
 
         void onFetchSubredditListingDataFail();
+    }
+
+    public interface FetchPostRequirementsListener {
+        void onFetchPostRequirementsSuccess(boolean isFlairRequired);
+
+        void onFetchPostRequirementsFail();
     }
 }

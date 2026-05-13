@@ -243,6 +243,8 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
                 binding.flairCustomTextViewPostTextActivity.setBackgroundColor(flairBackgroundColor);
                 binding.flairCustomTextViewPostTextActivity.setBorderColor(flairBackgroundColor);
                 binding.flairCustomTextViewPostTextActivity.setTextColor(flairTextColor);
+            } else if (getIntent().getBooleanExtra(EXTRA_IS_FLAIR_REQUIRED, false)) {
+                binding.flairCustomTextViewPostTextActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
             }
             if (isSpoiler) {
                 binding.spoilerCustomTextViewPostTextActivity.setBackgroundColor(spoilerBackgroundColor);
@@ -514,13 +516,39 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
                                 binding.flairCustomTextViewPostTextActivity.setText(R.string.flair);
                             }
                         }
+                        loadPostRequirements();
                     }
 
                     @Override
                     public void onFetchSubredditDataFail(boolean isQuarantined) {
                         loadSubredditIconSuccessful = false;
+                        loadPostRequirements();
                     }
                 });
+    }
+
+    private void loadPostRequirements() {
+        if (!accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+            FetchSubredditData.fetchPostRequirements(mExecutor, new Handler(), mOauthRetrofit, subredditName, accessToken,
+                    new FetchSubredditData.FetchPostRequirementsListener() {
+                        @Override
+                        public void onFetchPostRequirementsSuccess(boolean isFlairRequired) {
+                            if (isFlairRequired) {
+                                if (flair == null) {
+                                    binding.flairCustomTextViewPostTextActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                                }
+                            } else {
+                                // If post_requirements says it's NOT required, but about.json said it WAS,
+                                // we should probably trust post_requirements more, but only if we are sure it's accurate.
+                                // However, usually they should match.
+                            }
+                        }
+
+                        @Override
+                        public void onFetchPostRequirementsFail() {
+                        }
+                    });
+        }
     }
 
     private void promptAlertDialog(int titleResId, int messageResId) {
