@@ -208,6 +208,12 @@ public class JSONUtils {
     public static final String APPROVED_AT_UTC_KEY = "approved_at_utc";
     public static final String APPROVED_BY_KEY = "approved_by";
     public static final String SPAM_KEY = "spam";
+    public static final String LINK_FLAIR_REQUIRED_KEY = "link_flair_required";
+    public static final String SUBMISSION_TYPE_KEY = "submission_type";
+    public static final String ALLOW_VIDEOGIFS_KEY = "allow_videogifs";
+    public static final String ALLOW_IMAGES_KEY = "allow_images";
+    public static final String ALLOW_POLLS_KEY = "allow_polls";
+    public static final String ALLOW_GALLERIES_KEY = "allow_galleries";
 
 
     @Nullable

@@ -31,6 +31,18 @@ public class SubredditData {
     @ColumnInfo(name = "over18")
     private final boolean isNSFW;
     @Ignore
+    private boolean isFlairRequired;
+    @Ignore
+    private String submissionType;
+    @Ignore
+    private boolean allowVideos;
+    @Ignore
+    private boolean allowImages;
+    @Ignore
+    private boolean allowPolls;
+    @Ignore
+    private boolean allowGalleries;
+    @Ignore
     private boolean isSelected;
 
     public SubredditData(@NonNull String id, String name, String iconUrl, String bannerUrl,
@@ -88,6 +100,54 @@ public class SubredditData {
 
     public boolean isNSFW() {
         return isNSFW;
+    }
+
+    public boolean isFlairRequired() {
+        return isFlairRequired;
+    }
+
+    public void setFlairRequired(boolean flairRequired) {
+        isFlairRequired = flairRequired;
+    }
+
+    public String getSubmissionType() {
+        return submissionType;
+    }
+
+    public void setSubmissionType(String submissionType) {
+        this.submissionType = submissionType;
+    }
+
+    public boolean isAllowVideos() {
+        return allowVideos;
+    }
+
+    public void setAllowVideos(boolean allowVideos) {
+        this.allowVideos = allowVideos;
+    }
+
+    public boolean isAllowImages() {
+        return allowImages;
+    }
+
+    public void setAllowImages(boolean allowImages) {
+        this.allowImages = allowImages;
+    }
+
+    public boolean isAllowPolls() {
+        return allowPolls;
+    }
+
+    public void setAllowPolls(boolean allowPolls) {
+        this.allowPolls = allowPolls;
+    }
+
+    public boolean isAllowGalleries() {
+        return allowGalleries;
+    }
+
+    public void setAllowGalleries(boolean allowGalleries) {
+        this.allowGalleries = allowGalleries;
     }
 
     public boolean isSelected() {

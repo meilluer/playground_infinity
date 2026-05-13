@@ -74,6 +74,7 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
 
     static final String EXTRA_SUBREDDIT_NAME = "ESN";
     static final String EXTRA_CONTENT = "EC";
+    public static final String EXTRA_IS_FLAIR_REQUIRED = "EIFR";
 
     private static final String SELECTED_ACCOUNT_STATE = "SAS";
     private static final String SUBREDDIT_NAME_STATE = "SNS";
@@ -226,7 +227,7 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
                 binding.subredditNameTextViewPostTextActivity.setText(subredditName);
                 binding.flairCustomTextViewPostTextActivity.setVisibility(View.VISIBLE);
                 if (!loadSubredditIconSuccessful) {
-                    loadSubredditIcon();
+                    loadSubredditData();
                 }
             }
             displaySubredditIcon();
@@ -263,7 +264,10 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
                 binding.subredditNameTextViewPostTextActivity.setTextColor(primaryTextColor);
                 binding.subredditNameTextViewPostTextActivity.setText(subredditName);
                 binding.flairCustomTextViewPostTextActivity.setVisibility(View.VISIBLE);
-                loadSubredditIcon();
+                if (getIntent().getBooleanExtra(EXTRA_IS_FLAIR_REQUIRED, false)) {
+                    binding.flairCustomTextViewPostTextActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                }
+                loadSubredditData();
             } else {
                 mGlide.load(R.drawable.subreddit_default_icon)
                         .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(72, 0)))
@@ -490,13 +494,31 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
         }
     }
 
-    private void loadSubredditIcon() {
-        LoadSubredditIcon.loadSubredditIcon(mExecutor, new Handler(), mRedditDataRoomDatabase, subredditName,
-                accessToken, accountName, mOauthRetrofit, mRetrofit, iconImageUrl -> {
-            iconUrl = iconImageUrl;
-            displaySubredditIcon();
-            loadSubredditIconSuccessful = true;
-        });
+    private void loadSubredditData() {
+        FetchSubredditData.fetchSubredditData(mExecutor, new Handler(),
+                accountName.equals(Account.ANONYMOUS_ACCOUNT) ? null : mOauthRetrofit, mRetrofit,
+                subredditName, accessToken, new FetchSubredditData.FetchSubredditDataListener() {
+                    @Override
+                    public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
+                        iconUrl = subredditData.getIconUrl();
+                        displaySubredditIcon();
+                        loadSubredditIconSuccessful = true;
+                        if (subredditData.isFlairRequired()) {
+                            if (flair == null) {
+                                binding.flairCustomTextViewPostTextActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                            }
+                        } else {
+                            if (flair == null) {
+                                binding.flairCustomTextViewPostTextActivity.setText(R.string.flair);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFetchSubredditDataFail(boolean isQuarantined) {
+                        loadSubredditIconSuccessful = false;
+                    }
+                });
     }
 
     private void promptAlertDialog(int titleResId, int messageResId) {
@@ -653,6 +675,7 @@ public class PostTextActivity extends BaseActivity implements FlairBottomSheetFr
                 binding.flairCustomTextViewPostTextActivity.setTextColor(primaryTextColor);
                 binding.flairCustomTextViewPostTextActivity.setText(getString(R.string.flair));
                 flair = null;
+                loadSubredditData();
 
             } else if (requestCode == PICK_IMAGE_REQUEST_CODE) {
                 if (data == null) {

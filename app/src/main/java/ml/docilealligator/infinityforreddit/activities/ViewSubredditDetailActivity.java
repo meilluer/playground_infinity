@@ -198,6 +198,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
     private String mMessageFullname;
     private String mNewAccountName;
     private RequestManager glide;
+    private SubredditData mSubredditData;
     private int expandedTabTextColor;
     private int expandedTabBackgroundColor;
     private int expandedTabIndicatorColor;
@@ -751,6 +752,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                     subredditName, accessToken, new FetchSubredditData.FetchSubredditDataListener() {
                         @Override
                         public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
+                            mSubredditData = subredditData;
                             //mNCurrentOnlineSubscribers = nCurrentOnlineSubscribers;
                             binding.onlineSubscriberCountTextViewViewSubredditDetailActivity.setText(getString(R.string.online_subscribers_number_detail, nCurrentOnlineSubscribers));
                             if (!fromSuggestion) {
@@ -866,10 +868,21 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                 break;
             }
             default:
-                PostTypeBottomSheetFragment postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
-                postTypeBottomSheetFragment.show(getSupportFragmentManager(), postTypeBottomSheetFragment.getTag());
+                showPostTypeBottomSheet();
                 break;
         }
+    }
+
+    private void showPostTypeBottomSheet() {
+        PostTypeBottomSheetFragment postTypeBottomSheetFragment;
+        if (mSubredditData != null) {
+            postTypeBottomSheetFragment = PostTypeBottomSheetFragment.newInstance(mSubredditData.getSubmissionType(),
+                    mSubredditData.isAllowVideos(), mSubredditData.isAllowImages(), mSubredditData.isAllowPolls(),
+                    mSubredditData.isAllowGalleries());
+        } else {
+            postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
+        }
+        postTypeBottomSheetFragment.show(getSupportFragmentManager(), postTypeBottomSheetFragment.getTag());
     }
 
     private int getBottomAppBarOptionDrawableResource(int option) {
@@ -1120,8 +1133,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
                     }
                     break;
                 default:
-                    PostTypeBottomSheetFragment postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
-                    postTypeBottomSheetFragment.show(getSupportFragmentManager(), postTypeBottomSheetFragment.getTag());
+                    showPostTypeBottomSheet();
                     break;
             }
         });
@@ -1432,31 +1444,49 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
             case PostTypeBottomSheetFragment.TYPE_TEXT:
                 intent = new Intent(this, PostTextActivity.class);
                 intent.putExtra(PostTextActivity.EXTRA_SUBREDDIT_NAME, subredditName);
+                if (mSubredditData != null) {
+                    intent.putExtra(PostTextActivity.EXTRA_IS_FLAIR_REQUIRED, mSubredditData.isFlairRequired());
+                }
                 startActivity(intent);
                 break;
             case PostTypeBottomSheetFragment.TYPE_LINK:
                 intent = new Intent(this, PostLinkActivity.class);
                 intent.putExtra(PostLinkActivity.EXTRA_SUBREDDIT_NAME, subredditName);
+                if (mSubredditData != null) {
+                    intent.putExtra(PostLinkActivity.EXTRA_IS_FLAIR_REQUIRED, mSubredditData.isFlairRequired());
+                }
                 startActivity(intent);
                 break;
             case PostTypeBottomSheetFragment.TYPE_IMAGE:
                 intent = new Intent(this, PostImageActivity.class);
                 intent.putExtra(PostImageActivity.EXTRA_SUBREDDIT_NAME, subredditName);
+                if (mSubredditData != null) {
+                    intent.putExtra(PostImageActivity.EXTRA_IS_FLAIR_REQUIRED, mSubredditData.isFlairRequired());
+                }
                 startActivity(intent);
                 break;
             case PostTypeBottomSheetFragment.TYPE_VIDEO:
                 intent = new Intent(this, PostVideoActivity.class);
                 intent.putExtra(PostVideoActivity.EXTRA_SUBREDDIT_NAME, subredditName);
+                if (mSubredditData != null) {
+                    intent.putExtra(PostVideoActivity.EXTRA_IS_FLAIR_REQUIRED, mSubredditData.isFlairRequired());
+                }
                 startActivity(intent);
                 break;
             case PostTypeBottomSheetFragment.TYPE_GALLERY:
                 intent = new Intent(this, PostGalleryActivity.class);
                 intent.putExtra(PostGalleryActivity.EXTRA_SUBREDDIT_NAME, subredditName);
+                if (mSubredditData != null) {
+                    intent.putExtra(PostGalleryActivity.EXTRA_IS_FLAIR_REQUIRED, mSubredditData.isFlairRequired());
+                }
                 startActivity(intent);
                 break;
             case PostTypeBottomSheetFragment.TYPE_POLL:
                 intent = new Intent(this, PostPollActivity.class);
                 intent.putExtra(PostPollActivity.EXTRA_SUBREDDIT_NAME, subredditName);
+                if (mSubredditData != null) {
+                    intent.putExtra(PostPollActivity.EXTRA_IS_FLAIR_REQUIRED, mSubredditData.isFlairRequired());
+                }
                 startActivity(intent);
         }
     }
@@ -1528,8 +1558,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
     public void fabOptionSelected(int option) {
         switch (option) {
             case FABMoreOptionsBottomSheetFragment.FAB_OPTION_SUBMIT_POST:
-                PostTypeBottomSheetFragment postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
-                postTypeBottomSheetFragment.show(getSupportFragmentManager(), postTypeBottomSheetFragment.getTag());
+                showPostTypeBottomSheet();
                 break;
             case FABMoreOptionsBottomSheetFragment.FAB_OPTION_REFRESH:
                 if (sectionsPagerAdapter != null) {

@@ -66,6 +66,9 @@ import ml.docilealligator.infinityforreddit.events.SwitchAccountEvent;
 import ml.docilealligator.infinityforreddit.services.SubmitPostService;
 import ml.docilealligator.infinityforreddit.subreddit.Flair;
 import ml.docilealligator.infinityforreddit.thing.SelectThingReturnKey;
+import ml.docilealligator.infinityforreddit.subreddit.FetchSubredditData;
+import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
+import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import retrofit2.Retrofit;
 
@@ -73,6 +76,7 @@ public class PostVideoActivity extends BaseActivity implements FlairBottomSheetF
         AccountChooserBottomSheetFragment.AccountChooserListener {
 
     static final String EXTRA_SUBREDDIT_NAME = "ESN";
+    public static final String EXTRA_IS_FLAIR_REQUIRED = "EIFR";
 
     private static final String SELECTED_ACCOUNT_STATE = "SAS";
     private static final String SUBREDDIT_NAME_STATE = "SNS";
@@ -244,7 +248,7 @@ public class PostVideoActivity extends BaseActivity implements FlairBottomSheetF
                 binding.subredditNameTextViewPostVideoActivity.setText(subredditName);
                 binding.flairCustomTextViewPostVideoActivity.setVisibility(View.VISIBLE);
                 if (!loadSubredditIconSuccessful) {
-                    loadSubredditIcon();
+                    loadSubredditData();
                 }
             }
             displaySubredditIcon();
@@ -281,7 +285,10 @@ public class PostVideoActivity extends BaseActivity implements FlairBottomSheetF
                 binding.subredditNameTextViewPostVideoActivity.setTextColor(primaryTextColor);
                 binding.subredditNameTextViewPostVideoActivity.setText(subredditName);
                 binding.flairCustomTextViewPostVideoActivity.setVisibility(View.VISIBLE);
-                loadSubredditIcon();
+                if (getIntent().getBooleanExtra(EXTRA_IS_FLAIR_REQUIRED, false)) {
+                    binding.flairCustomTextViewPostVideoActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                }
+                loadSubredditData();
             } else {
                 mGlide.load(R.drawable.subreddit_default_icon)
                         .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(72, 0)))
@@ -532,13 +539,31 @@ public class PostVideoActivity extends BaseActivity implements FlairBottomSheetF
         }
     }
 
-    private void loadSubredditIcon() {
-        LoadSubredditIcon.loadSubredditIcon(mExecutor, new Handler(), mRedditDataRoomDatabase, subredditName,
-                accessToken, accountName, mOauthRetrofit, mRetrofit, iconImageUrl -> {
-            iconUrl = iconImageUrl;
-            displaySubredditIcon();
-            loadSubredditIconSuccessful = true;
-        });
+    private void loadSubredditData() {
+        FetchSubredditData.fetchSubredditData(mExecutor, new Handler(),
+                accountName.equals(Account.ANONYMOUS_ACCOUNT) ? null : mOauthRetrofit, mRetrofit,
+                subredditName, accessToken, new FetchSubredditData.FetchSubredditDataListener() {
+                    @Override
+                    public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
+                        iconUrl = subredditData.getIconUrl();
+                        displaySubredditIcon();
+                        loadSubredditIconSuccessful = true;
+                        if (subredditData.isFlairRequired()) {
+                            if (flair == null) {
+                                binding.flairCustomTextViewPostVideoActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                            }
+                        } else {
+                            if (flair == null) {
+                                binding.flairCustomTextViewPostVideoActivity.setText(R.string.flair);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFetchSubredditDataFail(boolean isQuarantined) {
+                        loadSubredditIconSuccessful = false;
+                    }
+                });
     }
 
     private void promptAlertDialog(int titleResId, int messageResId) {
@@ -698,6 +723,7 @@ public class PostVideoActivity extends BaseActivity implements FlairBottomSheetF
                     binding.flairCustomTextViewPostVideoActivity.setTextColor(primaryTextColor);
                     binding.flairCustomTextViewPostVideoActivity.setText(getString(R.string.flair));
                     flair = null;
+                    loadSubredditData();
                 }
             }
         } else if (requestCode == PICK_VIDEO_REQUEST_CODE) {

@@ -63,11 +63,15 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
+import ml.docilealligator.infinityforreddit.subreddit.FetchSubredditData;
+import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
+
 public class PostLinkActivity extends BaseActivity implements FlairBottomSheetFragment.FlairSelectionCallback,
         AccountChooserBottomSheetFragment.AccountChooserListener {
 
     static final String EXTRA_SUBREDDIT_NAME = "ESN";
     static final String EXTRA_LINK = "EL";
+    public static final String EXTRA_IS_FLAIR_REQUIRED = "EIFR";
 
     private static final String SELECTED_ACCOUNT_STATE = "SAS";
     private static final String SUBREDDIT_NAME_STATE = "SNS";
@@ -214,7 +218,7 @@ public class PostLinkActivity extends BaseActivity implements FlairBottomSheetFr
                 binding.subredditNameTextViewPostLinkActivity.setText(subredditName);
                 binding.flairCustomTextViewPostLinkActivity.setVisibility(View.VISIBLE);
                 if (!loadSubredditIconSuccessful) {
-                    loadSubredditIcon();
+                    loadSubredditData();
                 }
             }
             displaySubredditIcon();
@@ -251,7 +255,10 @@ public class PostLinkActivity extends BaseActivity implements FlairBottomSheetFr
                 binding.subredditNameTextViewPostLinkActivity.setTextColor(primaryTextColor);
                 binding.subredditNameTextViewPostLinkActivity.setText(subredditName);
                 binding.flairCustomTextViewPostLinkActivity.setVisibility(View.VISIBLE);
-                loadSubredditIcon();
+                if (getIntent().getBooleanExtra(EXTRA_IS_FLAIR_REQUIRED, false)) {
+                    binding.flairCustomTextViewPostLinkActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                }
+                loadSubredditData();
             } else {
                 mGlide.load(R.drawable.subreddit_default_icon)
                         .apply(RequestOptions.bitmapTransform(new RoundedCornersTransformation(72, 0)))
@@ -507,13 +514,31 @@ public class PostLinkActivity extends BaseActivity implements FlairBottomSheetFr
         }
     }
 
-    private void loadSubredditIcon() {
-        LoadSubredditIcon.loadSubredditIcon(mExecutor, new Handler(), mRedditDataRoomDatabase, subredditName,
-                accessToken, accountName, mOauthRetrofit, mRetrofit, iconImageUrl -> {
-            iconUrl = iconImageUrl;
-            displaySubredditIcon();
-            loadSubredditIconSuccessful = true;
-        });
+    private void loadSubredditData() {
+        FetchSubredditData.fetchSubredditData(mExecutor, new Handler(),
+                accountName.equals(Account.ANONYMOUS_ACCOUNT) ? null : mOauthRetrofit, mRetrofit,
+                subredditName, accessToken, new FetchSubredditData.FetchSubredditDataListener() {
+                    @Override
+                    public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
+                        iconUrl = subredditData.getIconUrl();
+                        displaySubredditIcon();
+                        loadSubredditIconSuccessful = true;
+                        if (subredditData.isFlairRequired()) {
+                            if (flair == null) {
+                                binding.flairCustomTextViewPostLinkActivity.setText(getString(R.string.flair) + " (" + getString(R.string.required) + ")");
+                            }
+                        } else {
+                            if (flair == null) {
+                                binding.flairCustomTextViewPostLinkActivity.setText(R.string.flair);
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFetchSubredditDataFail(boolean isQuarantined) {
+                        loadSubredditIconSuccessful = false;
+                    }
+                });
     }
 
     private void promptAlertDialog(int titleResId, int messageResId) {
@@ -656,6 +681,7 @@ public class PostLinkActivity extends BaseActivity implements FlairBottomSheetFr
                 binding.flairCustomTextViewPostLinkActivity.setTextColor(primaryTextColor);
                 binding.flairCustomTextViewPostLinkActivity.setText(getString(R.string.flair));
                 flair = null;
+                loadSubredditData();
             }/* else if (requestCode == MARKDOWN_PREVIEW_REQUEST_CODE) {
                 submitPost(mMenu.findItem(R.id.action_send_post_text_activity));
             }*/

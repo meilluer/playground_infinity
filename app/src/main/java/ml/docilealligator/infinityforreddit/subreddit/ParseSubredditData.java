@@ -137,8 +137,17 @@ public class ParseSubredditData {
             nSubscribers = subredditDataJsonObject.getInt(JSONUtils.SUBSCRIBERS_KEY);
         }
 
-        return new SubredditData(id, subredditFullName, iconUrl, bannerImageUrl, description,
+        SubredditData subredditData = new SubredditData(id, subredditFullName, iconUrl, bannerImageUrl, description,
                 sidebarDescription, nSubscribers, createdUTC, suggestedCommentSort, isNSFW);
+
+        subredditData.setFlairRequired(!subredditDataJsonObject.isNull(JSONUtils.LINK_FLAIR_REQUIRED_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.LINK_FLAIR_REQUIRED_KEY));
+        subredditData.setSubmissionType(subredditDataJsonObject.optString(JSONUtils.SUBMISSION_TYPE_KEY, "any"));
+        subredditData.setAllowVideos(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_VIDEOGIFS_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_VIDEOGIFS_KEY));
+        subredditData.setAllowImages(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_IMAGES_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_IMAGES_KEY));
+        subredditData.setAllowPolls(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_POLLS_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_POLLS_KEY));
+        subredditData.setAllowGalleries(!subredditDataJsonObject.isNull(JSONUtils.ALLOW_GALLERIES_KEY) && subredditDataJsonObject.getBoolean(JSONUtils.ALLOW_GALLERIES_KEY));
+
+        return subredditData;
     }
 
     public interface ParseSubredditListingDataListener {
