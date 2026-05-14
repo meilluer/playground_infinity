@@ -19,11 +19,18 @@ workflows:
 
       - name: Build release APK
         script: |
+          # If CM_KEYSTORE is provided as base64, decode it to a file
+          if [ ! -z "$CM_KEYSTORE" ]; then
+            echo $CM_KEYSTORE | base64 --decode > /tmp/infinity.jks
+            export CM_KEYSTORE_PATH=/tmp/infinity.jks
+          fi
+
           ./gradlew assembleRelease \
             -Pandroid.injected.signing.store.file=$CM_KEYSTORE_PATH \
             -Pandroid.injected.signing.store.password=$CM_KEYSTORE_PASSWORD \
             -Pandroid.injected.signing.key.alias=$CM_KEY_ALIAS \
             -Pandroid.injected.signing.key.password=$CM_KEY_PASSWORD
+          
           echo "Build version: $(grep "versionName" app/build.gradle | awk '{print $2}' | tr -d '\"')"
           echo "Build code: $(grep "versionCode" app/build.gradle | awk '{print $2}')"
 
