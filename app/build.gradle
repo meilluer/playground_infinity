@@ -9,7 +9,7 @@ android {
         applicationId "com.meilluer.infinity"
         minSdk 21
         targetSdk 35
-        versionCode 198
+        versionCode 199
         versionName "8.0.0-beta4"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -19,46 +19,54 @@ android {
         }
     }
 
+    def keystorePath = System.getenv("CM_KEYSTORE_PATH") ?: System.getenv("KEYSTORE")
+    def keystorePassword = System.getenv("CM_KEYSTORE_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
+    def keyAlias = System.getenv("CM_KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
+    def keyPassword = System.getenv("CM_KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
+    def localKeystore = file("C:/Users/mehul/upload-keystore.jks")
+    def resolvedKeystore = (keystorePath && file(keystorePath).exists()) ? file(keystorePath) : (localKeystore.exists() ? localKeystore : null)
+    def hasSigningCredentials = resolvedKeystore != null && keystorePassword && keyAlias && keyPassword
+
     signingConfigs {
-        debug {
-            // Check for Codemagic or custom environment variables
-            def keystorePath = System.getenv("CM_KEYSTORE_PATH") ?: System.getenv("KEYSTORE")
-            def keystorePassword = System.getenv("CM_KEYSTORE_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
-            def keyAlias = System.getenv("CM_KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
-            def keyPassword = System.getenv("CM_KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
-
-            // Check for local keystore path provided by user
-            def localKeystore = file("C:/Users/mehul/upload-keystore.jks")
-
-            if (keystorePath && file(keystorePath).exists()) {
-                storeFile file(keystorePath)
+        if (hasSigningCredentials) {
+            release {
+                storeFile resolvedKeystore
                 storePassword keystorePassword
                 keyAlias keyAlias
                 keyPassword keyPassword
-            } else if (localKeystore.exists()) {
-                storeFile localKeystore
-                // We'll assume the environment variables or default passwords are used here
-                storePassword keystorePassword ?: ""
-                keyAlias keyAlias ?: ""
-                keyPassword keyPassword ?: ""
+            }
+
+            debug {
+                storeFile resolvedKeystore
+                storePassword keystorePassword
+                keyAlias keyAlias
+                keyPassword keyPassword
             }
         }
     }
 
     buildTypes {
         release {
+            if (hasSigningCredentials) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
         minifiedRelease {
             initWith buildTypes.release
+            if (hasSigningCredentials) {
+                signingConfig signingConfigs.release
+            }
             zipAlignEnabled true
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
         debug {
-            signingConfig signingConfigs.debug
+            if (hasSigningCredentials) {
+                signingConfig signingConfigs.debug
+            }
             applicationIdSuffix '.debug'
             versionNameSuffix ' (DEBUG)'
         }
