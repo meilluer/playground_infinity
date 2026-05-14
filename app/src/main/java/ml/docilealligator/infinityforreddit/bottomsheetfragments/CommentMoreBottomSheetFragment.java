@@ -34,6 +34,7 @@ import ml.docilealligator.infinityforreddit.databinding.FragmentCommentMoreBotto
 import ml.docilealligator.infinityforreddit.Infinity;
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
+import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityNotificationManager;
 import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityUtils;
 import ml.docilealligator.infinityforreddit.utils.ShareScreenshotUtilsKt;
 import ml.docilealligator.infinityforreddit.utils.Utils;

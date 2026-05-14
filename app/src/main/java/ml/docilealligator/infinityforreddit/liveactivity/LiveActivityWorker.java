@@ -74,17 +74,18 @@ public class LiveActivityWorker extends Worker {
         FollowedThing thing = followedThings.get(0);
 
         try {
-            Account account = mRedditDataRoomDatabase.accountDao().getAccountByUsername(thing.getAccountName());
+            Account account = mRedditDataRoomDatabase.accountDao().getAccountData(thing.getAccountName());
+            boolean isAnonymous = account == null || account.getAccountName().equals(Account.ANONYMOUS_ACCOUNT);
             RedditAPI redditAPI;
-            if (account != null) {
+            if (!isAnonymous) {
                 redditAPI = mOauthWithoutAuthenticatorRetrofit.create(RedditAPI.class);
             } else {
                 redditAPI = mRetrofit.create(RedditAPI.class);
             }
 
             Response<String> response;
-            if (account != null) {
-                response = redditAPI.getInfoOauth(thing.getFullName(), APIUtils.getCustomUserAgent(context)).execute();
+            if (!isAnonymous) {
+                response = redditAPI.getInfoOauth(thing.getFullName(), APIUtils.getOAuthHeader(account.getAccessToken())).execute();
             } else {
                 response = redditAPI.getInfo(thing.getFullName()).execute();
             }
@@ -97,10 +98,6 @@ public class LiveActivityWorker extends Worker {
                     thing.setScore(data.getInt("score"));
                     if (thing.getType() == FollowedThing.TYPE_POST) {
                         thing.setCommentCount(data.getInt("num_comments"));
-                    } else {
-                        // For comments, "replies" field is complex. 
-                        // It might be easier to fetch the comment details separately if needed.
-                        // But getInfo usually doesn't give reply count directly in a simple way.
                     }
                     thing.setLastUpdated(System.currentTimeMillis());
                     mRedditDataRoomDatabase.followedThingDao().update(thing);
@@ -109,8 +106,8 @@ public class LiveActivityWorker extends Worker {
                     if (thing.getType() == FollowedThing.TYPE_POST) {
                         // Fetch latest comment for post
                         Response<String> commentResponse;
-                        if (account != null) {
-                            commentResponse = redditAPI.getPostOauth(thing.getId(), APIUtils.getOauthHeaders(account.getAccessToken())).execute();
+                        if (!isAnonymous) {
+                            commentResponse = redditAPI.getPostOauth(thing.getId(), APIUtils.getOAuthHeader(account.getAccessToken())).execute();
                         } else {
                             commentResponse = redditAPI.getPost(thing.getId()).execute();
                         }
@@ -131,8 +128,8 @@ public class LiveActivityWorker extends Worker {
                         if (postId.startsWith("t3_")) {
                             postId = postId.substring(3);
                         }
-                        if (account != null) {
-                            commentResponse = redditAPI.getPostOauth(postId, APIUtils.getOauthHeaders(account.getAccessToken())).execute();
+                        if (!isAnonymous) {
+                            commentResponse = redditAPI.getPostOauth(postId, APIUtils.getOAuthHeader(account.getAccessToken())).execute();
                         } else {
                             commentResponse = redditAPI.getPost(postId).execute();
                         }
