@@ -115,6 +115,7 @@ import ml.docilealligator.infinityforreddit.settings.VideoPreferenceFragment;
 import ml.docilealligator.infinityforreddit.worker.MaterialYouWorker;
 import ml.docilealligator.infinityforreddit.worker.PullNotificationWorker;
 import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityWorker;
+import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityReceiver;
 
 @Singleton
 @Component(modules = {AppModule.class, NetworkModule.class})
