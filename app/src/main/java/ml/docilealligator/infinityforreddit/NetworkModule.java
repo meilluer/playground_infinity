@@ -281,7 +281,7 @@ abstract class NetworkModule {
     @Singleton
     static Retrofit provideOnlineCustomThemesRetrofit(@Named("base") Retrofit retrofit, @Named("server") OkHttpClient httpClient) {
         return retrofit.newBuilder()
-                .baseUrl(APIUtils.SERVER_API_BASE_URI)
+                .baseUrl(APIUtils.normalizeBaseUrl(APIUtils.SERVER_API_BASE_URI, "http://127.0.0.1/"))
                 .client(httpClient)
                 .build();
     }

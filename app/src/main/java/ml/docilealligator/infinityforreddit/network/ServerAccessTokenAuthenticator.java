@@ -68,7 +68,7 @@ public class ServerAccessTokenAuthenticator implements Authenticator {
 
     private String refreshAccessToken(Account account) {
         Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(APIUtils.SERVER_API_BASE_URI)
+                .baseUrl(APIUtils.normalizeBaseUrl(APIUtils.SERVER_API_BASE_URI, "http://127.0.0.1/"))
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .build();
 

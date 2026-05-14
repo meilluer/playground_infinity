@@ -10,6 +10,7 @@ import java.util.Map;
 import android.content.Context;
 import android.content.SharedPreferences;
 import androidx.preference.PreferenceManager;
+import okhttp3.HttpUrl;
 import ml.docilealligator.infinityforreddit.account.Account;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -19,6 +20,7 @@ import okhttp3.RequestBody;
  */
 
 public class APIUtils {
+    private static final String DEFAULT_SERVER_API_BASE_URI = "http://127.0.0.1/";
 
     public static void init(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -27,11 +29,8 @@ public class APIUtils {
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
         REDIRECT_URI_key = preferences.getString("redirect_uri", "http://127.0.0.1");
-        if (REDIRECT_URI_key != null && REDIRECT_URI_key.startsWith("http")) {
-            SERVER_API_BASE_URI = REDIRECT_URI_key;
-        } else {
-            SERVER_API_BASE_URI = "http://127.0.0.1";
-        }
+        String serverBaseUri = preferences.getString("server_api_base_uri", null);
+        SERVER_API_BASE_URI = normalizeBaseUrl(serverBaseUri, normalizeBaseUrl(REDIRECT_URI_key, DEFAULT_SERVER_API_BASE_URI));
         REDIRECT_URI = REDIRECT_URI_key;
     }
     public static String REDIRECT_URI_key = "http://127.0.0.1";
@@ -43,7 +42,7 @@ public class APIUtils {
     public static final String REDGIFS_API_BASE_URI = "https://api.redgifs.com";
     public static final String IMGUR_API_BASE_URI = "https://api.imgur.com/3/";
     public static final String STREAMABLE_API_BASE_URI = "https://api.streamable.com";
-    public static String SERVER_API_BASE_URI = "http://127.0.0.1";
+    public static String SERVER_API_BASE_URI = DEFAULT_SERVER_API_BASE_URI;
 
     public static final String CLIENT_ID_KEY = "client_id";
     public static final String CLIENT_SECRET_KEY = "client_secret";
@@ -185,6 +184,39 @@ public class APIUtils {
         params.put(APIUtils.REFERER_KEY, APIUtils.REVEDDIT_REFERER);
         params.put(APIUtils.USER_AGENT_KEY, sUserAgent);
         return params;
+    }
+
+    public static String normalizeBaseUrl(String candidate, String fallback) {
+        String normalizedFallback = normalizeHttpBaseUrl(fallback);
+        String normalizedCandidate = normalizeHttpBaseUrl(candidate);
+        return normalizedCandidate != null ? normalizedCandidate : normalizedFallback;
+    }
+
+    private static String normalizeHttpBaseUrl(String candidate) {
+        if (candidate == null) {
+            return null;
+        }
+
+        String trimmed = candidate.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+
+        if (!trimmed.endsWith("/")) {
+            trimmed = trimmed + "/";
+        }
+
+        HttpUrl httpUrl = HttpUrl.parse(trimmed);
+        if (httpUrl == null) {
+            return null;
+        }
+
+        String scheme = httpUrl.scheme();
+        if (!"http".equals(scheme) && !"https".equals(scheme)) {
+            return null;
+        }
+
+        return httpUrl.toString();
     }
 
     // RedGifs token management
