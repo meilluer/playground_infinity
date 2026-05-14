@@ -1459,6 +1459,7 @@
     <string name="connect_to_billing_system_failed">Failed to connect to the billing system</string>
     <string name="connecting_to_billing_system">Connecting to the billing system. Please wait.</string>
     <string name="thank_you_for_subscription">Thank you for your subscription</string>
+    <string name="load_subscription_options">Load subscription options</string>
     <string name="acknowledging_subscription">Acknowledging your subscription. Please wait.</string>
     <string name="acknowledgement_purchase_failed_description">Oops, there was an error when acknowledging your purchase. If this problem persists for three days, you will automatically get a refund.\nDon\'t worry, you can still enjoy Infinity for Reddit.</string>
     <string name="continue_to_app">Continue to app</string>
