@@ -18,7 +18,14 @@ workflows:
         script: chmod +x ./gradlew
 
       - name: Build debug APK
-        script: ./gradlew assembleDebug
+        script: |
+          if [ ! -z "$KEYSTORE_BASE64" ]; then
+            echo $KEYSTORE_BASE64 | base64 --decode > /tmp/keystore.jks
+            export CM_KEYSTORE_PATH=/tmp/keystore.jks
+          fi
+          ./gradlew assembleDebug
+          echo "Build version: $(grep "versionName" app/build.gradle | awk '{print $2}' | tr -d '\"')"
+          echo "Build code: $(grep "versionCode" app/build.gradle | awk '{print $2}')"
 
     artifacts:
       - app/build/outputs/**/*.apk
