@@ -2,7 +2,9 @@ package ml.docilealligator.infinityforreddit.liveactivity;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.view.View;
 import android.widget.RemoteViews;
@@ -25,12 +27,19 @@ public class LiveActivityNotificationManager {
             notificationManager.createNotificationChannel(channel);
         }
 
+        Intent unfollowIntent = new Intent(context, LiveActivityReceiver.class);
+        unfollowIntent.setAction(LiveActivityReceiver.ACTION_UNFOLLOW);
+        unfollowIntent.putExtra(LiveActivityReceiver.EXTRA_ID, thing.getId());
+        PendingIntent unfollowPendingIntent = PendingIntent.getBroadcast(context, 0, unfollowIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0));
+
         RemoteViews collapsedView = new RemoteViews(context.getPackageName(), R.layout.notification_live_activity);
         collapsedView.setTextViewText(R.id.title, thing.getTitle());
         collapsedView.setTextViewText(R.id.subreddit, "r/" + thing.getSubreddit());
         collapsedView.setTextViewText(R.id.upvotes, "↑ " + thing.getScore());
         collapsedView.setTextViewText(R.id.comments, "💬 " + thing.getCommentCount());
         collapsedView.setViewVisibility(R.id.expanded_content, View.GONE);
+        collapsedView.setViewVisibility(R.id.unfollow_button, View.GONE);
 
         RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.notification_live_activity);
         expandedView.setTextViewText(R.id.title, thing.getTitle());
@@ -43,6 +52,8 @@ public class LiveActivityNotificationManager {
         } else {
             expandedView.setViewVisibility(R.id.expanded_content, View.GONE);
         }
+        expandedView.setViewVisibility(R.id.unfollow_button, View.VISIBLE);
+        expandedView.setOnClickPendingIntent(R.id.unfollow_button, unfollowPendingIntent);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notification)

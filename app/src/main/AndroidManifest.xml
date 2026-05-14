@@ -470,6 +470,13 @@
             android:exported="false" />
 
         <receiver android:name=".broadcastreceivers.DownloadedMediaDeleteActionBroadcastReceiver" />
+        <receiver
+            android:name=".liveactivity.LiveActivityReceiver"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="ml.docilealligator.infinityforreddit.liveactivity.ACTION_UNFOLLOW" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

@@ -52,4 +52,15 @@
         android:ellipsize="end"
         android:textColor="?android:attr/textColorPrimary" />
 
+    <Button
+        android:id="@+id/unfollow_button"
+        android:layout_width="wrap_content"
+        android:layout_height="36dp"
+        android:layout_marginTop="4dp"
+        android:layout_gravity="end"
+        android:text="@string/unfollow"
+        android:textSize="12sp"
+        style="?android:attr/borderlessButtonStyle"
+        android:visibility="gone" />
+
 </LinearLayout>

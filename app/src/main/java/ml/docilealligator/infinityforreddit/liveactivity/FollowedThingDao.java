@@ -9,8 +9,6 @@ import androidx.room.Update;
 
 import java.util.List;
 
-import io.reactivex.Single;
-
 @Dao
 public interface FollowedThingDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)

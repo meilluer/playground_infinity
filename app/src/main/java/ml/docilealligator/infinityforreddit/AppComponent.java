@@ -67,6 +67,7 @@ import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity;
 import ml.docilealligator.infinityforreddit.activities.WebViewActivity;
 import ml.docilealligator.infinityforreddit.activities.WikiActivity;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.AccountChooserBottomSheetFragment;
+import ml.docilealligator.infinityforreddit.bottomsheetfragments.CommentMoreBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.FlairBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.PostOptionsBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.fragments.CommentsListingFragment;
@@ -179,6 +180,8 @@ public interface AppComponent {
     void inject(PullNotificationWorker pullNotificationWorker);
 
     void inject(LiveActivityWorker liveActivityWorker);
+
+    void inject(LiveActivityReceiver liveActivityReceiver);
 
     void inject(InboxActivity inboxActivity);
 
