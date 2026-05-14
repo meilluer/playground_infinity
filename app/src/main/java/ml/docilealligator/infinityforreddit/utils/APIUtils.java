@@ -27,10 +27,14 @@ public class APIUtils {
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
         REDIRECT_URI_key = preferences.getString("redirect_uri", "http://127.0.0.1");
-        SERVER_API_BASE_URI = REDIRECT_URI_key;
+        if (REDIRECT_URI_key != null && REDIRECT_URI_key.startsWith("http")) {
+            SERVER_API_BASE_URI = REDIRECT_URI_key;
+        } else {
+            SERVER_API_BASE_URI = "http://127.0.0.1";
+        }
         REDIRECT_URI = REDIRECT_URI_key;
     }
-    public static String REDIRECT_URI_key = "";
+    public static String REDIRECT_URI_key = "http://127.0.0.1";
     public static final String OAUTH_URL = "https://www.reddit.com/api/v1/authorize.compact";
     public static final String OAUTH_API_BASE_URI = "https://oauth.reddit.com";
     public static final String API_BASE_URI = "https://www.reddit.com";
@@ -39,7 +43,7 @@ public class APIUtils {
     public static final String REDGIFS_API_BASE_URI = "https://api.redgifs.com";
     public static final String IMGUR_API_BASE_URI = "https://api.imgur.com/3/";
     public static final String STREAMABLE_API_BASE_URI = "https://api.streamable.com";
-    public static String SERVER_API_BASE_URI = REDIRECT_URI_key;
+    public static String SERVER_API_BASE_URI = "http://127.0.0.1";
 
     public static final String CLIENT_ID_KEY = "client_id";
     public static final String CLIENT_SECRET_KEY = "client_secret";
