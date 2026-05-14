@@ -19,28 +19,28 @@ android {
         }
     }
 
-    def keystorePath = System.getenv("CM_KEYSTORE_PATH") ?: System.getenv("KEYSTORE")
-    def keystorePassword = System.getenv("CM_KEYSTORE_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
-    def keyAlias = System.getenv("CM_KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
-    def keyPassword = System.getenv("CM_KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
+    def mKeystorePath = System.getenv("CM_KEYSTORE_PATH") ?: System.getenv("KEYSTORE")
+    def mKeystorePassword = System.getenv("CM_KEYSTORE_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD")
+    def mKeyAlias = System.getenv("CM_KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
+    def mKeyPassword = System.getenv("CM_KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
     def localKeystore = file("C:/Users/mehul/upload-keystore.jks")
-    def resolvedKeystore = (keystorePath && file(keystorePath).exists()) ? file(keystorePath) : (localKeystore.exists() ? localKeystore : null)
-    def hasSigningCredentials = resolvedKeystore != null && keystorePassword && keyAlias && keyPassword
+    def resolvedKeystore = (mKeystorePath && file(mKeystorePath).exists()) ? file(mKeystorePath) : (localKeystore.exists() ? localKeystore : null)
+    def hasSigningCredentials = resolvedKeystore != null && mKeystorePassword && mKeyAlias && mKeyPassword
 
     signingConfigs {
         if (hasSigningCredentials) {
             release {
                 storeFile resolvedKeystore
-                storePassword keystorePassword
-                keyAlias keyAlias
-                keyPassword keyPassword
+                storePassword mKeystorePassword
+                keyAlias mKeyAlias
+                keyPassword mKeyPassword
             }
 
             debug {
                 storeFile resolvedKeystore
-                storePassword keystorePassword
-                keyAlias keyAlias
-                keyPassword keyPassword
+                storePassword mKeystorePassword
+                keyAlias mKeyAlias
+                keyPassword mKeyPassword
             }
         }
     }
