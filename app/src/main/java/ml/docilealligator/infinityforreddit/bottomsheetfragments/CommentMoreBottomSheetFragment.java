@@ -31,11 +31,16 @@ import ml.docilealligator.infinityforreddit.activities.ViewUserDetailActivity;
 import ml.docilealligator.infinityforreddit.comment.Comment;
 import ml.docilealligator.infinityforreddit.customviews.LandscapeExpandedRoundedBottomSheetDialogFragment;
 import ml.docilealligator.infinityforreddit.databinding.FragmentCommentMoreBottomSheetBinding;
+import ml.docilealligator.infinityforreddit.Infinity;
+import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
+import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
+import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityUtils;
 import ml.docilealligator.infinityforreddit.utils.ShareScreenshotUtilsKt;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 
 
 import android.content.SharedPreferences;
+import javax.inject.Inject;
 import ml.docilealligator.infinityforreddit.GeminiSummarizer;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 
@@ -54,6 +59,9 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
     private FragmentCommentMoreBottomSheetBinding binding;
     private BaseActivity activity;
 
+    @Inject
+    RedditDataRoomDatabase mRedditDataRoomDatabase;
+
     public CommentMoreBottomSheetFragment() {
         // Required empty public constructor
     }
@@ -61,6 +69,8 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        ((Infinity) activity.getApplication()).getAppComponent().inject(this);
+
         binding = FragmentCommentMoreBottomSheetBinding.inflate(inflater, container, false);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
@@ -78,6 +88,42 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
             dismiss();
             return binding.getRoot();
         }
+
+        new Thread(() -> {
+            FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(comment.getId());
+            activity.runOnUiThread(() -> {
+                if (followedThing != null) {
+                    binding.followTextViewCommentMoreBottomSheetFragment.setText(R.string.unfollow);
+                } else {
+                    binding.followTextViewCommentMoreBottomSheetFragment.setText(R.string.follow);
+                }
+            });
+        }).start();
+
+        binding.followTextViewCommentMoreBottomSheetFragment.setOnClickListener(view -> {
+            new Thread(() -> {
+                FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(comment.getId());
+                if (followedThing != null) {
+                    mRedditDataRoomDatabase.followedThingDao().deleteById(comment.getId());
+                    new Thread(() -> {
+                        if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
+                            LiveActivityNotificationManager.cancelNotification(activity);
+                        }
+                    }).start();
+                    activity.runOnUiThread(() -> Toast.makeText(activity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
+                } else {
+                    FollowedThing newFollowedThing = new FollowedThing(comment.getId(), comment.getFullName(), 
+                            FollowedThing.TYPE_COMMENT, comment.getCommentRawText(), comment.getSubredditName(), 
+                            comment.getLinkId(), comment.getScore(), comment.getChildCount(), activity.accountName, System.currentTimeMillis());
+                    mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                    LiveActivityUtils.scheduleWorker(activity);
+                    LiveActivityUtils.triggerImmediateUpdate(activity);
+                    activity.runOnUiThread(() -> Toast.makeText(activity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());
+                }
+                dismiss();
+            }).start();
+        });
+
         boolean editAndDeleteAvailable = bundle.getBoolean(EXTRA_EDIT_AND_DELETE_AVAILABLE, false);
         boolean showReplyAndSaveOption = bundle.getBoolean(EXTRA_SHOW_REPLY_AND_SAVE_OPTION, false);
 

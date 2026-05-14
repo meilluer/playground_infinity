@@ -26,6 +26,8 @@ import ml.docilealligator.infinityforreddit.multireddit.AnonymousMultiredditSubr
 import ml.docilealligator.infinityforreddit.multireddit.AnonymousMultiredditSubredditDao;
 import ml.docilealligator.infinityforreddit.multireddit.MultiReddit;
 import ml.docilealligator.infinityforreddit.multireddit.MultiRedditDao;
+import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
+import ml.docilealligator.infinityforreddit.liveactivity.FollowedThingDao;
 import ml.docilealligator.infinityforreddit.offline.OfflineComment;
 import ml.docilealligator.infinityforreddit.offline.OfflineCommentDao;
 import ml.docilealligator.infinityforreddit.offline.OfflinePost;
@@ -55,7 +57,7 @@ import ml.docilealligator.infinityforreddit.user.UserData;
         SubscribedUserData.class, MultiReddit.class, CustomTheme.class, RecentSearchQuery.class,
         ReadPost.class, PostFilter.class, PostFilterUsage.class, AnonymousMultiredditSubreddit.class,
         CommentFilter.class, CommentFilterUsage.class, CommentDraft.class, ReadComment.class,
-        OfflineSubreddit.class, OfflinePost.class, OfflineComment.class}, version = 31, exportSchema = false)
+        OfflineSubreddit.class, OfflinePost.class, OfflineComment.class, FollowedThing.class}, version = 32, exportSchema = false)
 @TypeConverters(Converters.class)
 public abstract class RedditDataRoomDatabase extends RoomDatabase {
 
@@ -69,7 +71,7 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
                         MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21,
                         MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25,
                         MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
-                        MIGRATION_29_30, MIGRATION_30_31)
+                        MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32)
                 .build();
     }
 
@@ -98,6 +100,8 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
     public abstract PostFilterUsageDao postFilterUsageDao();
 
     public abstract AnonymousMultiredditSubredditDao anonymousMultiredditSubredditDao();
+
+    public abstract FollowedThingDao followedThingDao();
 
     public abstract CommentFilterDao commentFilterDao();
 
@@ -495,6 +499,13 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
             database.execSQL("CREATE TABLE IF NOT EXISTS `offline_posts` (`id` TEXT NOT NULL, `subredditName` TEXT, `postJson` TEXT, `mediaPath` TEXT, PRIMARY KEY(`id`))");
             database.execSQL("CREATE TABLE IF NOT EXISTS `offline_comments` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `parentPostId` TEXT, `commentJson` TEXT, FOREIGN KEY(`parentPostId`) REFERENCES `offline_posts`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )");
             database.execSQL("CREATE INDEX IF NOT EXISTS `index_offline_comments_parentPostId` ON `offline_comments` (`parentPostId`)");
+        }
+    };
+
+    private static final Migration MIGRATION_31_32 = new Migration(31, 32) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("CREATE TABLE IF NOT EXISTS `followed_things` (`id` TEXT NOT NULL, `fullName` TEXT, `type` INTEGER NOT NULL, `title` TEXT, `subreddit` TEXT, `linkId` TEXT, `score` INTEGER NOT NULL, `commentCount` INTEGER NOT NULL, `accountName` TEXT, `lastUpdated` INTEGER NOT NULL, PRIMARY KEY(`id`))");
         }
     };
 }

@@ -28,6 +28,10 @@ import javax.inject.Named;
 import ml.docilealligator.infinityforreddit.GeminiSummarizer;
 import ml.docilealligator.infinityforreddit.Infinity;
 import ml.docilealligator.infinityforreddit.R;
+import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
+import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
+import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityUtils;
+import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityWorker;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.activities.BaseActivity;
@@ -59,6 +63,9 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
     private BaseActivity mBaseActivity;
     private Post mPost;
     private FragmentPostOptionsBottomSheetBinding binding;
+
+    @Inject
+    RedditDataRoomDatabase mRedditDataRoomDatabase;
 
     @Inject
     @Named("oauth")
@@ -112,6 +119,41 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
         binding = FragmentPostOptionsBottomSheetBinding.inflate(inflater, container, false);
 
         if (mPost != null) {
+            new Thread(() -> {
+                FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(mPost.getId());
+                mBaseActivity.runOnUiThread(() -> {
+                    if (followedThing != null) {
+                        binding.followTextViewPostOptionsBottomSheetFragment.setText(R.string.unfollow);
+                    } else {
+                        binding.followTextViewPostOptionsBottomSheetFragment.setText(R.string.follow);
+                    }
+                });
+            }).start();
+
+            binding.followTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                new Thread(() -> {
+                    FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(mPost.getId());
+                    if (followedThing != null) {
+                        mRedditDataRoomDatabase.followedThingDao().deleteById(mPost.getId());
+                        new Thread(() -> {
+                            if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
+                                LiveActivityNotificationManager.cancelNotification(mBaseActivity);
+                            }
+                        }).start();
+                        mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
+                    } else {
+                        FollowedThing newFollowedThing = new FollowedThing(mPost.getId(), mPost.getFullName(), 
+                                FollowedThing.TYPE_POST, mPost.getTitle(), mPost.getSubredditName(), 
+                                null, mPost.getScore(), mPost.getNComments(), mBaseActivity.accountName, System.currentTimeMillis());
+                        mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                        LiveActivityUtils.scheduleWorker(mBaseActivity);
+                        LiveActivityUtils.triggerImmediateUpdate(mBaseActivity);
+                        mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());
+                    }
+                    dismiss();
+                }).start();
+            });
+
             switch (mPost.getPostType()) {
                 case Post.IMAGE_TYPE:
                 case Post.GALLERY_TYPE:

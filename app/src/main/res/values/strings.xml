@@ -1474,6 +1474,13 @@
 
     <string name="add_to_comment_filter">Add to Comment Filter</string>
     <string name="cannot_edit_post_with_images">Editing posts with images is not allowed.</string>
+    <string name="follow">Follow</string>
+    <string name="unfollow">Unfollow</string>
+    <string name="live_activity">Live Activity</string>
+    <string name="enable_live_activity">Enable Live Activity</string>
+    <string name="live_activity_refresh_interval">Live Activity Refresh Interval</string>
+    <string name="followed_successfully">Followed successfully</string>
+    <string name="unfollowed_successfully">Unfollowed successfully</string>
 
     <string name="local">Local</string>
     <string name="online">Online</string>

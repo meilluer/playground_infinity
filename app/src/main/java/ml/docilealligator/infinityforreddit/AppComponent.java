@@ -113,6 +113,7 @@ import ml.docilealligator.infinityforreddit.settings.TranslationFragment;
 import ml.docilealligator.infinityforreddit.settings.VideoPreferenceFragment;
 import ml.docilealligator.infinityforreddit.worker.MaterialYouWorker;
 import ml.docilealligator.infinityforreddit.worker.PullNotificationWorker;
+import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityWorker;
 
 @Singleton
 @Component(modules = {AppModule.class, NetworkModule.class})
@@ -176,6 +177,8 @@ public interface AppComponent {
     void inject(AccountPostsActivity accountPostsActivity);
 
     void inject(PullNotificationWorker pullNotificationWorker);
+
+    void inject(LiveActivityWorker liveActivityWorker);
 
     void inject(InboxActivity inboxActivity);
 
@@ -326,6 +329,8 @@ public interface AppComponent {
     void inject(LoginChromeCustomTabActivity loginChromeCustomTabActivity);
 
     void inject(PostOptionsBottomSheetFragment postOptionsBottomSheetFragment);
+
+    void inject(CommentMoreBottomSheetFragment commentMoreBottomSheetFragment);
 
     void inject(ProxyPreferenceFragment proxyPreferenceFragment);
 
