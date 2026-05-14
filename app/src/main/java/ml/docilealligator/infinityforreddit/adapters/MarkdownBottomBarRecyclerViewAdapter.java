@@ -38,8 +38,6 @@ public class MarkdownBottomBarRecyclerViewAdapter extends RecyclerView.Adapter<R
     private final CustomThemeWrapper customThemeWrapper;
     private final boolean canUploadImage;
     private final boolean canSendGiphyGIf;
-    private boolean isImageEnabled = true;
-    private boolean isGifEnabled = true;
     private final ItemClickListener itemClickListener;
 
     public interface ItemClickListener {
@@ -66,13 +64,6 @@ public class MarkdownBottomBarRecyclerViewAdapter extends RecyclerView.Adapter<R
         this.canUploadImage = canUploadImage;
         this.canSendGiphyGIf = canSendGiphyGif;
         this.itemClickListener = itemClickListener;
-    }
-
-    public void setMediaEnabled(boolean isImageEnabled, boolean isGifEnabled) {
-        this.isImageEnabled = isImageEnabled;
-        this.isGifEnabled = isGifEnabled;
-        notifyItemChanged(UPLOAD_IMAGE);
-        notifyItemChanged(GIPHY_GIF);
     }
 
     @NonNull
@@ -120,23 +111,9 @@ public class MarkdownBottomBarRecyclerViewAdapter extends RecyclerView.Adapter<R
                     break;
                 case UPLOAD_IMAGE:
                     ((MarkdownBottomBarItemViewHolder) holder).imageView.setImageResource(R.drawable.ic_image_day_night_24dp);
-                    if (isImageEnabled) {
-                        ((MarkdownBottomBarItemViewHolder) holder).imageView.setAlpha(255);
-                        ((MarkdownBottomBarItemViewHolder) holder).itemView.setEnabled(true);
-                    } else {
-                        ((MarkdownBottomBarItemViewHolder) holder).imageView.setAlpha(128);
-                        ((MarkdownBottomBarItemViewHolder) holder).itemView.setEnabled(false);
-                    }
                     break;
                 case GIPHY_GIF:
                     ((MarkdownBottomBarItemViewHolder) holder).imageView.setImageResource(R.drawable.ic_gif_24dp);
-                    if (isGifEnabled) {
-                        ((MarkdownBottomBarItemViewHolder) holder).imageView.setAlpha(255);
-                        ((MarkdownBottomBarItemViewHolder) holder).itemView.setEnabled(true);
-                    } else {
-                        ((MarkdownBottomBarItemViewHolder) holder).imageView.setAlpha(128);
-                        ((MarkdownBottomBarItemViewHolder) holder).itemView.setEnabled(false);
-                    }
                     break;
             }
         }

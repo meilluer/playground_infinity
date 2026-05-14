@@ -410,6 +410,7 @@ public class MainActivity extends BaseActivity implements SortTypeSelectionCallb
         } else {
             mMessageFullname = getIntent().getStringExtra(EXTRA_MESSAGE_FULLNAME);
             mNewAccountName = getIntent().getStringExtra(EXTRA_NEW_ACCOUNT_NAME);
+            inboxCount = mCurrentAccountSharedPreferences.getInt(SharedPreferencesUtils.INBOX_COUNT, 0);
         }
 
         /*if (!mInternalSharedPreferences.getBoolean(SharedPreferencesUtils.DO_NOT_SHOW_REDDIT_API_INFO_V2_AGAIN, false)) {

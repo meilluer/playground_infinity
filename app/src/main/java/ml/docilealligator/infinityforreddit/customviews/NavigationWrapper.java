@@ -244,40 +244,55 @@ public class NavigationWrapper {
             this.inboxCount = inboxCount;
         }
 
-        if (option1 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option1 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
-            if (navigationRailView == null) {
-                if (this.inboxCount == 0) {
+        if (navigationRailView == null) {
+            if (badgeDrawable != null) {
+                if (option1BottomAppBar != null) {
                     BadgeUtils.detachBadgeDrawable(badgeDrawable, option1BottomAppBar);
-                    badgeDrawable = null;
-                } else {
-                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option1BottomAppBar), option1BottomAppBar);
                 }
-            }
-        } else if (option2 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option2 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
-            if (navigationRailView == null) {
-                if (this.inboxCount == 0) {
+                if (option2BottomAppBar != null) {
                     BadgeUtils.detachBadgeDrawable(badgeDrawable, option2BottomAppBar);
-                    badgeDrawable = null;
-                } else {
-                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option2BottomAppBar), option2BottomAppBar);
                 }
-            }
-        } else if (option3 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option3 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
-            if (navigationRailView == null) {
-                if (this.inboxCount == 0) {
+                if (option3BottomAppBar != null) {
                     BadgeUtils.detachBadgeDrawable(badgeDrawable, option3BottomAppBar);
-                    badgeDrawable = null;
-                } else {
-                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option3BottomAppBar), option3BottomAppBar);
+                }
+                if (option4BottomAppBar != null) {
+                    BadgeUtils.detachBadgeDrawable(badgeDrawable, option4BottomAppBar);
+                }
+                badgeDrawable = null;
+            }
+
+            if (this.inboxCount > 0) {
+                if (option1 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option1 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, this.inboxCount, option1BottomAppBar), option1BottomAppBar);
+                } else if (option2 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option2 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, this.inboxCount, option2BottomAppBar), option2BottomAppBar);
+                } else if (option3 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option3 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, this.inboxCount, option3BottomAppBar), option3BottomAppBar);
+                } else if (option4 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option4 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, this.inboxCount, option4BottomAppBar), option4BottomAppBar);
                 }
             }
-        } else if (option4 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option4 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
-            if (navigationRailView == null) {
-                if (this.inboxCount == 0) {
-                    BadgeUtils.detachBadgeDrawable(badgeDrawable, option4BottomAppBar);
-                    badgeDrawable = null;
+        } else {
+            int itemId = -1;
+            if (option1 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option1 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                itemId = R.id.navigation_rail_option_1;
+            } else if (option2 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option2 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                itemId = R.id.navigation_rail_option_2;
+            } else if (option3 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option3 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                itemId = R.id.navigation_rail_option_3;
+            } else if (option4 == SharedPreferencesUtils.MAIN_ACTIVITY_BOTTOM_APP_BAR_OPTION_INBOX || option4 == SharedPreferencesUtils.OTHER_ACTIVITIES_BOTTOM_APP_BAR_OPTION_INBOX) {
+                itemId = R.id.navigation_rail_option_4;
+            }
+
+            if (itemId != -1) {
+                if (this.inboxCount > 0) {
+                    BadgeDrawable badge = navigationRailView.getOrCreateBadge(itemId);
+                    badge.setNumber(this.inboxCount);
+                    badge.setBackgroundColor(customThemeWrapper.getColorAccent());
+                    badge.setBadgeTextColor(customThemeWrapper.getButtonTextColor());
+                    badge.setVisible(true);
                 } else {
-                    BadgeUtils.attachBadgeDrawable(getBadgeDrawable(context, inboxCount, option4BottomAppBar), option4BottomAppBar);
+                    navigationRailView.removeBadge(itemId);
                 }
             }
         }

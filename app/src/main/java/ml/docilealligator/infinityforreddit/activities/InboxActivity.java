@@ -326,6 +326,7 @@ public class InboxActivity extends BaseActivity implements ActivityToolbarInterf
         } else if (item.getItemId() == R.id.action_read_all_messages_inbox_activity) {
             if (!accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
                 Toast.makeText(this, R.string.please_wait, Toast.LENGTH_SHORT).show();
+                mCurrentAccountSharedPreferences.edit().putInt(SharedPreferencesUtils.INBOX_COUNT, 0).apply();
                 EventBus.getDefault().post(new ChangeInboxCountEvent(0));
                 mOauthRetrofit.create(RedditAPI.class).readAllMessages(APIUtils.getOAuthHeader(accessToken))
                         .enqueue(new Callback<>() {
