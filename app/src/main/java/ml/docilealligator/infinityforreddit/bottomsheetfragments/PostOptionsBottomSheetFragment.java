@@ -165,6 +165,7 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                                 FollowedThing.TYPE_POST, mPost.getTitle(), mPost.getSubredditName(), 
                                 null, mPost.getScore(), mPost.getNComments(), mBaseActivity.accountName, System.currentTimeMillis());
                         mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                        LiveActivityNotificationManager.updateNotification(mBaseActivity, newFollowedThing, null);
                         LiveActivityUtils.scheduleWorker(mBaseActivity);
                         LiveActivityUtils.triggerImmediateUpdate(mBaseActivity);
                         mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());

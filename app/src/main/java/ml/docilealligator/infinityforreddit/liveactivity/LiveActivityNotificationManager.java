@@ -37,7 +37,11 @@ public class LiveActivityNotificationManager {
         collapsedView.setTextViewText(R.id.title, thing.getTitle());
         collapsedView.setTextViewText(R.id.subreddit, "r/" + thing.getSubreddit());
         collapsedView.setTextViewText(R.id.upvotes, "↑ " + thing.getScore());
-        collapsedView.setTextViewText(R.id.comments, "💬 " + thing.getCommentCount());
+        if (thing.getType() == FollowedThing.TYPE_POST) {
+            collapsedView.setTextViewText(R.id.comments, "💬 " + thing.getCommentCount());
+        } else {
+            collapsedView.setTextViewText(R.id.comments, "↩ " + thing.getCommentCount());
+        }
         collapsedView.setViewVisibility(R.id.expanded_content, View.GONE);
         collapsedView.setViewVisibility(R.id.unfollow_button, View.GONE);
 
@@ -45,7 +49,11 @@ public class LiveActivityNotificationManager {
         expandedView.setTextViewText(R.id.title, thing.getTitle());
         expandedView.setTextViewText(R.id.subreddit, "r/" + thing.getSubreddit());
         expandedView.setTextViewText(R.id.upvotes, "↑ " + thing.getScore());
-        expandedView.setTextViewText(R.id.comments, "💬 " + thing.getCommentCount());
+        if (thing.getType() == FollowedThing.TYPE_POST) {
+            expandedView.setTextViewText(R.id.comments, "💬 " + thing.getCommentCount());
+        } else {
+            expandedView.setTextViewText(R.id.comments, "↩ " + thing.getCommentCount());
+        }
         if (topContent != null && !topContent.isEmpty()) {
             expandedView.setViewVisibility(R.id.expanded_content, View.VISIBLE);
             expandedView.setTextViewText(R.id.expanded_content, topContent);
@@ -56,12 +64,13 @@ public class LiveActivityNotificationManager {
         expandedView.setOnClickPendingIntent(R.id.unfollow_button, unfollowPendingIntent);
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
                 .setCustomContentView(collapsedView)
                 .setCustomBigContentView(expandedView)
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle())
                 .setOngoing(true)
-                .setOnlyAlertOnce(true);
+                .setOnlyAlertOnce(true)
+                .setPriority(NotificationCompat.PRIORITY_LOW);
 
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }

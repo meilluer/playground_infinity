@@ -144,6 +144,7 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                             FollowedThing.TYPE_COMMENT, comment.getCommentRawText(), comment.getSubredditName(), 
                             comment.getLinkId(), comment.getScore(), comment.getChildCount(), activity.accountName, System.currentTimeMillis());
                     mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                    LiveActivityNotificationManager.updateNotification(activity, newFollowedThing, null);
                     LiveActivityUtils.scheduleWorker(activity);
                     LiveActivityUtils.triggerImmediateUpdate(activity);
                     activity.runOnUiThread(() -> Toast.makeText(activity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());
