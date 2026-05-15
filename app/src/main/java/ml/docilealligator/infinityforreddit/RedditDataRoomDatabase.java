@@ -71,7 +71,14 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
                         MIGRATION_17_18, MIGRATION_18_19, MIGRATION_19_20, MIGRATION_20_21,
                         MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24, MIGRATION_24_25,
                         MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
-                        MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32)
+                        MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33)
+                .addCallback(new Callback() {
+                    @Override
+                    public void onCreate(@NonNull SupportSQLiteDatabase db) {
+                        super.onCreate(db);
+                        db.execSQL("INSERT INTO accounts(username, karma, is_current_user) VALUES (\"-\", 0, 0)");
+                    }
+                })
                 .fallbackToDestructiveMigration()
                 .build();
     }
@@ -507,6 +514,13 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
         @Override
         public void migrate(@NonNull SupportSQLiteDatabase database) {
             database.execSQL("CREATE TABLE IF NOT EXISTS `followed_things` (`id` TEXT NOT NULL, `fullName` TEXT, `type` INTEGER NOT NULL, `title` TEXT, `subreddit` TEXT, `linkId` TEXT, `score` INTEGER NOT NULL, `commentCount` INTEGER NOT NULL, `accountName` TEXT, `lastUpdated` INTEGER NOT NULL, PRIMARY KEY(`id`))");
+        }
+    };
+
+    private static final Migration MIGRATION_32_33 = new Migration(32, 33) {
+        @Override
+        public void migrate(@NonNull SupportSQLiteDatabase database) {
+            database.execSQL("ALTER TABLE followed_things ADD COLUMN expirationTime INTEGER DEFAULT 0 NOT NULL");
         }
     };
 }
