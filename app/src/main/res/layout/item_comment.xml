@@ -198,7 +198,7 @@
                 android:layout_height="wrap_content"
                 app:icon="@drawable/ic_mic_14dp"
                 app:iconSize="24dp"
-                app:iconTint="#FFFFFF"
+                app:iconTint="?attr/textToSpeechIconTint"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/placeholder_item_post_comment"
                 app:layout_constraintHorizontal_bias="0.5"

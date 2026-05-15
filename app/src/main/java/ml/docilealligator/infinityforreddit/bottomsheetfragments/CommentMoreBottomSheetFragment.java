@@ -41,8 +41,18 @@ import ml.docilealligator.infinityforreddit.utils.Utils;
 
 
 import android.content.SharedPreferences;
+import android.os.Handler;
+import android.os.Looper;
+
 import javax.inject.Inject;
+import javax.inject.Named;
+
+import java.util.concurrent.Executor;
+import retrofit2.Retrofit;
+
 import ml.docilealligator.infinityforreddit.GeminiSummarizer;
+import ml.docilealligator.infinityforreddit.asynctasks.CheckIsFollowingUser;
+import ml.docilealligator.infinityforreddit.user.UserFollowing;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 
 /**
@@ -62,6 +72,17 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
 
     @Inject
     RedditDataRoomDatabase mRedditDataRoomDatabase;
+
+    @Inject
+    @Named("oauth")
+    Retrofit mOauthRetrofit;
+
+    @Inject
+    @Named("no_oauth")
+    Retrofit mRetrofit;
+
+    @Inject
+    Executor mExecutor;
 
     public CommentMoreBottomSheetFragment() {
         // Required empty public constructor
@@ -88,6 +109,77 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
         if (comment == null) {
             dismiss();
             return binding.getRoot();
+        }
+
+        if (comment.getAuthor() != null && !comment.getAuthor().equals("[deleted]") && !comment.getAuthor().equals(activity.accountName)) {
+            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setVisibility(View.VISIBLE);
+            CheckIsFollowingUser.checkIsFollowingUser(mExecutor, new Handler(Looper.getMainLooper()), mRedditDataRoomDatabase,
+                    comment.getAuthor(), activity.accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
+                        @Override
+                        public void isSubscribed() {
+                            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setText(getString(R.string.unfollow_user, comment.getAuthor()));
+                        }
+
+                        @Override
+                        public void isNotSubscribed() {
+                            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setText(getString(R.string.follow_user, comment.getAuthor()));
+                        }
+                    });
+
+            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setOnClickListener(v -> {
+                if (activity.accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                    UserFollowing.anonymousFollowUser(mExecutor, new Handler(Looper.getMainLooper()), mRetrofit, comment.getAuthor(),
+                            mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                @Override
+                                public void onUserFollowingSuccess() {
+                                    Toast.makeText(activity, R.string.followed, Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onUserFollowingFail() {
+                                    Toast.makeText(activity, R.string.follow_failed, Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                } else {
+                    CheckIsFollowingUser.checkIsFollowingUser(mExecutor, new Handler(Looper.getMainLooper()), mRedditDataRoomDatabase,
+                            comment.getAuthor(), activity.accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
+                                @Override
+                                public void isSubscribed() {
+                                    UserFollowing.unfollowUser(mExecutor, new Handler(Looper.getMainLooper()), mOauthRetrofit, mRetrofit,
+                                            activity.accessToken, comment.getAuthor(), activity.accountName,
+                                            mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                                @Override
+                                                public void onUserFollowingSuccess() {
+                                                    Toast.makeText(activity, R.string.unfollowed, Toast.LENGTH_SHORT).show();
+                                                }
+
+                                                @Override
+                                                public void onUserFollowingFail() {
+                                                    Toast.makeText(activity, R.string.unfollow_failed, Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+
+                                @Override
+                                public void isNotSubscribed() {
+                                    UserFollowing.followUser(mExecutor, new Handler(Looper.getMainLooper()), mOauthRetrofit, mRetrofit,
+                                            activity.accessToken, comment.getAuthor(), activity.accountName,
+                                            mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                                @Override
+                                                public void onUserFollowingSuccess() {
+                                                    Toast.makeText(activity, R.string.followed, Toast.LENGTH_SHORT).show();
+                                                }
+
+                                                @Override
+                                                public void onUserFollowingFail() {
+                                                    Toast.makeText(activity, R.string.follow_failed, Toast.LENGTH_SHORT).show();
+                                                }
+                                            });
+                                }
+                            });
+                }
+                dismiss();
+            });
         }
 
         new Thread(() -> {

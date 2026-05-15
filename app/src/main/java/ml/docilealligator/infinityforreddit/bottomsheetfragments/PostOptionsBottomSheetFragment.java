@@ -25,8 +25,13 @@ import org.greenrobot.eventbus.EventBus;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.util.concurrent.Executor;
+
 import ml.docilealligator.infinityforreddit.GeminiSummarizer;
 import ml.docilealligator.infinityforreddit.Infinity;
+import ml.docilealligator.infinityforreddit.asynctasks.CheckIsFollowingUser;
+import ml.docilealligator.infinityforreddit.user.UserFollowing;
+import retrofit2.Retrofit;
 import ml.docilealligator.infinityforreddit.R;
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
@@ -71,6 +76,13 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
     @Inject
     @Named("oauth")
     Retrofit mOauthRetrofit;
+
+    @Inject
+    @Named("no_oauth")
+    Retrofit mRetrofit;
+
+    @Inject
+    Executor mExecutor;
 
     public PostOptionsBottomSheetFragment() {
         // Required empty public constructor
@@ -120,6 +132,77 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
         binding = FragmentPostOptionsBottomSheetBinding.inflate(inflater, container, false);
 
         if (mPost != null) {
+            if (mPost.getAuthor() != null && !mPost.getAuthor().equals("[deleted]") && !mPost.getAuthor().equals(mBaseActivity.accountName)) {
+                binding.followAuthorTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                CheckIsFollowingUser.checkIsFollowingUser(mExecutor, new Handler(Looper.getMainLooper()), mRedditDataRoomDatabase,
+                        mPost.getAuthor(), mBaseActivity.accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
+                            @Override
+                            public void isSubscribed() {
+                                binding.followAuthorTextViewPostOptionsBottomSheetFragment.setText(getString(R.string.unfollow_user, mPost.getAuthor()));
+                            }
+
+                            @Override
+                            public void isNotSubscribed() {
+                                binding.followAuthorTextViewPostOptionsBottomSheetFragment.setText(getString(R.string.follow_user, mPost.getAuthor()));
+                            }
+                        });
+
+                binding.followAuthorTextViewPostOptionsBottomSheetFragment.setOnClickListener(v -> {
+                    if (mBaseActivity.accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                        UserFollowing.anonymousFollowUser(mExecutor, new Handler(Looper.getMainLooper()), mRetrofit, mPost.getAuthor(),
+                                mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                    @Override
+                                    public void onUserFollowingSuccess() {
+                                        Toast.makeText(mBaseActivity, R.string.followed, Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onUserFollowingFail() {
+                                        Toast.makeText(mBaseActivity, R.string.follow_failed, Toast.LENGTH_SHORT).show();
+                                    }
+                                });
+                    } else {
+                        CheckIsFollowingUser.checkIsFollowingUser(mExecutor, new Handler(Looper.getMainLooper()), mRedditDataRoomDatabase,
+                                mPost.getAuthor(), mBaseActivity.accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
+                                    @Override
+                                    public void isSubscribed() {
+                                        UserFollowing.unfollowUser(mExecutor, new Handler(Looper.getMainLooper()), mOauthRetrofit, mRetrofit,
+                                                mBaseActivity.accessToken, mPost.getAuthor(), mBaseActivity.accountName,
+                                                mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                                    @Override
+                                                    public void onUserFollowingSuccess() {
+                                                        Toast.makeText(mBaseActivity, R.string.unfollowed, Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onUserFollowingFail() {
+                                                        Toast.makeText(mBaseActivity, R.string.unfollow_failed, Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }
+
+                                    @Override
+                                    public void isNotSubscribed() {
+                                        UserFollowing.followUser(mExecutor, new Handler(Looper.getMainLooper()), mOauthRetrofit, mRetrofit,
+                                                mBaseActivity.accessToken, mPost.getAuthor(), mBaseActivity.accountName,
+                                                mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                                    @Override
+                                                    public void onUserFollowingSuccess() {
+                                                        Toast.makeText(mBaseActivity, R.string.followed, Toast.LENGTH_SHORT).show();
+                                                    }
+
+                                                    @Override
+                                                    public void onUserFollowingFail() {
+                                                        Toast.makeText(mBaseActivity, R.string.follow_failed, Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }
+                                });
+                    }
+                    dismiss();
+                });
+            }
+
             new Thread(() -> {
                 FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(mPost.getId());
                 mBaseActivity.runOnUiThread(() -> {

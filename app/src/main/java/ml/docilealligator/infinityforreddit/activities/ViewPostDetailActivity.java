@@ -58,6 +58,7 @@ import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.apis.RedditAPI;
 import ml.docilealligator.infinityforreddit.asynctasks.AccountManagement;
+import ml.docilealligator.infinityforreddit.asynctasks.CheckIsFollowingUser;
 import ml.docilealligator.infinityforreddit.comment.Comment;
 import ml.docilealligator.infinityforreddit.customtheme.CustomThemeWrapper;
 import ml.docilealligator.infinityforreddit.customviews.slidr.Slidr;
@@ -79,6 +80,7 @@ import ml.docilealligator.infinityforreddit.readpost.ReadPostsListInterface;
 import ml.docilealligator.infinityforreddit.thing.SaveThing;
 import ml.docilealligator.infinityforreddit.thing.SortType;
 import ml.docilealligator.infinityforreddit.thing.SortTypeSelectionCallback;
+import ml.docilealligator.infinityforreddit.user.UserFollowing;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
@@ -432,6 +434,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
         binding.viewPager2ViewPostDetailActivity.registerOnPageChangeCallback(new ViewPager2.OnPageChangeCallback() {
             @Override
             public void onPageSelected(int position) {
+                invalidateOptionsMenu();
                 if (posts != null && position > posts.size() - 5) {
                     fetchMorePosts(false);
                 }
@@ -833,6 +836,40 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem followAuthorItem = menu.findItem(R.id.action_follow_author_view_post_detail_activity);
+        Post currentPost = null;
+        if (posts != null && !posts.isEmpty()) {
+            int position = binding.viewPager2ViewPostDetailActivity.getCurrentItem();
+            if (position < posts.size()) {
+                currentPost = posts.get(position);
+            }
+        } else if (post != null) {
+            currentPost = post;
+        }
+
+        if (currentPost != null && currentPost.getAuthor() != null && !currentPost.getAuthor().equals("[deleted]") && !currentPost.getAuthor().equals(accountName)) {
+            followAuthorItem.setVisible(true);
+            Post finalCurrentPost = currentPost;
+            CheckIsFollowingUser.checkIsFollowingUser(mExecutor, mHandler, mRedditDataRoomDatabase,
+                    currentPost.getAuthor(), accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
+                        @Override
+                        public void isSubscribed() {
+                            followAuthorItem.setTitle(getString(R.string.unfollow_user, finalCurrentPost.getAuthor()));
+                        }
+
+                        @Override
+                        public void isNotSubscribed() {
+                            followAuthorItem.setTitle(getString(R.string.follow_user, finalCurrentPost.getAuthor()));
+                        }
+                    });
+        } else {
+            followAuthorItem.setVisible(false);
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             triggerBackPress();
@@ -845,6 +882,20 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
             return true;
         } else if (item.getItemId() == R.id.action_previous_parent_comment_view_post_detail_activity) {
             scrollToPreviousParentComment();
+            return true;
+        } else if (item.getItemId() == R.id.action_follow_author_view_post_detail_activity) {
+            Post currentPost = null;
+            if (posts != null && !posts.isEmpty()) {
+                int position = binding.viewPager2ViewPostDetailActivity.getCurrentItem();
+                if (position < posts.size()) {
+                    currentPost = posts.get(position);
+                }
+            } else if (post != null) {
+                currentPost = post;
+            }
+            if (currentPost != null) {
+                followAuthor(currentPost);
+            }
             return true;
         }
         return false;
@@ -943,6 +994,63 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
     public void unlockSwipeRightToGoBack() {
         if (mSliderPanel != null) {
             mSliderPanel.unlock();
+        }
+    }
+
+    private void followAuthor(Post post) {
+        if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+            UserFollowing.anonymousFollowUser(mExecutor, mHandler, mRetrofit, post.getAuthor(),
+                    mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                        @Override
+                        public void onUserFollowingSuccess() {
+                            Toast.makeText(ViewPostDetailActivity.this, R.string.followed, Toast.LENGTH_SHORT).show();
+                            invalidateOptionsMenu();
+                        }
+
+                        @Override
+                        public void onUserFollowingFail() {
+                            Toast.makeText(ViewPostDetailActivity.this, R.string.follow_failed, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+        } else {
+            CheckIsFollowingUser.checkIsFollowingUser(mExecutor, mHandler, mRedditDataRoomDatabase,
+                    post.getAuthor(), accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
+                        @Override
+                        public void isSubscribed() {
+                            UserFollowing.unfollowUser(mExecutor, mHandler, mOauthRetrofit, mRetrofit,
+                                    accessToken, post.getAuthor(), accountName,
+                                    mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                        @Override
+                                        public void onUserFollowingSuccess() {
+                                            Toast.makeText(ViewPostDetailActivity.this, R.string.unfollowed, Toast.LENGTH_SHORT).show();
+                                            invalidateOptionsMenu();
+                                        }
+
+                                        @Override
+                                        public void onUserFollowingFail() {
+                                            Toast.makeText(ViewPostDetailActivity.this, R.string.unfollow_failed, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+
+                        @Override
+                        public void isNotSubscribed() {
+                            UserFollowing.followUser(mExecutor, mHandler, mOauthRetrofit, mRetrofit,
+                                    accessToken, post.getAuthor(), accountName,
+                                    mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
+                                        @Override
+                                        public void onUserFollowingSuccess() {
+                                            Toast.makeText(ViewPostDetailActivity.this, R.string.followed, Toast.LENGTH_SHORT).show();
+                                            invalidateOptionsMenu();
+                                        }
+
+                                        @Override
+                                        public void onUserFollowingFail() {
+                                            Toast.makeText(ViewPostDetailActivity.this, R.string.follow_failed, Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
+                        }
+                    });
         }
     }
 

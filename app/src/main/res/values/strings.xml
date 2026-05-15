@@ -187,6 +187,9 @@
     <string name="unfollowed">Unfollowed</string>
     <string name="unfollow_failed">Unfollowing Failed</string>
 
+    <string name="follow_user">Follow u/%s</string>
+    <string name="unfollow_user">Unfollow u/%s</string>
+
     <string name="app_label">Infinity</string>
     <string name="search_hint">Search anything</string>
     <string name="search_only_subreddits_hint">Search subreddits</string>

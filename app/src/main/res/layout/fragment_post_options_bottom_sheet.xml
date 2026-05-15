@@ -76,6 +76,48 @@
             app:drawableTint="?attr/primaryTextColor" />
 
         <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/follow_author_text_view_post_options_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_user_day_night_24dp"
+            android:drawablePadding="48dp"
+            android:focusable="true"
+            android:fontFamily="?attr/font_family"
+            android:paddingStart="32dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="16dp"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            android:visibility="gone"
+            app:drawableTint="?attr/primaryTextColor"
+            tools:visibility="visible"
+            tools:text="Follow u/author" />
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/follow_text_view_post_options_bottom_sheet_fragment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:drawableStart="@drawable/ic_notifications_day_night_24dp"
+            android:drawablePadding="48dp"
+            android:focusable="true"
+            android:fontFamily="?attr/font_family"
+            android:paddingStart="32dp"
+            android:paddingTop="16dp"
+            android:paddingEnd="32dp"
+            android:paddingBottom="16dp"
+            android:text="@string/follow"
+            android:textColor="?attr/primaryTextColor"
+            android:textSize="?attr/font_default"
+            app:drawableTint="?attr/primaryTextColor" />
+
+        <androidx.appcompat.widget.AppCompatTextView
             android:id="@+id/add_to_post_filter_text_view_post_options_bottom_sheet_fragment"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -174,26 +216,6 @@
             android:textColor="?attr/primaryTextColor"
             android:textSize="?attr/font_default"
             android:visibility="gone"
-            app:drawableTint="?attr/primaryTextColor" />
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/follow_text_view_post_options_bottom_sheet_fragment"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:background="?attr/selectableItemBackground"
-            android:clickable="true"
-            android:drawableStart="@drawable/ic_notifications_day_night_24dp"
-            android:drawablePadding="48dp"
-            android:focusable="true"
-            android:fontFamily="?attr/font_family"
-            android:paddingStart="32dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="32dp"
-            android:paddingBottom="16dp"
-            android:text="@string/follow"
-            android:textColor="?attr/primaryTextColor"
-            android:textSize="?attr/font_default"
             app:drawableTint="?attr/primaryTextColor" />
 
         <androidx.appcompat.widget.AppCompatTextView

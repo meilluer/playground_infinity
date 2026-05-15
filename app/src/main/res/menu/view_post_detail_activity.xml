@@ -18,4 +18,11 @@
         android:orderInCategory="102"
         android:title="@string/action_previous_parent_comment"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_follow_author_view_post_detail_activity"
+        android:orderInCategory="103"
+        android:title="@string/follow"
+        android:visible="false"
+        app:showAsAction="never" />
 </menu>

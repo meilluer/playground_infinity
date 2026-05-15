@@ -525,6 +525,7 @@
         <item name="secondaryTextColor">#8A000000</item>
         <item name="backgroundColor">@color/backgroundColor</item>
         <item name="cardViewBackgroundColor">#FFFFFF</item>
+        <item name="textToSpeechIconTint">#000000</item>
     </style>
 
     <style name="Theme.Normal.NormalDark">
@@ -537,7 +538,8 @@
         <item name="backgroundColor">@color/backgroundColor</item>
         <item name="cardViewBackgroundColor">#242424</item>
         <item name="checkboxStyle">@style/Widget.App.CheckBox.Dark</item>
-        <item name="switchStyle">@style/Widget.App.Switch.Dark</item>        
+        <item name="switchStyle">@style/Widget.App.Switch.Dark</item>
+        <item name="textToSpeechIconTint">#FFFFFF</item>
     </style>
 
     <style name="Theme.Normal.AmoledDark">
@@ -550,7 +552,8 @@
         <item name="backgroundColor">#000000</item>
         <item name="cardViewBackgroundColor">#000000</item>
         <item name="checkboxStyle">@style/Widget.App.CheckBox.Dark</item>
-        <item name="switchStyle">@style/Widget.App.Switch.Dark</item>        
+        <item name="switchStyle">@style/Widget.App.Switch.Dark</item>
+        <item name="textToSpeechIconTint">#FFFFFF</item>
     </style>
 
     <style name="ToroMediaButton">
