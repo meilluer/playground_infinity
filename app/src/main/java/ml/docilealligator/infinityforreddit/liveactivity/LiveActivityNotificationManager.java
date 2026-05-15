@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.Bundle;
 import android.view.View;
 import android.widget.RemoteViews;
 
@@ -46,6 +47,14 @@ public class LiveActivityNotificationManager {
                 chipText = "↑" + thing.getScore() + " ↩" + thing.getCommentCount();
             }
 
+            // Ensure chipText is within 7-10 characters for best display in status bar
+            if (chipText.length() > 10) {
+                chipText = chipText.substring(0, 10);
+            }
+
+            Bundle extras = new Bundle();
+            extras.putBoolean("android.requestPromotedOngoing", true);
+
             Notification.Builder builder = new Notification.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
                     .setContentTitle(thing.getTitle())
@@ -54,8 +63,8 @@ public class LiveActivityNotificationManager {
                     .setOnlyAlertOnce(true)
                     .setCategory(Notification.CATEGORY_SERVICE)
                     .setStyle(style)
+                    .addExtras(extras)
                     .setShortCriticalText(chipText) // Status bar chip text
-                    .setRequestPromotedOngoing(true) // Promote to status bar chip
                     .addAction(new Notification.Action.Builder(0, context.getString(R.string.unfollow), unfollowPendingIntent).build());
 
             if (topContent != null && !topContent.isEmpty()) {
