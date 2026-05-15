@@ -109,6 +109,7 @@
             android:textSize="?attr/font_default"
             android:fontFamily="?attr/font_family"
             android:visibility="gone"
+            app:drawableTint="@android:color/white"
             app:drawableStartCompat="@drawable/ic_mic_14dp" />
 
         <TextView

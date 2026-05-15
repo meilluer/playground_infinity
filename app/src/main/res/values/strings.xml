@@ -189,6 +189,10 @@
 
     <string name="follow_user">Follow u/%s</string>
     <string name="unfollow_user">Unfollow u/%s</string>
+    <string name="follow_post">Follow Post</string>
+    <string name="unfollow_post">Unfollow Post</string>
+    <string name="follow_comment">Follow Comment</string>
+    <string name="unfollow_comment">Unfollow Comment</string>
 
     <string name="app_label">Infinity</string>
     <string name="search_hint">Search anything</string>

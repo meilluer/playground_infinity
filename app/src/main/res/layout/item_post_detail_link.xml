@@ -356,7 +356,7 @@
             android:id="@+id/gemini_logo_item_post_detail_link"
             android:layout_width="20dp"
             android:layout_height="20dp"
-            android:layout_marginStart="3dp"
+            android:layout_marginStart="0dp"
             android:src="@drawable/gemini_color"
             android:visibility="visible"
             app:layout_constraintTop_toTopOf="@+id/comments_count_button_item_post_detail_link"

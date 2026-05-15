@@ -100,7 +100,6 @@ public class LiveActivityWorker extends Worker {
                         thing.setCommentCount(data.getInt("num_comments"));
                     }
                     thing.setLastUpdated(System.currentTimeMillis());
-                    mRedditDataRoomDatabase.followedThingDao().update(thing);
 
                     String topContent = null;
                     if (thing.getType() == FollowedThing.TYPE_POST) {
@@ -140,15 +139,20 @@ public class LiveActivityWorker extends Worker {
                             if (targetComment != null && targetComment.has("replies") && !targetComment.isNull("replies")) {
                                 JSONObject repliesData = targetComment.getJSONObject("replies").getJSONObject(JSONUtils.DATA_KEY);
                                 JSONArray replies = repliesData.getJSONArray(JSONUtils.CHILDREN_KEY);
+                                thing.setCommentCount(replies.length());
                                 if (replies.length() > 0) {
                                     JSONObject latestReply = replies.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
                                     if (latestReply.has("body")) {
                                         topContent = latestReply.getString("body");
                                     }
                                 }
+                            } else {
+                                thing.setCommentCount(0);
                             }
                         }
                     }
+                    
+                    mRedditDataRoomDatabase.followedThingDao().update(thing);
 
                     LiveActivityNotificationManager.updateNotification(context, thing, topContent);
                 }

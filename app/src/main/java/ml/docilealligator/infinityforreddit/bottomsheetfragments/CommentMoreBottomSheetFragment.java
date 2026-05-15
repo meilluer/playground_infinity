@@ -111,84 +111,15 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
             return binding.getRoot();
         }
 
-        if (comment.getAuthor() != null && !comment.getAuthor().equals("[deleted]") && !comment.getAuthor().equals(activity.accountName)) {
-            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setVisibility(View.VISIBLE);
-            CheckIsFollowingUser.checkIsFollowingUser(mExecutor, new Handler(Looper.getMainLooper()), mRedditDataRoomDatabase,
-                    comment.getAuthor(), activity.accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
-                        @Override
-                        public void isSubscribed() {
-                            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setText(getString(R.string.unfollow_user, comment.getAuthor()));
-                        }
-
-                        @Override
-                        public void isNotSubscribed() {
-                            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setText(getString(R.string.follow_user, comment.getAuthor()));
-                        }
-                    });
-
-            binding.followAuthorTextViewCommentMoreBottomSheetFragment.setOnClickListener(v -> {
-                if (activity.accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
-                    UserFollowing.anonymousFollowUser(mExecutor, new Handler(Looper.getMainLooper()), mRetrofit, comment.getAuthor(),
-                            mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
-                                @Override
-                                public void onUserFollowingSuccess() {
-                                    Toast.makeText(activity, R.string.followed, Toast.LENGTH_SHORT).show();
-                                }
-
-                                @Override
-                                public void onUserFollowingFail() {
-                                    Toast.makeText(activity, R.string.follow_failed, Toast.LENGTH_SHORT).show();
-                                }
-                            });
-                } else {
-                    CheckIsFollowingUser.checkIsFollowingUser(mExecutor, new Handler(Looper.getMainLooper()), mRedditDataRoomDatabase,
-                            comment.getAuthor(), activity.accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
-                                @Override
-                                public void isSubscribed() {
-                                    UserFollowing.unfollowUser(mExecutor, new Handler(Looper.getMainLooper()), mOauthRetrofit, mRetrofit,
-                                            activity.accessToken, comment.getAuthor(), activity.accountName,
-                                            mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
-                                                @Override
-                                                public void onUserFollowingSuccess() {
-                                                    Toast.makeText(activity, R.string.unfollowed, Toast.LENGTH_SHORT).show();
-                                                }
-
-                                                @Override
-                                                public void onUserFollowingFail() {
-                                                    Toast.makeText(activity, R.string.unfollow_failed, Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                }
-
-                                @Override
-                                public void isNotSubscribed() {
-                                    UserFollowing.followUser(mExecutor, new Handler(Looper.getMainLooper()), mOauthRetrofit, mRetrofit,
-                                            activity.accessToken, comment.getAuthor(), activity.accountName,
-                                            mRedditDataRoomDatabase, new UserFollowing.UserFollowingListener() {
-                                                @Override
-                                                public void onUserFollowingSuccess() {
-                                                    Toast.makeText(activity, R.string.followed, Toast.LENGTH_SHORT).show();
-                                                }
-
-                                                @Override
-                                                public void onUserFollowingFail() {
-                                                    Toast.makeText(activity, R.string.follow_failed, Toast.LENGTH_SHORT).show();
-                                                }
-                                            });
-                                }
-                            });
-                }
-                dismiss();
-            });
-        }
+        binding.followAuthorTextViewCommentMoreBottomSheetFragment.setVisibility(View.GONE);
 
         new Thread(() -> {
             FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(comment.getId());
             activity.runOnUiThread(() -> {
                 if (followedThing != null) {
-                    binding.followTextViewCommentMoreBottomSheetFragment.setText(R.string.unfollow);
+                    binding.followTextViewCommentMoreBottomSheetFragment.setText(R.string.unfollow_comment);
                 } else {
-                    binding.followTextViewCommentMoreBottomSheetFragment.setText(R.string.follow);
+                    binding.followTextViewCommentMoreBottomSheetFragment.setText(R.string.follow_comment);
                 }
             });
         }).start();
@@ -205,6 +136,10 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                     }).start();
                     activity.runOnUiThread(() -> Toast.makeText(activity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
                 } else {
+                    activity.getSharedPreferences(SharedPreferencesUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+                            .edit()
+                            .putBoolean("enable_live_activity", true)
+                            .apply();
                     FollowedThing newFollowedThing = new FollowedThing(comment.getId(), comment.getFullName(), 
                             FollowedThing.TYPE_COMMENT, comment.getCommentRawText(), comment.getSubredditName(), 
                             comment.getLinkId(), comment.getScore(), comment.getChildCount(), activity.accountName, System.currentTimeMillis());
