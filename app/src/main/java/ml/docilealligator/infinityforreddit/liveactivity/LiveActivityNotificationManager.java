@@ -1,5 +1,6 @@
 package ml.docilealligator.infinityforreddit.liveactivity;
 
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -23,42 +24,53 @@ public class LiveActivityNotificationManager {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_LOW);
+            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT);
             notificationManager.createNotificationChannel(channel);
         }
 
         Intent unfollowIntent = new Intent(context, LiveActivityReceiver.class);
         unfollowIntent.setAction(LiveActivityReceiver.ACTION_UNFOLLOW);
         unfollowIntent.putExtra(LiveActivityReceiver.EXTRA_ID, thing.getId());
+        // Use FLAG_MUTABLE to ensure extras are updated correctly on newer Android versions
         PendingIntent unfollowPendingIntent = PendingIntent.getBroadcast(context, 0, unfollowIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M ? PendingIntent.FLAG_IMMUTABLE : 0));
-
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
-                .setOngoing(true)
-                .setOnlyAlertOnce(true)
-                .setPriority(NotificationCompat.PRIORITY_LOW)
-                .setCategory(NotificationCompat.CATEGORY_SERVICE);
+                PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_MUTABLE : 0));
 
         if (Build.VERSION.SDK_INT >= 36) { // Android 16
-            // Use the new ProgressStyle for "Live Updates" on Android 16
-            Notification.ProgressStyle style = new Notification.ProgressStyle()
-                    .setTitle(thing.getTitle())
-                    .setSubtitle("r/" + thing.getSubreddit());
+            // Use the platform Notification.Builder for "Live Updates" on Android 16
+            Notification.ProgressStyle style = new Notification.ProgressStyle();
 
+            String contentText;
             if (thing.getType() == FollowedThing.TYPE_POST) {
-                builder.setContentText("↑ " + thing.getScore() + " | 💬 " + thing.getCommentCount());
+                contentText = "↑ " + thing.getScore() + " | 💬 " + thing.getCommentCount();
             } else {
-                builder.setContentText("↑ " + thing.getScore() + " | ↩ " + thing.getCommentCount());
+                contentText = "↑ " + thing.getScore() + " | ↩ " + thing.getCommentCount();
             }
 
             if (topContent != null && !topContent.isEmpty()) {
                 style.setSummaryText(topContent);
             }
 
-            builder.setStyle(NotificationCompat.Style.extractFromNotificationStyle(style));
-            builder.addAction(new NotificationCompat.Action(0, context.getString(R.string.unfollow), unfollowPendingIntent));
+            Notification notification = new Notification.Builder(context, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
+                    .setContentTitle(thing.getTitle())
+                    .setSubText("r/" + thing.getSubreddit())
+                    .setOngoing(true)
+                    .setOnlyAlertOnce(true)
+                    .setCategory(Notification.CATEGORY_SERVICE)
+                    .setContentText(contentText)
+                    .setStyle(style)
+                    .addAction(new Notification.Action.Builder(0, context.getString(R.string.unfollow), unfollowPendingIntent).build())
+                    .build();
+
+            notificationManager.notify(NOTIFICATION_ID, notification);
         } else {
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
+                    .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
+                    .setOngoing(true)
+                    .setOnlyAlertOnce(true)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    .setCategory(NotificationCompat.CATEGORY_SERVICE);
+
             // Fallback for older Android versions
             RemoteViews collapsedView = new RemoteViews(context.getPackageName(), R.layout.notification_live_activity);
             collapsedView.setTextViewText(R.id.title, thing.getTitle());
@@ -93,13 +105,13 @@ public class LiveActivityNotificationManager {
             builder.setCustomContentView(collapsedView)
                    .setCustomBigContentView(expandedView)
                    .setStyle(new NotificationCompat.DecoratedCustomViewStyle());
-        }
 
-        notificationManager.notify(NOTIFICATION_ID, builder.build());
+            notificationManager.notify(NOTIFICATION_ID, builder.build());
+        }
     }
 
     public static void cancelNotification(Context context) {
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(context);
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancel(NOTIFICATION_ID);
     }
 }

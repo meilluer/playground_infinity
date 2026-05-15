@@ -62,8 +62,22 @@ public class LiveActivityWorker extends Worker {
         }
 
         List<FollowedThing> followedThings = mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings();
+        boolean changed = false;
+        long currentTime = System.currentTimeMillis();
+        for (FollowedThing thing : followedThings) {
+            if (thing.getExpirationTime() != 0 && thing.getExpirationTime() < currentTime) {
+                mRedditDataRoomDatabase.followedThingDao().deleteById(thing.getId());
+                changed = true;
+            }
+        }
+
+        if (changed) {
+            followedThings = mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings();
+        }
+
         if (followedThings.isEmpty()) {
             LiveActivityNotificationManager.cancelNotification(context);
+            LiveActivityUtils.cancelWorker(context);
             return Result.success();
         }
 

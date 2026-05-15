@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 
 import ml.docilealligator.infinityforreddit.GeminiSummarizer;
 import ml.docilealligator.infinityforreddit.Infinity;
@@ -161,9 +162,14 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                                 .edit()
                                 .putBoolean("enable_live_activity", true)
                                 .apply();
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mBaseActivity);
+                        String durationStr = sharedPreferences.getString("live_activity_follow_duration", "0");
+                        int durationHours = Integer.parseInt(durationStr);
+                        long expirationTime = durationHours == 0 ? 0 : System.currentTimeMillis() + TimeUnit.HOURS.toMillis(durationHours);
+
                         FollowedThing newFollowedThing = new FollowedThing(mPost.getId(), mPost.getFullName(), 
                                 FollowedThing.TYPE_POST, mPost.getTitle(), mPost.getSubredditName(), 
-                                null, mPost.getScore(), mPost.getNComments(), mBaseActivity.accountName, System.currentTimeMillis());
+                                null, mPost.getScore(), mPost.getNComments(), mBaseActivity.accountName, System.currentTimeMillis(), expirationTime);
                         mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
                         LiveActivityNotificationManager.updateNotification(mBaseActivity, newFollowedThing, null);
                         LiveActivityUtils.scheduleWorker(mBaseActivity);

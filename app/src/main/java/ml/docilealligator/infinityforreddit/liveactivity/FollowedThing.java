@@ -21,9 +21,9 @@ public class FollowedThing {
     private int commentCount; // nComments for posts, childCount for comments
     private String accountName;
     private long lastUpdated;
+    private long expirationTime;
 
-    public FollowedThing(@NonNull String id, String fullName, int type, String title, String subreddit, 
-                         String linkId, int score, int commentCount, String accountName, long lastUpdated) {
+    public FollowedThing(String id, String fullName, int type, String title, String subreddit, String linkId, int score, int commentCount, String accountName, long lastUpdated, long expirationTime) {
         this.id = id;
         this.fullName = fullName;
         this.type = type;
@@ -34,6 +34,7 @@ public class FollowedThing {
         this.commentCount = commentCount;
         this.accountName = accountName;
         this.lastUpdated = lastUpdated;
+        this.expirationTime = expirationTime;
     }
 
     @NonNull
@@ -87,5 +88,13 @@ public class FollowedThing {
 
     public void setLastUpdated(long lastUpdated) {
         this.lastUpdated = lastUpdated;
+    }
+
+    public long getExpirationTime() {
+        return expirationTime;
+    }
+
+    public void setExpirationTime(long expirationTime) {
+        this.expirationTime = expirationTime;
     }
 }

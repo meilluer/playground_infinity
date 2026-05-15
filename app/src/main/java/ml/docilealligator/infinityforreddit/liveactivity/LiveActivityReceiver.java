@@ -28,6 +28,7 @@ public class LiveActivityReceiver extends BroadcastReceiver {
                     if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
                         LiveActivityUtils.cancelWorker(context);
                     } else {
+                        // Trigger update to show the next item in the notification
                         LiveActivityUtils.triggerImmediateUpdate(context);
                     }
                 }).start();

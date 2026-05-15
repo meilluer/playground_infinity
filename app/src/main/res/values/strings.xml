@@ -1484,6 +1484,7 @@
     <string name="live_activity">Live Activity</string>
     <string name="enable_live_activity">Enable Live Activity</string>
     <string name="live_activity_refresh_interval">Live Activity Refresh Interval</string>
+    <string name="live_activity_follow_duration">Live Activity Follow Duration</string>
     <string name="followed_successfully">Followed successfully</string>
     <string name="unfollowed_successfully">Unfollowed successfully</string>
 

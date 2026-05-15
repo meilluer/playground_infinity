@@ -36,6 +36,16 @@
             app:useSimpleSummaryProvider="true"
             app:dependency="enable_live_activity" />
 
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+            app:defaultValue="0"
+            app:entries="@array/live_activity_follow_duration_entries"
+            app:entryValues="@array/live_activity_follow_duration_values"
+            app:key="live_activity_follow_duration"
+            app:icon="@drawable/ic_access_time_day_night_24dp"
+            app:title="@string/live_activity_follow_duration"
+            app:useSimpleSummaryProvider="true"
+            app:dependency="enable_live_activity" />
+
     </androidx.preference.PreferenceCategory>
 
 </androidx.preference.PreferenceScreen>

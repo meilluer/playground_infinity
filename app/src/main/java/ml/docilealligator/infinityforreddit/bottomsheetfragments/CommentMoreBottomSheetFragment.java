@@ -48,7 +48,10 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
 import retrofit2.Retrofit;
+
+import androidx.preference.PreferenceManager;
 
 import ml.docilealligator.infinityforreddit.GeminiSummarizer;
 import ml.docilealligator.infinityforreddit.asynctasks.CheckIsFollowingUser;
@@ -140,9 +143,14 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                             .edit()
                             .putBoolean("enable_live_activity", true)
                             .apply();
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity);
+                    String durationStr = sharedPreferences.getString("live_activity_follow_duration", "0");
+                    int durationHours = Integer.parseInt(durationStr);
+                    long expirationTime = durationHours == 0 ? 0 : System.currentTimeMillis() + TimeUnit.HOURS.toMillis(durationHours);
+
                     FollowedThing newFollowedThing = new FollowedThing(comment.getId(), comment.getFullName(), 
                             FollowedThing.TYPE_COMMENT, comment.getCommentRawText(), comment.getSubredditName(), 
-                            comment.getLinkId(), comment.getScore(), comment.getChildCount(), activity.accountName, System.currentTimeMillis());
+                            comment.getLinkId(), comment.getScore(), comment.getChildCount(), activity.accountName, System.currentTimeMillis(), expirationTime);
                     mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
                     LiveActivityNotificationManager.updateNotification(activity, newFollowedThing, null);
                     LiveActivityUtils.scheduleWorker(activity);
