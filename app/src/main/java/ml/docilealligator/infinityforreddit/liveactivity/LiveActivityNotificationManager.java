@@ -39,30 +39,32 @@ public class LiveActivityNotificationManager {
             // Use the platform Notification.Builder for "Live Updates" on Android 16
             Notification.ProgressStyle style = new Notification.ProgressStyle();
 
-            String contentText;
+            String chipText;
             if (thing.getType() == FollowedThing.TYPE_POST) {
-                contentText = "↑ " + thing.getScore() + " | 💬 " + thing.getCommentCount();
+                chipText = "↑" + thing.getScore() + " 💬" + thing.getCommentCount();
             } else {
-                contentText = "↑ " + thing.getScore() + " | ↩ " + thing.getCommentCount();
+                chipText = "↑" + thing.getScore() + " ↩" + thing.getCommentCount();
             }
 
-            if (topContent != null && !topContent.isEmpty()) {
-                style.setSummaryText(topContent);
-            }
-
-            Notification notification = new Notification.Builder(context, CHANNEL_ID)
+            Notification.Builder builder = new Notification.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
                     .setContentTitle(thing.getTitle())
                     .setSubText("r/" + thing.getSubreddit())
                     .setOngoing(true)
                     .setOnlyAlertOnce(true)
                     .setCategory(Notification.CATEGORY_SERVICE)
-                    .setContentText(contentText)
                     .setStyle(style)
-                    .addAction(new Notification.Action.Builder(0, context.getString(R.string.unfollow), unfollowPendingIntent).build())
-                    .build();
+                    .setShortCriticalText(chipText) // Status bar chip text
+                    .setRequestPromotedOngoing(true) // Promote to status bar chip
+                    .addAction(new Notification.Action.Builder(0, context.getString(R.string.unfollow), unfollowPendingIntent).build());
 
-            notificationManager.notify(NOTIFICATION_ID, notification);
+            if (topContent != null && !topContent.isEmpty()) {
+                builder.setContentText(topContent); // Expanded view main content
+            } else {
+                builder.setContentText(chipText); // Fallback for collapsed view
+            }
+
+            notificationManager.notify(NOTIFICATION_ID, builder.build());
         } else {
             NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
