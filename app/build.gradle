@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    compileSdk 35
+    compileSdk 36
     defaultConfig {
         applicationId "com.meilluer.infinity"
         minSdk 21
-        targetSdk 35
+        targetSdk 36
         versionCode 200
         versionName "8.0.0-beta5"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
