@@ -157,7 +157,7 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                         }).start();
                         mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
                     } else {
-                        mBaseActivity.getSharedPreferences(SharedPreferencesUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+                        mBaseActivity.getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
                                 .edit()
                                 .putBoolean("enable_live_activity", true)
                                 .apply();

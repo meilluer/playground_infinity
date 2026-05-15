@@ -136,7 +136,7 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                     }).start();
                     activity.runOnUiThread(() -> Toast.makeText(activity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
                 } else {
-                    activity.getSharedPreferences(SharedPreferencesUtils.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE)
+                    activity.getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
                             .edit()
                             .putBoolean("enable_live_activity", true)
                             .apply();
