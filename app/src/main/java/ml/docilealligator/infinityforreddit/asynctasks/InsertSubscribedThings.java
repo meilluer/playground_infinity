@@ -1,5 +1,6 @@
 package ml.docilealligator.infinityforreddit.asynctasks;
 
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import java.util.concurrent.Executor;
 
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.account.Account;
+import ml.docilealligator.infinityforreddit.account.AccountDao;
 import ml.docilealligator.infinityforreddit.subreddit.SubredditDao;
 import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
 import ml.docilealligator.infinityforreddit.subscribedsubreddit.SubscribedSubredditDao;
@@ -27,56 +29,65 @@ public class InsertSubscribedThings {
                                               List<SubredditData> subredditDataList,
                                               InsertSubscribedThingListener insertSubscribedThingListener) {
         executor.execute(() -> {
-            if (!accountName.equals(Account.ANONYMOUS_ACCOUNT) && redditDataRoomDatabase.accountDao().getAccountData(accountName) == null) {
+            try {
+                AccountDao accountDao = redditDataRoomDatabase.accountDao();
+                if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                    if (!accountDao.isAnonymousAccountInserted()) {
+                        accountDao.insert(Account.getAnonymousAccount());
+                    }
+                } else if (accountDao.getAccountData(accountName) == null) {
+                    handler.post(insertSubscribedThingListener::insertSuccess);
+                    return;
+                }
+
+                SubscribedSubredditDao subscribedSubredditDao = redditDataRoomDatabase.subscribedSubredditDao();
+                SubscribedUserDao subscribedUserDao = redditDataRoomDatabase.subscribedUserDao();
+                SubredditDao subredditDao = redditDataRoomDatabase.subredditDao();
+
+                if (subscribedSubredditDataList != null) {
+                    List<SubscribedSubredditData> existingSubscribedSubredditDataList =
+                            subscribedSubredditDao.getAllSubscribedSubredditsList(accountName);
+                    Collections.sort(subscribedSubredditDataList, (subscribedSubredditData, t1) -> subscribedSubredditData.getName().compareToIgnoreCase(t1.getName()));
+                    List<String> unsubscribedSubreddits = new ArrayList<>();
+                    compareTwoSubscribedSubredditList(subscribedSubredditDataList, existingSubscribedSubredditDataList,
+                            unsubscribedSubreddits);
+
+                    for (String unsubscribed : unsubscribedSubreddits) {
+                        subscribedSubredditDao.deleteSubscribedSubreddit(unsubscribed, accountName);
+                    }
+
+                    for (SubscribedSubredditData s : subscribedSubredditDataList) {
+                        subscribedSubredditDao.insert(s);
+                    }
+                }
+
+                if (subscribedUserDataList != null) {
+                    List<SubscribedUserData> existingSubscribedUserDataList =
+                            subscribedUserDao.getAllSubscribedUsersList(accountName);
+                    Collections.sort(subscribedUserDataList, (subscribedUserData, t1) -> subscribedUserData.getName().compareToIgnoreCase(t1.getName()));
+                    List<String> unsubscribedUsers = new ArrayList<>();
+                    compareTwoSubscribedUserList(subscribedUserDataList, existingSubscribedUserDataList,
+                            unsubscribedUsers);
+
+                    for (String unsubscribed : unsubscribedUsers) {
+                        subscribedUserDao.deleteSubscribedUser(unsubscribed, accountName);
+                    }
+
+                    for (SubscribedUserData s : subscribedUserDataList) {
+                        subscribedUserDao.insert(s);
+                    }
+                }
+
+                if (subredditDataList != null) {
+                    for (SubredditData s : subredditDataList) {
+                        subredditDao.insert(s);
+                    }
+                }
+
                 handler.post(insertSubscribedThingListener::insertSuccess);
-                return;
+            } catch (SQLiteConstraintException e) {
+                e.printStackTrace();
             }
-
-            SubscribedSubredditDao subscribedSubredditDao = redditDataRoomDatabase.subscribedSubredditDao();
-            SubscribedUserDao subscribedUserDao = redditDataRoomDatabase.subscribedUserDao();
-            SubredditDao subredditDao = redditDataRoomDatabase.subredditDao();
-
-            if (subscribedSubredditDataList != null) {
-                List<SubscribedSubredditData> existingSubscribedSubredditDataList =
-                        subscribedSubredditDao.getAllSubscribedSubredditsList(accountName);
-                Collections.sort(subscribedSubredditDataList, (subscribedSubredditData, t1) -> subscribedSubredditData.getName().compareToIgnoreCase(t1.getName()));
-                List<String> unsubscribedSubreddits = new ArrayList<>();
-                compareTwoSubscribedSubredditList(subscribedSubredditDataList, existingSubscribedSubredditDataList,
-                        unsubscribedSubreddits);
-
-                for (String unsubscribed : unsubscribedSubreddits) {
-                    subscribedSubredditDao.deleteSubscribedSubreddit(unsubscribed, accountName);
-                }
-
-                for (SubscribedSubredditData s : subscribedSubredditDataList) {
-                    subscribedSubredditDao.insert(s);
-                }
-            }
-
-            if (subscribedUserDataList != null) {
-                List<SubscribedUserData> existingSubscribedUserDataList =
-                        subscribedUserDao.getAllSubscribedUsersList(accountName);
-                Collections.sort(subscribedUserDataList, (subscribedUserData, t1) -> subscribedUserData.getName().compareToIgnoreCase(t1.getName()));
-                List<String> unsubscribedUsers = new ArrayList<>();
-                compareTwoSubscribedUserList(subscribedUserDataList, existingSubscribedUserDataList,
-                        unsubscribedUsers);
-
-                for (String unsubscribed : unsubscribedUsers) {
-                    subscribedUserDao.deleteSubscribedUser(unsubscribed, accountName);
-                }
-
-                for (SubscribedUserData s : subscribedUserDataList) {
-                    subscribedUserDao.insert(s);
-                }
-            }
-
-            if (subredditDataList != null) {
-                for (SubredditData s : subredditDataList) {
-                    subredditDao.insert(s);
-                }
-            }
-
-            handler.post(insertSubscribedThingListener::insertSuccess);
         });
     }
 
@@ -84,14 +95,23 @@ public class InsertSubscribedThings {
                                               SubscribedSubredditData singleSubscribedSubredditData,
                                               InsertSubscribedThingListener insertSubscribedThingListener) {
         executor.execute(() -> {
-            String accountName = singleSubscribedSubredditData.getUsername();
-            if (redditDataRoomDatabase.accountDao().getAccountData(accountName) == null) {
-                handler.post(insertSubscribedThingListener::insertSuccess);
-                return;
-            }
+            try {
+                String accountName = singleSubscribedSubredditData.getUsername();
+                AccountDao accountDao = redditDataRoomDatabase.accountDao();
+                if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                    if (!accountDao.isAnonymousAccountInserted()) {
+                        accountDao.insert(Account.getAnonymousAccount());
+                    }
+                } else if (accountDao.getAccountData(accountName) == null) {
+                    handler.post(insertSubscribedThingListener::insertSuccess);
+                    return;
+                }
 
-            redditDataRoomDatabase.subscribedSubredditDao().insert(singleSubscribedSubredditData);
-            handler.post(insertSubscribedThingListener::insertSuccess);
+                redditDataRoomDatabase.subscribedSubredditDao().insert(singleSubscribedSubredditData);
+                handler.post(insertSubscribedThingListener::insertSuccess);
+            } catch (SQLiteConstraintException e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -99,14 +119,23 @@ public class InsertSubscribedThings {
                                               SubscribedUserData singleSubscribedUserData,
                                               InsertSubscribedThingListener insertSubscribedThingListener) {
         executor.execute(() -> {
-            String accountName = singleSubscribedUserData.getUsername();
-            if (redditDataRoomDatabase.accountDao().getAccountData(accountName) == null) {
-                handler.post(insertSubscribedThingListener::insertSuccess);
-                return;
-            }
+            try {
+                String accountName = singleSubscribedUserData.getUsername();
+                AccountDao accountDao = redditDataRoomDatabase.accountDao();
+                if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                    if (!accountDao.isAnonymousAccountInserted()) {
+                        accountDao.insert(Account.getAnonymousAccount());
+                    }
+                } else if (accountDao.getAccountData(accountName) == null) {
+                    handler.post(insertSubscribedThingListener::insertSuccess);
+                    return;
+                }
 
-            redditDataRoomDatabase.subscribedUserDao().insert(singleSubscribedUserData);
-            handler.post(insertSubscribedThingListener::insertSuccess);
+                redditDataRoomDatabase.subscribedUserDao().insert(singleSubscribedUserData);
+                handler.post(insertSubscribedThingListener::insertSuccess);
+            } catch (SQLiteConstraintException e) {
+                e.printStackTrace();
+            }
         });
     }
 

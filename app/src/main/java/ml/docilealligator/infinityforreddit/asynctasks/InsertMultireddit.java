@@ -1,5 +1,6 @@
 package ml.docilealligator.infinityforreddit.asynctasks;
 
+import android.database.sqlite.SQLiteConstraintException;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
@@ -11,6 +12,7 @@ import java.util.concurrent.Executor;
 
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.account.Account;
+import ml.docilealligator.infinityforreddit.account.AccountDao;
 import ml.docilealligator.infinityforreddit.multireddit.AnonymousMultiredditSubreddit;
 import ml.docilealligator.infinityforreddit.multireddit.MultiReddit;
 import ml.docilealligator.infinityforreddit.multireddit.MultiRedditDao;
@@ -21,21 +23,35 @@ public class InsertMultireddit {
                                           ArrayList<MultiReddit> multiReddits, @NonNull String accountName,
                                           InsertMultiRedditListener insertMultiRedditListener) {
         executor.execute(() -> {
-            MultiRedditDao multiRedditDao = redditDataRoomDatabase.multiRedditDao();
-            List<MultiReddit> existingMultiReddits = multiRedditDao.getAllMultiRedditsList(accountName);
-            Collections.sort(multiReddits, (multiReddit, t1) -> multiReddit.getName().compareToIgnoreCase(t1.getName()));
-            List<String> deletedMultiredditNames = new ArrayList<>();
-            compareTwoMultiRedditList(multiReddits, existingMultiReddits, deletedMultiredditNames);
+            try {
+                AccountDao accountDao = redditDataRoomDatabase.accountDao();
+                if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                    if (!accountDao.isAnonymousAccountInserted()) {
+                        accountDao.insert(Account.getAnonymousAccount());
+                    }
+                } else if (accountDao.getAccountData(accountName) == null) {
+                    handler.post(insertMultiRedditListener::success);
+                    return;
+                }
 
-            for (String deleted : deletedMultiredditNames) {
-                multiRedditDao.deleteMultiReddit(deleted, accountName);
+                MultiRedditDao multiRedditDao = redditDataRoomDatabase.multiRedditDao();
+                List<MultiReddit> existingMultiReddits = multiRedditDao.getAllMultiRedditsList(accountName);
+                Collections.sort(multiReddits, (multiReddit, t1) -> multiReddit.getName().compareToIgnoreCase(t1.getName()));
+                List<String> deletedMultiredditNames = new ArrayList<>();
+                compareTwoMultiRedditList(multiReddits, existingMultiReddits, deletedMultiredditNames);
+
+                for (String deleted : deletedMultiredditNames) {
+                    multiRedditDao.deleteMultiReddit(deleted, accountName);
+                }
+
+                for (MultiReddit multiReddit : multiReddits) {
+                    multiRedditDao.insert(multiReddit);
+                }
+
+                handler.post(insertMultiRedditListener::success);
+            } catch (SQLiteConstraintException e) {
+                e.printStackTrace();
             }
-
-            for (MultiReddit multiReddit : multiReddits) {
-                multiRedditDao.insert(multiReddit);
-            }
-
-            handler.post(insertMultiRedditListener::success);
         });
     }
 
@@ -43,17 +59,32 @@ public class InsertMultireddit {
                                          MultiReddit multiReddit,
                                          InsertMultiRedditListener insertMultiRedditListener) {
         executor.execute(() -> {
-            if (multiReddit.getOwner().equals(Account.ANONYMOUS_ACCOUNT)) {
-                ArrayList<AnonymousMultiredditSubreddit> allAnonymousMultiRedditSubreddits =
-                        (ArrayList<AnonymousMultiredditSubreddit>) redditDataRoomDatabase.anonymousMultiredditSubredditDao().getAllAnonymousMultiRedditSubreddits(multiReddit.getPath());
-                redditDataRoomDatabase.multiRedditDao().insert(multiReddit);
-                if (allAnonymousMultiRedditSubreddits != null) {
-                    redditDataRoomDatabase.anonymousMultiredditSubredditDao().insertAll(allAnonymousMultiRedditSubreddits);
+            try {
+                String accountName = multiReddit.getOwner();
+                AccountDao accountDao = redditDataRoomDatabase.accountDao();
+                if (accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                    if (!accountDao.isAnonymousAccountInserted()) {
+                        accountDao.insert(Account.getAnonymousAccount());
+                    }
+                } else if (accountDao.getAccountData(accountName) == null) {
+                    handler.post(insertMultiRedditListener::success);
+                    return;
                 }
-            } else {
-                redditDataRoomDatabase.multiRedditDao().insert(multiReddit);
+
+                if (multiReddit.getOwner().equals(Account.ANONYMOUS_ACCOUNT)) {
+                    ArrayList<AnonymousMultiredditSubreddit> allAnonymousMultiRedditSubreddits =
+                            (ArrayList<AnonymousMultiredditSubreddit>) redditDataRoomDatabase.anonymousMultiredditSubredditDao().getAllAnonymousMultiRedditSubreddits(multiReddit.getPath());
+                    redditDataRoomDatabase.multiRedditDao().insert(multiReddit);
+                    if (allAnonymousMultiRedditSubreddits != null) {
+                        redditDataRoomDatabase.anonymousMultiredditSubredditDao().insertAll(allAnonymousMultiRedditSubreddits);
+                    }
+                } else {
+                    redditDataRoomDatabase.multiRedditDao().insert(multiReddit);
+                }
+                handler.post(insertMultiRedditListener::success);
+            } catch (SQLiteConstraintException e) {
+                e.printStackTrace();
             }
-            handler.post(insertMultiRedditListener::success);
         });
     }
 
