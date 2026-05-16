@@ -76,7 +76,7 @@ public abstract class RedditDataRoomDatabase extends RoomDatabase {
                     @Override
                     public void onCreate(@NonNull SupportSQLiteDatabase db) {
                         super.onCreate(db);
-                        db.execSQL("INSERT INTO accounts(username, karma, is_current_user) VALUES (\"-\", 0, 0)");
+                        db.execSQL("INSERT INTO accounts(username, karma, is_current_user, is_mod) VALUES (\"-\", 0, 0, 0)");
                     }
                 })
                 .fallbackToDestructiveMigration()
