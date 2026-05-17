@@ -34,7 +34,6 @@ import ml.docilealligator.infinityforreddit.databinding.FragmentCommentMoreBotto
 import ml.docilealligator.infinityforreddit.Infinity;
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
-import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityNotificationManager;
 import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityUtils;
 import ml.docilealligator.infinityforreddit.utils.ShareScreenshotUtilsKt;
 import ml.docilealligator.infinityforreddit.utils.Utils;
@@ -132,11 +131,11 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                 FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(comment.getId());
                 if (followedThing != null) {
                     mRedditDataRoomDatabase.followedThingDao().deleteById(comment.getId());
-                    new Thread(() -> {
-                        if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
-                            LiveActivityNotificationManager.cancelNotification(activity);
-                        }
-                    }).start();
+                    if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
+                        LiveActivityUtils.cancelWorker(activity);
+                    } else {
+                        LiveActivityUtils.triggerImmediateUpdate(activity);
+                    }
                     activity.runOnUiThread(() -> Toast.makeText(activity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
                 } else {
                     activity.getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
@@ -152,7 +151,6 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                             FollowedThing.TYPE_COMMENT, comment.getCommentRawText(), comment.getSubredditName(), 
                             comment.getLinkId(), comment.getScore(), comment.getChildCount(), activity.accountName, System.currentTimeMillis(), expirationTime);
                     mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
-                    LiveActivityNotificationManager.updateNotification(activity, newFollowedThing, null);
                     LiveActivityUtils.scheduleWorker(activity);
                     LiveActivityUtils.triggerImmediateUpdate(activity);
                     activity.runOnUiThread(() -> Toast.makeText(activity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());

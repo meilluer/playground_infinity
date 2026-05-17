@@ -36,7 +36,6 @@ import retrofit2.Retrofit;
 import ml.docilealligator.infinityforreddit.R;
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
-import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityNotificationManager;
 import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityUtils;
 import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityWorker;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
@@ -151,11 +150,11 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                     FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(mPost.getId());
                     if (followedThing != null) {
                         mRedditDataRoomDatabase.followedThingDao().deleteById(mPost.getId());
-                        new Thread(() -> {
-                            if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
-                                LiveActivityNotificationManager.cancelNotification(mBaseActivity);
-                            }
-                        }).start();
+                        if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
+                            LiveActivityUtils.cancelWorker(mBaseActivity);
+                        } else {
+                            LiveActivityUtils.triggerImmediateUpdate(mBaseActivity);
+                        }
                         mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
                     } else {
                         mBaseActivity.getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
@@ -171,7 +170,6 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                                 FollowedThing.TYPE_POST, mPost.getTitle(), mPost.getSubredditName(), 
                                 null, mPost.getScore(), mPost.getNComments(), mBaseActivity.accountName, System.currentTimeMillis(), expirationTime);
                         mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
-                        LiveActivityNotificationManager.updateNotification(mBaseActivity, newFollowedThing, null);
                         LiveActivityUtils.scheduleWorker(mBaseActivity);
                         LiveActivityUtils.triggerImmediateUpdate(mBaseActivity);
                         mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());

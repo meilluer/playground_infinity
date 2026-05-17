@@ -21,5 +21,7 @@ public class NotificationPreferenceFragment extends CustomFontPreferenceFragment
             LiveActivityUtils.scheduleWorker(requireContext());
             return true;
         });
+
+        findPreference("live_activity_follow_duration").setOnPreferenceChangeListener((preference, newValue) -> true);
     }
 }

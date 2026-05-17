@@ -4,31 +4,36 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import androidx.preference.PreferenceManager;
-import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkManager;
 
 import java.util.concurrent.TimeUnit;
 
 public class LiveActivityUtils {
+    private static OneTimeWorkRequest buildWorkerRequest(long delayMinutes) {
+        OneTimeWorkRequest.Builder builder = new OneTimeWorkRequest.Builder(LiveActivityWorker.class);
+        if (delayMinutes > 0) {
+            builder.setInitialDelay(delayMinutes, TimeUnit.MINUTES);
+        }
+        return builder.build();
+    }
+
     public static void scheduleWorker(Context context) {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         boolean enabled = sharedPreferences.getBoolean("enable_live_activity", false);
-        if (enabled) {
-            String intervalStr = sharedPreferences.getString("live_activity_refresh_interval", "15");
-            int interval = Integer.parseInt(intervalStr);
-            
-            PeriodicWorkRequest workRequest = new PeriodicWorkRequest.Builder(LiveActivityWorker.class, interval, TimeUnit.MINUTES)
-                    .build();
-            
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
-                    LiveActivityWorker.UNIQUE_WORKER_NAME,
-                    ExistingPeriodicWorkPolicy.REPLACE,
-                    workRequest);
-        } else {
+        if (!enabled) {
             cancelWorker(context);
+            return;
         }
+
+        String intervalStr = sharedPreferences.getString("live_activity_refresh_interval", "15");
+        long interval = Long.parseLong(intervalStr);
+
+        WorkManager.getInstance(context).enqueueUniqueWork(
+                LiveActivityWorker.UNIQUE_WORKER_NAME,
+                ExistingWorkPolicy.REPLACE,
+                buildWorkerRequest(interval));
     }
 
     public static void cancelWorker(Context context) {
@@ -37,6 +42,9 @@ public class LiveActivityUtils {
     }
 
     public static void triggerImmediateUpdate(Context context) {
-        WorkManager.getInstance(context).enqueue(OneTimeWorkRequest.from(LiveActivityWorker.class));
+        WorkManager.getInstance(context).enqueueUniqueWork(
+                LiveActivityWorker.UNIQUE_WORKER_NAME,
+                ExistingWorkPolicy.REPLACE,
+                buildWorkerRequest(0));
     }
 }

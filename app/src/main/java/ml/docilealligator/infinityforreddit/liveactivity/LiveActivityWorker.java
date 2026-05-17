@@ -23,7 +23,6 @@ import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.apis.RedditAPI;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.JSONUtils;
-import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
@@ -62,122 +61,142 @@ public class LiveActivityWorker extends Worker {
         }
 
         List<FollowedThing> followedThings = mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings();
-        boolean changed = false;
+        boolean removedExpiredThings = false;
         long currentTime = System.currentTimeMillis();
         for (FollowedThing thing : followedThings) {
             if (thing.getExpirationTime() != 0 && thing.getExpirationTime() < currentTime) {
                 mRedditDataRoomDatabase.followedThingDao().deleteById(thing.getId());
-                changed = true;
+                removedExpiredThings = true;
             }
         }
 
-        if (changed) {
+        if (removedExpiredThings) {
             followedThings = mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings();
         }
 
         if (followedThings.isEmpty()) {
-            LiveActivityNotificationManager.cancelNotification(context);
             LiveActivityUtils.cancelWorker(context);
             return Result.success();
         }
 
-        // For now, we only support one live activity at a time (the most recently updated one)
-        // Or we could show a summary. But the user said "on status bar show upvotes and total comment count", 
-        // which implies a single item or a very compact summary.
-        // Let's take the first one for simplicity, or we can improve this later.
-        FollowedThing thing = followedThings.get(0);
+        FollowedThing headlineThing = null;
+        String topContent = null;
 
         try {
-            Account account = mRedditDataRoomDatabase.accountDao().getAccountData(thing.getAccountName());
-            boolean isAnonymous = account == null || account.getAccountName().equals(Account.ANONYMOUS_ACCOUNT);
-            RedditAPI redditAPI;
-            if (!isAnonymous) {
-                redditAPI = mOauthWithoutAuthenticatorRetrofit.create(RedditAPI.class);
-            } else {
-                redditAPI = mRetrofit.create(RedditAPI.class);
-            }
+            for (FollowedThing thing : followedThings) {
+                Account account = mRedditDataRoomDatabase.accountDao().getAccountData(thing.getAccountName());
+                boolean isAnonymous = account == null || account.getAccountName().equals(Account.ANONYMOUS_ACCOUNT);
+                RedditAPI redditAPI = isAnonymous
+                        ? mRetrofit.create(RedditAPI.class)
+                        : mOauthWithoutAuthenticatorRetrofit.create(RedditAPI.class);
 
-            Response<String> response;
-            if (!isAnonymous) {
-                response = redditAPI.getInfoOauth(thing.getFullName(), APIUtils.getOAuthHeader(account.getAccessToken())).execute();
-            } else {
-                response = redditAPI.getInfo(thing.getFullName()).execute();
-            }
+                Response<String> response = isAnonymous
+                        ? redditAPI.getInfo(thing.getFullName()).execute()
+                        : redditAPI.getInfoOauth(thing.getFullName(), APIUtils.getOAuthHeader(account.getAccessToken())).execute();
 
-            if (response.isSuccessful() && response.body() != null) {
+                if (!response.isSuccessful() || response.body() == null) {
+                    continue;
+                }
+
                 JSONObject jsonResponse = new JSONObject(response.body());
                 JSONArray children = jsonResponse.getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
-                if (children.length() > 0) {
-                    JSONObject data = children.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
-                    thing.setScore(data.getInt("score"));
-                    if (thing.getType() == FollowedThing.TYPE_POST) {
-                        thing.setCommentCount(data.getInt("num_comments"));
-                    }
-                    thing.setLastUpdated(System.currentTimeMillis());
+                if (children.length() <= 0) {
+                    continue;
+                }
 
-                    String topContent = null;
-                    if (thing.getType() == FollowedThing.TYPE_POST) {
-                        // Fetch latest comment for post
-                        Response<String> commentResponse;
-                        if (!isAnonymous) {
-                            commentResponse = redditAPI.getPostOauth(thing.getId(), APIUtils.getOAuthHeader(account.getAccessToken())).execute();
-                        } else {
-                            commentResponse = redditAPI.getPost(thing.getId()).execute();
-                        }
-                        if (commentResponse.isSuccessful() && commentResponse.body() != null) {
-                            JSONArray commentArray = new JSONArray(commentResponse.body());
-                            JSONArray comments = commentArray.getJSONObject(1).getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
-                            if (comments.length() > 0) {
-                                JSONObject latestComment = comments.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
-                                if (latestComment.has("body")) {
-                                    topContent = latestComment.getString("body");
-                                }
-                            }
-                        }
-                    } else if (thing.getType() == FollowedThing.TYPE_COMMENT) {
-                        // Fetch latest reply for comment
-                        Response<String> commentResponse;
-                        String postId = thing.getLinkId();
-                        if (postId.startsWith("t3_")) {
-                            postId = postId.substring(3);
-                        }
-                        if (!isAnonymous) {
-                            commentResponse = redditAPI.getPostOauth(postId, APIUtils.getOAuthHeader(account.getAccessToken())).execute();
-                        } else {
-                            commentResponse = redditAPI.getPost(postId).execute();
-                        }
-                        if (commentResponse.isSuccessful() && commentResponse.body() != null) {
-                            JSONArray commentArray = new JSONArray(commentResponse.body());
-                            JSONArray comments = commentArray.getJSONObject(1).getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
-                            JSONObject targetComment = findCommentById(comments, thing.getFullName());
-                            if (targetComment != null && targetComment.has("replies") && !targetComment.isNull("replies")) {
-                                JSONObject repliesData = targetComment.getJSONObject("replies").getJSONObject(JSONUtils.DATA_KEY);
-                                JSONArray replies = repliesData.getJSONArray(JSONUtils.CHILDREN_KEY);
-                                thing.setCommentCount(replies.length());
-                                if (replies.length() > 0) {
-                                    JSONObject latestReply = replies.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
-                                    if (latestReply.has("body")) {
-                                        topContent = latestReply.getString("body");
-                                    }
-                                }
-                            } else {
-                                thing.setCommentCount(0);
-                            }
-                        }
-                    }
-                    
-                    mRedditDataRoomDatabase.followedThingDao().update(thing);
+                JSONObject data = children.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
+                thing.setScore(data.getInt("score"));
+                if (thing.getType() == FollowedThing.TYPE_POST) {
+                    thing.setCommentCount(data.getInt("num_comments"));
+                }
+                thing.setLastUpdated(System.currentTimeMillis());
 
-                    LiveActivityNotificationManager.updateNotification(context, thing, topContent);
+                String itemTopContent = null;
+                if (thing.getType() == FollowedThing.TYPE_POST) {
+                    itemTopContent = fetchLatestPostComment(redditAPI, isAnonymous, account, thing.getId());
+                } else {
+                    CommentReplySnapshot replySnapshot = fetchLatestCommentReply(redditAPI, isAnonymous, account, thing);
+                    thing.setCommentCount(replySnapshot.replyCount);
+                    itemTopContent = replySnapshot.latestReplyBody;
+                }
+
+                mRedditDataRoomDatabase.followedThingDao().update(thing);
+
+                if (headlineThing == null || thing.getLastUpdated() > headlineThing.getLastUpdated()) {
+                    headlineThing = thing;
+                    topContent = itemTopContent;
                 }
             }
-
         } catch (IOException | JSONException e) {
             e.printStackTrace();
-            return Result.retry();
+            LiveActivityUtils.scheduleWorker(context);
+            return Result.success();
         }
 
+        List<FollowedThing> updatedFollowedThings = mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings();
+        if (updatedFollowedThings.isEmpty()) {
+            LiveActivityUtils.cancelWorker(context);
+            return Result.success();
+        }
+
+        if (headlineThing == null) {
+            headlineThing = updatedFollowedThings.get(0);
+        }
+
+        LiveActivityNotificationManager.updateNotification(context, updatedFollowedThings, headlineThing, topContent);
+        LiveActivityUtils.scheduleWorker(context);
         return Result.success();
+    }
+
+    private String fetchLatestPostComment(RedditAPI redditAPI, boolean isAnonymous, Account account, String postId)
+            throws IOException, JSONException {
+        Response<String> commentResponse = isAnonymous
+                ? redditAPI.getPost(postId).execute()
+                : redditAPI.getPostOauth(postId, APIUtils.getOAuthHeader(account.getAccessToken())).execute();
+        if (!commentResponse.isSuccessful() || commentResponse.body() == null) {
+            return null;
+        }
+
+        JSONArray commentArray = new JSONArray(commentResponse.body());
+        JSONArray comments = commentArray.getJSONObject(1).getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
+        if (comments.length() <= 0) {
+            return null;
+        }
+
+        JSONObject latestComment = comments.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
+        return latestComment.has("body") ? latestComment.getString("body") : null;
+    }
+
+    private CommentReplySnapshot fetchLatestCommentReply(RedditAPI redditAPI, boolean isAnonymous, Account account,
+                                                         FollowedThing thing) throws IOException, JSONException {
+        String postId = thing.getLinkId();
+        if (postId.startsWith("t3_")) {
+            postId = postId.substring(3);
+        }
+
+        Response<String> commentResponse = isAnonymous
+                ? redditAPI.getPost(postId).execute()
+                : redditAPI.getPostOauth(postId, APIUtils.getOAuthHeader(account.getAccessToken())).execute();
+        if (!commentResponse.isSuccessful() || commentResponse.body() == null) {
+            return new CommentReplySnapshot(thing.getCommentCount(), null);
+        }
+
+        JSONArray commentArray = new JSONArray(commentResponse.body());
+        JSONArray comments = commentArray.getJSONObject(1).getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
+        JSONObject targetComment = findCommentById(comments, thing.getFullName());
+        if (targetComment == null || !targetComment.has("replies") || targetComment.isNull("replies")) {
+            return new CommentReplySnapshot(0, null);
+        }
+
+        JSONObject repliesData = targetComment.getJSONObject("replies").getJSONObject(JSONUtils.DATA_KEY);
+        JSONArray replies = repliesData.getJSONArray(JSONUtils.CHILDREN_KEY);
+        if (replies.length() <= 0) {
+            return new CommentReplySnapshot(0, null);
+        }
+
+        JSONObject latestReply = replies.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
+        String latestReplyBody = latestReply.has("body") ? latestReply.getString("body") : null;
+        return new CommentReplySnapshot(replies.length(), latestReplyBody);
     }
 
     private JSONObject findCommentById(JSONArray comments, String fullName) throws JSONException {
@@ -199,5 +218,15 @@ public class LiveActivityWorker extends Worker {
             }
         }
         return null;
+    }
+
+    private static class CommentReplySnapshot {
+        final int replyCount;
+        final String latestReplyBody;
+
+        CommentReplySnapshot(int replyCount, String latestReplyBody) {
+            this.replyCount = replyCount;
+            this.latestReplyBody = latestReplyBody;
+        }
     }
 }
