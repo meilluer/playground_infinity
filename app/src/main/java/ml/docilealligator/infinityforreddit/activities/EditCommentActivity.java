@@ -61,6 +61,8 @@ import ml.docilealligator.infinityforreddit.databinding.ActivityEditCommentBindi
 import ml.docilealligator.infinityforreddit.events.SwitchAccountEvent;
 import ml.docilealligator.infinityforreddit.markdown.RichTextJSONConverter;
 import ml.docilealligator.infinityforreddit.repositories.EditCommentActivityRepository;
+import ml.docilealligator.infinityforreddit.subreddit.FetchSubredditData;
+import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
 import ml.docilealligator.infinityforreddit.thing.GiphyGif;
 import ml.docilealligator.infinityforreddit.thing.MediaMetadata;
 import ml.docilealligator.infinityforreddit.thing.UploadedImage;
@@ -77,6 +79,7 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
 
     public static final String EXTRA_CONTENT = "EC";
     public static final String EXTRA_FULLNAME = "EF";
+    public static final String EXTRA_SUBREDDIT_NAME = "ESN";
     public static final String EXTRA_MEDIA_METADATA_LIST = "EMML";
     public static final String EXTRA_POSITION = "EP";
     public static final String RETURN_EXTRA_EDITED_COMMENT = "REEC";
@@ -112,9 +115,13 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
     private String mAccessToken;
     private String mCommentContent;
     private boolean isSubmitting = false;
+    private String subredditName;
     private Uri capturedImageUri;
     private ArrayList<UploadedImage> uploadedImages = new ArrayList<>();
     private GiphyGif giphyGif;
+    private boolean isCommentImageEnabled = true;
+    private boolean isCommentGifEnabled = true;
+    private MarkdownBottomBarRecyclerViewAdapter adapter;
     private ActivityEditCommentBinding binding;
     public EditCommentActivityViewModel editCommentActivityViewModel;
 
@@ -169,6 +176,7 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mFullName = getIntent().getStringExtra(EXTRA_FULLNAME);
+        subredditName = getIntent().getStringExtra(EXTRA_SUBREDDIT_NAME);
         mAccessToken = mCurrentAccountSharedPreferences.getString(SharedPreferencesUtils.ACCESS_TOKEN, null);
         mCommentContent = getIntent().getStringExtra(EXTRA_CONTENT);
         ArrayList<MediaMetadata> mediaMetadataList = getIntent().getParcelableArrayListExtra(EXTRA_MEDIA_METADATA_LIST);
@@ -197,7 +205,7 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
             giphyGif = savedInstanceState.getParcelable(GIPHY_GIF_STATE);
         }
 
-        MarkdownBottomBarRecyclerViewAdapter adapter = new MarkdownBottomBarRecyclerViewAdapter(
+        adapter = new MarkdownBottomBarRecyclerViewAdapter(
                 mCustomThemeWrapper, true, true, new MarkdownBottomBarRecyclerViewAdapter.ItemClickListener() {
             @Override
             public void onClick(int item) {
@@ -225,6 +233,26 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
         binding.markdownBottomBarRecyclerViewEditCommentActivity.setLayoutManager(new LinearLayoutManagerBugFixed(this,
                 LinearLayoutManager.HORIZONTAL, true).setStackFromEndAndReturnCurrentObject());
         binding.markdownBottomBarRecyclerViewEditCommentActivity.setAdapter(adapter);
+        updateCommentMediaToolbarState();
+
+        if (subredditName != null && !subredditName.isEmpty()) {
+            FetchSubredditData.fetchSubredditData(mExecutor, new Handler(), mOauthRetrofit, null,
+                    subredditName, mAccessToken, new FetchSubredditData.FetchSubredditDataListener() {
+                        @Override
+                        public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
+                            isCommentImageEnabled = subredditData.isCommentImagesEnabled();
+                            isCommentGifEnabled = subredditData.isCommentGifsEnabled();
+                            updateCommentMediaToolbarState();
+                        }
+
+                        @Override
+                        public void onFetchSubredditDataFail(boolean isQuarantined) {
+                            isCommentImageEnabled = true;
+                            isCommentGifEnabled = true;
+                            updateCommentMediaToolbarState();
+                        }
+                    });
+        }
 
         binding.commentEditTextEditCommentActivity.requestFocus();
         Utils.showKeyboard(this, new Handler(), binding.commentEditTextEditCommentActivity);
@@ -298,6 +326,13 @@ public class EditCommentActivity extends BaseActivity implements UploadImageEnab
     protected void onPause() {
         super.onPause();
         Utils.hideKeyboard(this);
+    }
+
+    private void updateCommentMediaToolbarState() {
+        if (adapter != null) {
+            adapter.setUploadImageEnabled(isCommentImageEnabled);
+            adapter.setGiphyGifEnabled(isCommentGifEnabled);
+        }
     }
 
     @Override

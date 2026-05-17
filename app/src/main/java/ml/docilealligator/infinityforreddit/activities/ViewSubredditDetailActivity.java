@@ -874,7 +874,26 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
     }
 
     private void showPostTypeBottomSheet() {
-        PostTypeBottomSheetFragment postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
+        PostTypeBottomSheetFragment postTypeBottomSheetFragment;
+        if (mFetchSubredditInfoSuccess && mSubredditData != null) {
+            String submissionType = mSubredditData.getSubmissionType();
+            boolean allowSelfPosts = !"link".equalsIgnoreCase(submissionType);
+            boolean allowLinkPosts = !"self".equalsIgnoreCase(submissionType);
+            boolean allowImagePosts = allowLinkPosts && mSubredditData.isAllowImages();
+            boolean allowVideoPosts = allowLinkPosts && mSubredditData.isAllowVideos();
+            boolean allowGalleryPosts = allowLinkPosts && mSubredditData.isAllowImages() && mSubredditData.isAllowGalleries();
+            boolean allowPollPosts = allowSelfPosts && mSubredditData.isAllowPolls();
+            postTypeBottomSheetFragment = PostTypeBottomSheetFragment.newInstance(
+                    allowSelfPosts,
+                    allowLinkPosts,
+                    allowImagePosts,
+                    allowVideoPosts,
+                    allowGalleryPosts,
+                    allowPollPosts
+            );
+        } else {
+            postTypeBottomSheetFragment = new PostTypeBottomSheetFragment();
+        }
         postTypeBottomSheetFragment.show(getSupportFragmentManager(), postTypeBottomSheetFragment.getTag());
     }
 

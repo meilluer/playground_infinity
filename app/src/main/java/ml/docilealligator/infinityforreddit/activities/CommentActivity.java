@@ -96,6 +96,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import ml.docilealligator.infinityforreddit.adapters.SubredditAutocompleteRecyclerViewAdapter;
+import ml.docilealligator.infinityforreddit.subreddit.FetchSubredditData;
 import ml.docilealligator.infinityforreddit.subreddit.SubredditData;
 
 public class CommentActivity extends BaseActivity implements UploadImageEnabledActivity,
@@ -154,6 +155,9 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
     private Menu mMenu;
     private MarkdownBottomBarRecyclerViewAdapter markdownBottomBarRecyclerViewAdapter;
     public CommentActivityViewModel commentActivityViewModel;
+    private String subredditName;
+    private boolean isCommentImageEnabled = true;
+    private boolean isCommentGifEnabled = true;
 
     /**
      * Post or comment body text color
@@ -192,6 +196,7 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
 
         Intent intent = getIntent();
         isReplying = intent.getExtras().getBoolean(EXTRA_IS_REPLYING_KEY);
+        subredditName = intent.getStringExtra(EXTRA_SUBREDDIT_NAME_KEY);
         applyCustomTheme();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -384,6 +389,26 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
         binding.commentMarkdownBottomBarRecyclerView.setLayoutManager(new LinearLayoutManagerBugFixed(this,
                 LinearLayoutManagerBugFixed.HORIZONTAL, true).setStackFromEndAndReturnCurrentObject());
         binding.commentMarkdownBottomBarRecyclerView.setAdapter(markdownBottomBarRecyclerViewAdapter);
+        updateCommentMediaToolbarState();
+
+        if (subredditName != null && !subredditName.isEmpty()) {
+            FetchSubredditData.fetchSubredditData(mExecutor, new Handler(), mOauthRetrofit, mRetrofit,
+                    subredditName, accessToken, new FetchSubredditData.FetchSubredditDataListener() {
+                        @Override
+                        public void onFetchSubredditDataSuccess(SubredditData subredditData, int nCurrentOnlineSubscribers) {
+                            isCommentImageEnabled = subredditData.isCommentImagesEnabled();
+                            isCommentGifEnabled = subredditData.isCommentGifsEnabled();
+                            updateCommentMediaToolbarState();
+                        }
+
+                        @Override
+                        public void onFetchSubredditDataFail(boolean isQuarantined) {
+                            isCommentImageEnabled = true;
+                            isCommentGifEnabled = true;
+                            updateCommentMediaToolbarState();
+                        }
+                    });
+        }
 
         binding.commentAccountLinearLayout.setOnClickListener(view -> {
             AccountChooserBottomSheetFragment fragment = new AccountChooserBottomSheetFragment();
@@ -453,6 +478,13 @@ public class CommentActivity extends BaseActivity implements UploadImageEnabledA
         outState.putParcelable(SELECTED_ACCOUNT_STATE, selectedAccount);
         outState.putParcelableArrayList(UPLOADED_IMAGES_STATE, uploadedImages);
         outState.putParcelable(GIPHY_GIF_STATE, giphyGif);
+    }
+
+    private void updateCommentMediaToolbarState() {
+        if (markdownBottomBarRecyclerViewAdapter != null) {
+            markdownBottomBarRecyclerViewAdapter.setUploadImageEnabled(isCommentImageEnabled);
+            markdownBottomBarRecyclerViewAdapter.setGiphyGifEnabled(isCommentGifEnabled);
+        }
     }
 
     @Override

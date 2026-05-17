@@ -29,8 +29,29 @@ public class PostTypeBottomSheetFragment extends LandscapeExpandedRoundedBottomS
     public static final int TYPE_VIDEO = 3;
     public static final int TYPE_GALLERY = 4;
     public static final int TYPE_POLL = 5;
+    private static final String EXTRA_ALLOW_TEXT = "EAT";
+    private static final String EXTRA_ALLOW_LINK = "EAL";
+    private static final String EXTRA_ALLOW_IMAGE = "EAI";
+    private static final String EXTRA_ALLOW_VIDEO = "EAV";
+    private static final String EXTRA_ALLOW_GALLERY = "EAG";
+    private static final String EXTRA_ALLOW_POLL = "EAP";
 
     private BaseActivity activity;
+
+    public static PostTypeBottomSheetFragment newInstance(boolean allowText, boolean allowLink,
+                                                          boolean allowImage, boolean allowVideo,
+                                                          boolean allowGallery, boolean allowPoll) {
+        PostTypeBottomSheetFragment fragment = new PostTypeBottomSheetFragment();
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(EXTRA_ALLOW_TEXT, allowText);
+        bundle.putBoolean(EXTRA_ALLOW_LINK, allowLink);
+        bundle.putBoolean(EXTRA_ALLOW_IMAGE, allowImage);
+        bundle.putBoolean(EXTRA_ALLOW_VIDEO, allowVideo);
+        bundle.putBoolean(EXTRA_ALLOW_GALLERY, allowGallery);
+        bundle.putBoolean(EXTRA_ALLOW_POLL, allowPoll);
+        fragment.setArguments(bundle);
+        return fragment;
+    }
 
     public PostTypeBottomSheetFragment() {
         // Required empty public constructor
@@ -40,11 +61,25 @@ public class PostTypeBottomSheetFragment extends LandscapeExpandedRoundedBottomS
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         FragmentPostTypeBottomSheetBinding binding = FragmentPostTypeBottomSheetBinding.inflate(inflater, container, false);
+        Bundle arguments = getArguments();
+        boolean allowText = arguments == null || arguments.getBoolean(EXTRA_ALLOW_TEXT, true);
+        boolean allowLink = arguments == null || arguments.getBoolean(EXTRA_ALLOW_LINK, true);
+        boolean allowImage = arguments == null || arguments.getBoolean(EXTRA_ALLOW_IMAGE, true);
+        boolean allowVideo = arguments == null || arguments.getBoolean(EXTRA_ALLOW_VIDEO, true);
+        boolean allowGallery = arguments == null || arguments.getBoolean(EXTRA_ALLOW_GALLERY, true);
+        boolean allowPoll = arguments == null || arguments.getBoolean(EXTRA_ALLOW_POLL, true);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
                 && (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) != Configuration.UI_MODE_NIGHT_YES) {
             binding.getRoot().setSystemUiVisibility(View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
         }
+
+        binding.textTypeLinearLayoutPostTypeBottomSheetFragment.setVisibility(allowText ? View.VISIBLE : View.GONE);
+        binding.linkTypeLinearLayoutPostTypeBottomSheetFragment.setVisibility(allowLink ? View.VISIBLE : View.GONE);
+        binding.imageTypeLinearLayoutPostTypeBottomSheetFragment.setVisibility(allowImage ? View.VISIBLE : View.GONE);
+        binding.videoTypeLinearLayoutPostTypeBottomSheetFragment.setVisibility(allowVideo ? View.VISIBLE : View.GONE);
+        binding.galleryTypeLinearLayoutPostTypeBottomSheetFragment.setVisibility(allowGallery ? View.VISIBLE : View.GONE);
+        binding.pollTypeLinearLayoutPostTypeBottomSheetFragment.setVisibility(allowPoll ? View.VISIBLE : View.GONE);
 
         binding.textTypeLinearLayoutPostTypeBottomSheetFragment.setOnClickListener(view -> {
             ((PostTypeSelectionCallback) activity).postTypeSelected(TYPE_TEXT);

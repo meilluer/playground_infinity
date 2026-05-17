@@ -38,6 +38,8 @@ public class MarkdownBottomBarRecyclerViewAdapter extends RecyclerView.Adapter<R
     private final CustomThemeWrapper customThemeWrapper;
     private final boolean canUploadImage;
     private final boolean canSendGiphyGIf;
+    private boolean isUploadImageEnabled;
+    private boolean isGiphyGifEnabled;
     private final ItemClickListener itemClickListener;
 
     public interface ItemClickListener {
@@ -63,7 +65,23 @@ public class MarkdownBottomBarRecyclerViewAdapter extends RecyclerView.Adapter<R
         this.customThemeWrapper = customThemeWrapper;
         this.canUploadImage = canUploadImage;
         this.canSendGiphyGIf = canSendGiphyGif;
+        this.isUploadImageEnabled = canUploadImage;
+        this.isGiphyGifEnabled = canSendGiphyGif;
         this.itemClickListener = itemClickListener;
+    }
+
+    public void setUploadImageEnabled(boolean enabled) {
+        isUploadImageEnabled = enabled;
+        if (canUploadImage) {
+            notifyItemChanged(UPLOAD_IMAGE);
+        }
+    }
+
+    public void setGiphyGifEnabled(boolean enabled) {
+        isGiphyGifEnabled = enabled;
+        if (canUploadImage && canSendGiphyGIf) {
+            notifyItemChanged(GIPHY_GIF);
+        }
     }
 
     @NonNull
@@ -116,6 +134,14 @@ public class MarkdownBottomBarRecyclerViewAdapter extends RecyclerView.Adapter<R
                     ((MarkdownBottomBarItemViewHolder) holder).imageView.setImageResource(R.drawable.ic_gif_24dp);
                     break;
             }
+
+            boolean enabled = true;
+            if (position == UPLOAD_IMAGE) {
+                enabled = isUploadImageEnabled;
+            } else if (position == GIPHY_GIF) {
+                enabled = isGiphyGifEnabled;
+            }
+            ((MarkdownBottomBarItemViewHolder) holder).bindEnabledState(enabled);
         }
     }
 
@@ -336,15 +362,27 @@ public class MarkdownBottomBarRecyclerViewAdapter extends RecyclerView.Adapter<R
             itemView.setOnClickListener(view -> {
                 int position = getBindingAdapterPosition();
                 if (position == UPLOAD_IMAGE) {
+                    if (!isUploadImageEnabled) {
+                        return;
+                    }
                     itemClickListener.onUploadImage();
                 } else if (position == GIPHY_GIF) {
+                    if (!isGiphyGifEnabled) {
+                        return;
+                    }
                     itemClickListener.onSelectGiphyGif();
                 } else {
                     itemClickListener.onClick(position);
                 }
             });
 
-            imageView.setColorFilter(customThemeWrapper.getPrimaryIconColor(), android.graphics.PorterDuff.Mode.SRC_IN);
+            bindEnabledState(true);
+        }
+
+        void bindEnabledState(boolean enabled) {
+            int iconColor = enabled ? customThemeWrapper.getPrimaryIconColor() : customThemeWrapper.getSecondaryTextColor();
+            imageView.setColorFilter(iconColor, android.graphics.PorterDuff.Mode.SRC_IN);
+            itemView.setAlpha(enabled ? 1f : 0.45f);
         }
     }
 }

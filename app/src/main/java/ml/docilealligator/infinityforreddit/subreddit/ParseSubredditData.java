@@ -152,16 +152,22 @@ public class ParseSubredditData {
         boolean commentGifsEnabled = subredditDataJsonObject.optBoolean(JSONUtils.COMMENT_GIFS_ENABLED_KEY, false);
         boolean commentImagesEnabled = subredditDataJsonObject.optBoolean(JSONUtils.COMMENT_IMAGES_ENABLED_KEY, false);
 
-        if (subredditDataJsonObject.has(JSONUtils.ALLOWED_MEDIA_TYPES_KEY) && !subredditDataJsonObject.isNull(JSONUtils.ALLOWED_MEDIA_TYPES_KEY)) {
-            org.json.JSONArray allowedMediaTypes = subredditDataJsonObject.optJSONArray(JSONUtils.ALLOWED_MEDIA_TYPES_KEY);
+        org.json.JSONArray allowedMediaTypes = subredditDataJsonObject.optJSONArray(JSONUtils.ALLOWED_MEDIA_TYPES_KEY);
+        org.json.JSONObject commentContributionSettings = subredditDataJsonObject.optJSONObject("comment_contribution_settings");
+        if (commentContributionSettings != null) {
+            allowedMediaTypes = commentContributionSettings.optJSONArray(JSONUtils.ALLOWED_MEDIA_TYPES_KEY);
             if (allowedMediaTypes != null) {
-                for (int i = 0; i < allowedMediaTypes.length(); i++) {
-                    String type = allowedMediaTypes.optString(i);
-                    if (type.equalsIgnoreCase("giphy")) {
-                        commentGifsEnabled = true;
-                    } else if (type.equalsIgnoreCase("static")) {
-                        commentImagesEnabled = true;
-                    }
+                commentGifsEnabled = false;
+                commentImagesEnabled = false;
+            }
+        }
+        if (allowedMediaTypes != null) {
+            for (int i = 0; i < allowedMediaTypes.length(); i++) {
+                String type = allowedMediaTypes.optString(i);
+                if (type.equalsIgnoreCase("giphy") || type.equalsIgnoreCase("animated")) {
+                    commentGifsEnabled = true;
+                } else if (type.equalsIgnoreCase("static")) {
+                    commentImagesEnabled = true;
                 }
             }
         }
