@@ -24,10 +24,9 @@ public class FetchSubredditData {
                                           String subredditName, String accessToken,
                                           final FetchSubredditDataListener fetchSubredditDataListener) {
         executor.execute(() -> {
-            RedditAPI api = retrofit.create(RedditAPI.class);
-
             Call<String> subredditData;
             if (oauthRetrofit == null) {
+                RedditAPI api = retrofit.create(RedditAPI.class);
                 subredditData = api.getSubredditData(subredditName);
             } else {
                 RedditAPI oauthApi = oauthRetrofit.create(RedditAPI.class);
