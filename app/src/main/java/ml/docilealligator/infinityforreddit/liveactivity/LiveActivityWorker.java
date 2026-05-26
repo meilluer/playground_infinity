@@ -151,20 +151,24 @@ public class LiveActivityWorker extends Worker {
     private String fetchLatestPostComment(RedditAPI redditAPI, boolean isAnonymous, Account account, String postId)
             throws IOException, JSONException {
         Response<String> commentResponse = isAnonymous
-                ? redditAPI.getPost(postId).execute()
-                : redditAPI.getPostOauth(postId, APIUtils.getOAuthHeader(account.getAccessToken())).execute();
+                ? redditAPI.getPostWithSort(postId, "new").execute()
+                : redditAPI.getPostWithSortOauth(postId, "new", APIUtils.getOAuthHeader(account.getAccessToken())).execute();
         if (!commentResponse.isSuccessful() || commentResponse.body() == null) {
             return null;
         }
 
         JSONArray commentArray = new JSONArray(commentResponse.body());
         JSONArray comments = commentArray.getJSONObject(1).getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
-        if (comments.length() <= 0) {
-            return null;
+        
+        JSONObject latestComment = null;
+        for (int i = 0; i < comments.length(); i++) {
+            JSONObject commentObj = comments.getJSONObject(i);
+            if (commentObj.optString(JSONUtils.KIND_KEY, "").equals("t1")) {
+                latestComment = commentObj.getJSONObject(JSONUtils.DATA_KEY);
+                break;
+            }
         }
-
-        JSONObject latestComment = comments.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
-        return latestComment.has("body") ? latestComment.getString("body") : null;
+        return latestComment != null && latestComment.has("body") ? latestComment.getString("body") : null;
     }
 
     private CommentReplySnapshot fetchLatestCommentReply(RedditAPI redditAPI, boolean isAnonymous, Account account,
@@ -175,8 +179,8 @@ public class LiveActivityWorker extends Worker {
         }
 
         Response<String> commentResponse = isAnonymous
-                ? redditAPI.getPost(postId).execute()
-                : redditAPI.getPostOauth(postId, APIUtils.getOAuthHeader(account.getAccessToken())).execute();
+                ? redditAPI.getPostWithSort(postId, "new").execute()
+                : redditAPI.getPostWithSortOauth(postId, "new", APIUtils.getOAuthHeader(account.getAccessToken())).execute();
         if (!commentResponse.isSuccessful() || commentResponse.body() == null) {
             return new CommentReplySnapshot(thing.getCommentCount(), null);
         }
@@ -190,13 +194,25 @@ public class LiveActivityWorker extends Worker {
 
         JSONObject repliesData = targetComment.getJSONObject("replies").getJSONObject(JSONUtils.DATA_KEY);
         JSONArray replies = repliesData.getJSONArray(JSONUtils.CHILDREN_KEY);
-        if (replies.length() <= 0) {
-            return new CommentReplySnapshot(0, null);
+        
+        JSONObject latestReply = null;
+        double maxCreatedUtc = 0;
+        int replyCount = 0;
+        for (int i = 0; i < replies.length(); i++) {
+            JSONObject replyObj = replies.getJSONObject(i);
+            if (replyObj.optString(JSONUtils.KIND_KEY, "").equals("t1")) {
+                replyCount++;
+                JSONObject replyData = replyObj.getJSONObject(JSONUtils.DATA_KEY);
+                double createdUtc = replyData.optDouble("created_utc", 0);
+                if (latestReply == null || createdUtc > maxCreatedUtc) {
+                    latestReply = replyData;
+                    maxCreatedUtc = createdUtc;
+                }
+            }
         }
 
-        JSONObject latestReply = replies.getJSONObject(0).getJSONObject(JSONUtils.DATA_KEY);
-        String latestReplyBody = latestReply.has("body") ? latestReply.getString("body") : null;
-        return new CommentReplySnapshot(replies.length(), latestReplyBody);
+        String latestReplyBody = latestReply != null && latestReply.has("body") ? latestReply.getString("body") : null;
+        return new CommentReplySnapshot(replyCount, latestReplyBody);
     }
 
     private JSONObject findCommentById(JSONArray comments, String fullName) throws JSONException {

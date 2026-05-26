@@ -54,7 +54,13 @@ public interface RedditAPI {
     Call<String> getPostOauth(@Path("id") String id, @HeaderMap Map<String, String> headers);
 
     @GET("comments/{id}.json?raw_json=1")
+    Call<String> getPostWithSortOauth(@Path("id") String id, @Query("sort") String sort, @HeaderMap Map<String, String> headers);
+
+    @GET("comments/{id}.json?raw_json=1")
     Call<String> getPost(@Path("id") String id);
+
+    @GET("comments/{id}.json?raw_json=1")
+    Call<String> getPostWithSort(@Path("id") String id, @Query("sort") String sort);
 
     @GET("user/{username}/about.json?raw_json=1")
     Call<String> getUserData(@Path("username") String username);
