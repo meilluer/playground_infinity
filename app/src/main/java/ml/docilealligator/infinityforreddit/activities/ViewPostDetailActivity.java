@@ -68,6 +68,9 @@ import ml.docilealligator.infinityforreddit.events.ProvidePostListToViewPostDeta
 import ml.docilealligator.infinityforreddit.events.SwitchAccountEvent;
 import ml.docilealligator.infinityforreddit.fragments.MorePostsInfoFragment;
 import ml.docilealligator.infinityforreddit.fragments.ViewPostDetailFragment;
+import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
+import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityUtils;
+import androidx.preference.PreferenceManager;
 import ml.docilealligator.infinityforreddit.post.HistoryPostPagingSource;
 import ml.docilealligator.infinityforreddit.post.LoadingMorePostsStatus;
 import ml.docilealligator.infinityforreddit.post.ParsePost;
@@ -848,21 +851,19 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
             currentPost = post;
         }
 
-        if (currentPost != null && currentPost.getAuthor() != null && !currentPost.getAuthor().equals("[deleted]") && !currentPost.getAuthor().equals(accountName)) {
+        if (currentPost != null) {
             followAuthorItem.setVisible(true);
             Post finalCurrentPost = currentPost;
-            CheckIsFollowingUser.checkIsFollowingUser(mExecutor, mHandler, mRedditDataRoomDatabase,
-                    currentPost.getAuthor(), accountName, new CheckIsFollowingUser.CheckIsFollowingUserListener() {
-                        @Override
-                        public void isSubscribed() {
-                            followAuthorItem.setTitle(getString(R.string.unfollow_user, finalCurrentPost.getAuthor()));
-                        }
-
-                        @Override
-                        public void isNotSubscribed() {
-                            followAuthorItem.setTitle(getString(R.string.follow_user, finalCurrentPost.getAuthor()));
-                        }
-                    });
+            new Thread(() -> {
+                FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(finalCurrentPost.getId());
+                runOnUiThread(() -> {
+                    if (followedThing != null) {
+                        followAuthorItem.setTitle(R.string.unfollow_post);
+                    } else {
+                        followAuthorItem.setTitle(R.string.follow_post);
+                    }
+                });
+            }).start();
         } else {
             followAuthorItem.setVisible(false);
         }
@@ -894,7 +895,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
                 currentPost = post;
             }
             if (currentPost != null) {
-                followAuthor(currentPost);
+                followPost(currentPost);
             }
             return true;
         }
@@ -995,6 +996,44 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
         if (mSliderPanel != null) {
             mSliderPanel.unlock();
         }
+    }
+
+    private void followPost(Post post) {
+        new Thread(() -> {
+            FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(post.getId());
+            if (followedThing != null) {
+                mRedditDataRoomDatabase.followedThingDao().deleteById(post.getId());
+                if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
+                    LiveActivityUtils.cancelWorker(this);
+                } else {
+                    LiveActivityUtils.triggerImmediateUpdate(this);
+                }
+                runOnUiThread(() -> {
+                    Toast.makeText(this, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show();
+                    invalidateOptionsMenu();
+                });
+            } else {
+                getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
+                        .edit()
+                        .putBoolean("enable_live_activity", true)
+                        .apply();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+                String durationStr = sharedPreferences.getString("live_activity_follow_duration", "0");
+                int durationHours = Integer.parseInt(durationStr);
+                long expirationTime = durationHours == 0 ? 0 : System.currentTimeMillis() + TimeUnit.HOURS.toMillis(durationHours);
+
+                FollowedThing newFollowedThing = new FollowedThing(post.getId(), post.getFullName(), 
+                        FollowedThing.TYPE_POST, post.getTitle(), post.getSubredditName(), 
+                        null, post.getScore(), post.getNComments(), accountName, System.currentTimeMillis(), expirationTime);
+                mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                LiveActivityUtils.scheduleWorker(this);
+                LiveActivityUtils.triggerImmediateUpdate(this);
+                runOnUiThread(() -> {
+                    Toast.makeText(this, R.string.followed_successfully, Toast.LENGTH_SHORT).show();
+                    invalidateOptionsMenu();
+                });
+            }
+        }).start();
     }
 
     private void followAuthor(Post post) {
