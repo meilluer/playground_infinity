@@ -6,13 +6,18 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextUtils;
+import android.text.style.ImageSpan;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
@@ -44,19 +49,44 @@ public class LiveActivityNotificationManager {
                 PendingIntent.FLAG_UPDATE_CURRENT | (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S ? PendingIntent.FLAG_MUTABLE : 0));
 
         int totalFollowedCount = followedThings.size();
+        int totalScore = 0;
         int totalReplyCount = 0;
         for (FollowedThing followedThing : followedThings) {
+            totalScore += followedThing.getScore();
             totalReplyCount += followedThing.getCommentCount();
         }
 
-        String compactStats = totalFollowedCount + "P " + totalReplyCount + "R";
+        String compactStats = totalScore + "U " + totalReplyCount + "R";
         String title = totalFollowedCount == 1 ? headlineThing.getTitle() : totalFollowedCount + " live activities";
         String subtitle = totalFollowedCount == 1 ? "r/" + headlineThing.getSubreddit() : headlineThing.getTitle();
         String contentText = !TextUtils.isEmpty(topContent) ? topContent : compactStats;
 
         if (Build.VERSION.SDK_INT >= 36) {
             Notification.ProgressStyle style = new Notification.ProgressStyle();
-            String chipText = compactStats.length() > 10 ? compactStats.substring(0, 10) : compactStats;
+
+            SpannableStringBuilder chipText = new SpannableStringBuilder();
+            chipText.append(" "); // placeholder for upvote icon
+            Drawable upvoteDrawable = ContextCompat.getDrawable(context, R.drawable.ic_upvote_24dp);
+            if (upvoteDrawable != null) {
+                upvoteDrawable = upvoteDrawable.mutate();
+                int size = (int) (14 * context.getResources().getDisplayMetrics().density);
+                upvoteDrawable.setBounds(0, 0, size, size);
+                ImageSpan upvoteSpan = new ImageSpan(upvoteDrawable, ImageSpan.ALIGN_BOTTOM);
+                chipText.setSpan(upvoteSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            chipText.append(" ").append(String.valueOf(totalScore)).append("   ");
+
+            int replyStart = chipText.length();
+            chipText.append(" "); // placeholder for reply/comment icon
+            Drawable replyDrawable = ContextCompat.getDrawable(context, R.drawable.ic_comment_grey_24dp);
+            if (replyDrawable != null) {
+                replyDrawable = replyDrawable.mutate();
+                int size = (int) (14 * context.getResources().getDisplayMetrics().density);
+                replyDrawable.setBounds(0, 0, size, size);
+                ImageSpan replySpan = new ImageSpan(replyDrawable, ImageSpan.ALIGN_BOTTOM);
+                chipText.setSpan(replySpan, replyStart, replyStart + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            }
+            chipText.append(" ").append(String.valueOf(totalReplyCount));
 
             Bundle extras = new Bundle();
             extras.putBoolean("android.requestPromotedOngoing", true);
@@ -88,16 +118,16 @@ public class LiveActivityNotificationManager {
         RemoteViews collapsedView = new RemoteViews(context.getPackageName(), R.layout.notification_live_activity);
         collapsedView.setTextViewText(R.id.title, title);
         collapsedView.setTextViewText(R.id.subreddit, subtitle);
-        collapsedView.setTextViewText(R.id.upvotes, "Posts " + totalFollowedCount);
-        collapsedView.setTextViewText(R.id.comments, "Replies " + totalReplyCount);
+        collapsedView.setTextViewText(R.id.upvotes, "Upvotes " + totalScore);
+        collapsedView.setTextViewText(R.id.comments, (headlineThing.getType() == FollowedThing.TYPE_COMMENT ? "Replies " : "Comments ") + totalReplyCount);
         collapsedView.setViewVisibility(R.id.expanded_content, View.GONE);
         collapsedView.setViewVisibility(R.id.unfollow_button, View.GONE);
 
         RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.notification_live_activity);
         expandedView.setTextViewText(R.id.title, title);
         expandedView.setTextViewText(R.id.subreddit, subtitle);
-        expandedView.setTextViewText(R.id.upvotes, "Posts " + totalFollowedCount);
-        expandedView.setTextViewText(R.id.comments, "Replies " + totalReplyCount);
+        expandedView.setTextViewText(R.id.upvotes, "Upvotes " + totalScore);
+        expandedView.setTextViewText(R.id.comments, (headlineThing.getType() == FollowedThing.TYPE_COMMENT ? "Replies " : "Comments ") + totalReplyCount);
         if (!TextUtils.isEmpty(topContent)) {
             expandedView.setViewVisibility(R.id.expanded_content, View.VISIBLE);
             expandedView.setTextViewText(R.id.expanded_content, topContent);

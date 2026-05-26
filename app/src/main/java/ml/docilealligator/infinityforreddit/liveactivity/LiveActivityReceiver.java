@@ -24,12 +24,15 @@ public class LiveActivityReceiver extends BroadcastReceiver {
             String id = intent.getStringExtra(EXTRA_ID);
             if (id != null) {
                 new Thread(() -> {
-                    mRedditDataRoomDatabase.followedThingDao().deleteById(id);
-                    if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
-                        LiveActivityUtils.cancelWorker(context);
-                    } else {
-                        // Trigger update to show the next item in the notification
-                        LiveActivityUtils.triggerImmediateUpdate(context);
+                    FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(id);
+                    if (followedThing != null) {
+                        mRedditDataRoomDatabase.followedThingDao().deleteById(id);
+                        if (followedThing.getType() == FollowedThing.TYPE_COMMENT || mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
+                            LiveActivityUtils.cancelWorker(context);
+                        } else {
+                            // Trigger update to show the next item in the notification
+                            LiveActivityUtils.triggerImmediateUpdate(context);
+                        }
                     }
                 }).start();
             }

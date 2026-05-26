@@ -131,11 +131,7 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
                 FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(comment.getId());
                 if (followedThing != null) {
                     mRedditDataRoomDatabase.followedThingDao().deleteById(comment.getId());
-                    if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
-                        LiveActivityUtils.cancelWorker(activity);
-                    } else {
-                        LiveActivityUtils.triggerImmediateUpdate(activity);
-                    }
+                    LiveActivityUtils.cancelWorker(activity);
                     activity.runOnUiThread(() -> Toast.makeText(activity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
                 } else {
                     activity.getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
