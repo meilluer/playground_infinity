@@ -17,6 +17,7 @@ import androidx.core.app.NotificationCompat;
 import java.util.List;
 
 import ml.docilealligator.infinityforreddit.R;
+import ml.docilealligator.infinityforreddit.utils.Utils;
 
 public class LiveActivityNotificationManager {
     public static final String CHANNEL_ID = "live_activity";
@@ -53,12 +54,16 @@ public class LiveActivityNotificationManager {
 
         String compactStats = totalScore + "U " + totalReplyCount + "R";
         String title = totalFollowedCount == 1 ? headlineThing.getTitle() : totalFollowedCount + " live activities";
-        String subtitle = totalFollowedCount == 1 ? "r/" + headlineThing.getSubreddit() : headlineThing.getTitle();
+        
+        long lastUpdated = headlineThing.getLastUpdated() > 0 ? headlineThing.getLastUpdated() : System.currentTimeMillis();
+        String elapsedTime = Utils.getElapsedTime(context, lastUpdated);
+        String subtitle = totalFollowedCount == 1
+                ? "r/" + headlineThing.getSubreddit() + " • " + elapsedTime
+                : headlineThing.getTitle() + " • " + elapsedTime;
+
         String contentText = !TextUtils.isEmpty(topContent) ? topContent : compactStats;
 
         if (Build.VERSION.SDK_INT >= 36) {
-            Notification.ProgressStyle style = new Notification.ProgressStyle();
-
             // Construct the chip text with high-aesthetic emojis for upvotes (🔺) and replies (💬)
             String chipText = "🔺" + totalScore + "  💬" + totalReplyCount;
 
@@ -73,7 +78,6 @@ public class LiveActivityNotificationManager {
                     .setOngoing(true)
                     .setOnlyAlertOnce(true)
                     .setCategory(Notification.CATEGORY_SERVICE)
-                    .setStyle(style)
                     .addExtras(extras)
                     .setShortCriticalText(chipText)
                     .addAction(new Notification.Action.Builder(0, context.getString(R.string.unfollow), unfollowPendingIntent).build());
