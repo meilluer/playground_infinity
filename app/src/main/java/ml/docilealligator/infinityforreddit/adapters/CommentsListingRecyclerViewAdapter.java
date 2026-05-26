@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import androidx.core.graphics.ColorUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Spanned;
@@ -236,6 +237,13 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         if (holder instanceof CommentBaseViewHolder) {
             Comment comment = getItem(holder.getBindingAdapterPosition());
             if (comment != null) {
+                boolean isNew = (System.currentTimeMillis() - comment.getCommentTimeMillis()) < 10 * 60 * 1000;
+                if (isNew) {
+                    int blendedColor = ColorUtils.blendARGB(mCommentBackgroundColor, Color.parseColor("#FFD700"), 0.08f);
+                    holder.itemView.setBackgroundColor(blendedColor);
+                } else {
+                    holder.itemView.setBackgroundColor(mCommentBackgroundColor);
+                }
                 String name = "r/" + comment.getSubredditName();
                 ((CommentBaseViewHolder) holder).authorTextView.setText(name);
                 ((CommentBaseViewHolder) holder).authorTextView.setTextColor(mSubredditColor);

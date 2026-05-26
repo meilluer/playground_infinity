@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import androidx.core.graphics.ColorUtils;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -426,8 +427,14 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         if (holder instanceof CommentBaseViewHolder) {
             Comment comment = getCurrentComment(position);
             if (comment != null) {
+                boolean isNew = (System.currentTimeMillis() - comment.getCommentTimeMillis()) < 10 * 60 * 1000;
                 if (mIsSingleCommentThreadMode && comment.getId().equals(mSingleCommentId)) {
                     holder.itemView.setBackgroundColor(mSingleCommentThreadBackgroundColor);
+                } else if (isNew) {
+                    int blendedColor = ColorUtils.blendARGB(mCommentBackgroundColor, Color.parseColor("#FFD700"), 0.08f);
+                    holder.itemView.setBackgroundColor(blendedColor);
+                } else {
+                    holder.itemView.setBackgroundColor(mCommentBackgroundColor);
                 }
 
                 String authorPrefixed = "u/" + comment.getAuthor();
