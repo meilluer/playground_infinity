@@ -6,18 +6,13 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.SpannableStringBuilder;
-import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.ImageSpan;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
-import androidx.core.content.ContextCompat;
 
 import java.util.List;
 
@@ -64,29 +59,8 @@ public class LiveActivityNotificationManager {
         if (Build.VERSION.SDK_INT >= 36) {
             Notification.ProgressStyle style = new Notification.ProgressStyle();
 
-            SpannableStringBuilder chipText = new SpannableStringBuilder();
-            chipText.append(" "); // placeholder for upvote icon
-            Drawable upvoteDrawable = ContextCompat.getDrawable(context, R.drawable.ic_upvote_24dp);
-            if (upvoteDrawable != null) {
-                upvoteDrawable = upvoteDrawable.mutate();
-                int size = (int) (14 * context.getResources().getDisplayMetrics().density);
-                upvoteDrawable.setBounds(0, 0, size, size);
-                ImageSpan upvoteSpan = new ImageSpan(upvoteDrawable, ImageSpan.ALIGN_BOTTOM);
-                chipText.setSpan(upvoteSpan, 0, 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            chipText.append(" ").append(String.valueOf(totalScore)).append("   ");
-
-            int replyStart = chipText.length();
-            chipText.append(" "); // placeholder for reply/comment icon
-            Drawable replyDrawable = ContextCompat.getDrawable(context, R.drawable.ic_comment_grey_24dp);
-            if (replyDrawable != null) {
-                replyDrawable = replyDrawable.mutate();
-                int size = (int) (14 * context.getResources().getDisplayMetrics().density);
-                replyDrawable.setBounds(0, 0, size, size);
-                ImageSpan replySpan = new ImageSpan(replyDrawable, ImageSpan.ALIGN_BOTTOM);
-                chipText.setSpan(replySpan, replyStart, replyStart + 1, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-            }
-            chipText.append(" ").append(String.valueOf(totalReplyCount));
+            // Construct the chip text with high-aesthetic emojis for upvotes (🔺) and replies (💬)
+            String chipText = "🔺" + totalScore + "  💬" + totalReplyCount;
 
             Bundle extras = new Bundle();
             extras.putBoolean("android.requestPromotedOngoing", true);
