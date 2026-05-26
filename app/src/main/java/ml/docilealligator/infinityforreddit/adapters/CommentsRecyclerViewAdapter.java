@@ -169,6 +169,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     private int mSearchCommentIndex = -1;
 
     private boolean canStartActivity = true;
+    private long mLastReadTime = -1;
 
     public CommentsRecyclerViewAdapter(BaseActivity activity, ViewPostDetailFragment fragment,
                                        CustomThemeWrapper customThemeWrapper,
@@ -427,7 +428,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         if (holder instanceof CommentBaseViewHolder) {
             Comment comment = getCurrentComment(position);
             if (comment != null) {
-                boolean isNew = (System.currentTimeMillis() - comment.getCommentTimeMillis()) < 10 * 60 * 1000;
+                boolean isNew = mLastReadTime > 0 && comment.getCommentTimeMillis() > mLastReadTime;
                 if (mIsSingleCommentThreadMode && comment.getId().equals(mSingleCommentId)) {
                     holder.itemView.setBackgroundColor(mSingleCommentThreadBackgroundColor);
                 } else if (isNew) {
@@ -875,6 +876,10 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 });
             }
         }
+    }
+
+    public void setLastReadTime(long lastReadTime) {
+        this.mLastReadTime = lastReadTime;
     }
 
     public void setCanStartActivity(boolean canStartActivity) {

@@ -240,6 +240,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     private FragmentViewPostDetailBinding binding;
     private RecyclerView mCommentsRecyclerView;
     public ViewPostDetailFragmentViewModel viewPostDetailFragmentViewModel;
+    private long mPostLastReadTime = -1;
 
     public ViewPostDetailFragment() {
         // Required empty public constructor
@@ -600,6 +601,19 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
             mPost = getArguments().getParcelable(EXTRA_POST_DATA);
         }
 
+        String postId = null;
+        if (mPost != null) {
+            postId = mPost.getId();
+        } else if (getArguments() != null) {
+            postId = getArguments().getString(EXTRA_POST_ID);
+        }
+
+        if (postId != null) {
+            android.content.SharedPreferences lastViewedPrefs = activity.getSharedPreferences("post_last_viewed_times", android.content.Context.MODE_PRIVATE);
+            mPostLastReadTime = lastViewedPrefs.getLong(postId, 0);
+            lastViewedPrefs.edit().putLong(postId, System.currentTimeMillis()).apply();
+        }
+
         if (mPost == null) {
             fetchPostAndCommentsById(getArguments().getString(EXTRA_POST_ID));
         } else {
@@ -646,6 +660,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                             ViewPostDetailFragment.this.onTtsLongClick(comment);
                         }
                     });
+            mCommentsAdapter.setLastReadTime(mPostLastReadTime);
             if (mCommentsRecyclerView != null) {
                 binding.postDetailRecyclerViewViewPostDetailFragment.setAdapter(mPostAdapter);
                 mCommentsRecyclerView.setAdapter(mCommentsAdapter);
@@ -1427,25 +1442,17 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                             return sortType;
                                         }
 
-                                                                                                                @Override
+                                        @Override
+                                        public void onTtsClick(Comment comment, View itemView) {
+                                            ViewPostDetailFragment.this.onTtsClick(comment, itemView);
+                                        }
 
-                                                                                                                public void onTtsClick(Comment comment, View itemView) {
-
-                                                                                                                    ViewPostDetailFragment.this.onTtsClick(comment, itemView);
-
-                                                                                                                }
-
-                                                                                        
-
-                                                                                                                @Override
-
-                                                                                                                public void onTtsLongClick(Comment comment) {
-
-                                                                                                                    ViewPostDetailFragment.this.onTtsLongClick(comment);
-
-                                                                                                                }
-
-                                                                                                            });
+                                        @Override
+                                        public void onTtsLongClick(Comment comment) {
+                                            ViewPostDetailFragment.this.onTtsLongClick(comment);
+                                        }
+                                    });
+                            mCommentsAdapter.setLastReadTime(mPostLastReadTime);
                             if (mCommentsRecyclerView != null) {
                                 binding.postDetailRecyclerViewViewPostDetailFragment.setAdapter(mPostAdapter);
                                 mCommentsRecyclerView.setAdapter(mCommentsAdapter);

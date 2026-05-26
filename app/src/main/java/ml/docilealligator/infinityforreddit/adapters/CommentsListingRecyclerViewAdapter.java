@@ -237,7 +237,14 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         if (holder instanceof CommentBaseViewHolder) {
             Comment comment = getItem(holder.getBindingAdapterPosition());
             if (comment != null) {
-                boolean isNew = (System.currentTimeMillis() - comment.getCommentTimeMillis()) < 10 * 60 * 1000;
+                long lastReadTime = 0;
+                String linkId = comment.getLinkId();
+                if (linkId != null) {
+                    String postId = linkId.startsWith("t3_") ? linkId.substring(3) : linkId;
+                    android.content.SharedPreferences lastViewedPrefs = mActivity.getSharedPreferences("post_last_viewed_times", android.content.Context.MODE_PRIVATE);
+                    lastReadTime = lastViewedPrefs.getLong(postId, 0);
+                }
+                boolean isNew = lastReadTime > 0 && comment.getCommentTimeMillis() > lastReadTime;
                 if (isNew) {
                     int blendedColor = ColorUtils.blendARGB(mCommentBackgroundColor, Color.parseColor("#FFD700"), 0.08f);
                     holder.itemView.setBackgroundColor(blendedColor);
