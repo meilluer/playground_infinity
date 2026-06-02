@@ -80,7 +80,7 @@ public final class Utils {
             //For i.redd.it media, it only matches [caption](image-link. Notice there is no ) at the end.
             //i.redd.it: (\\[(?:(?!((?<!\\\\)\\[)).)*?]\\()?https://i.redd.it/\\w+.(jpg|png|jpeg|gif)"
             Pattern.compile("((?:\\[(?:(?!(?:(?<!\\\\)\\[)).)*?]\\()?https://preview.redd.it/\\w+.(?:jpg|png|jpeg)(?:(?:\\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*)|))|((?:\\[(?:(?!(?:(?<!\\\\)\\[)).)*?]\\()?https://i.redd.it/\\w+.(?:jpg|png|jpeg|gif))"),
-            Pattern.compile("(?:\\[(.*?)]\\()?(https://reddit\\.com/link/([^/]+)/video/([^/]+)/player)\\)?")
+            Pattern.compile("(?:\\[(?:(?!(?:(?<!\\\\)\\[)).)*?]\\()?https://(?:www\\.)?reddit\\.com/link/[^/]+/video/([^/)]+)/player(?:\\?[-a-zA-Z0-9()@:%_+.~#?&/=]*)?\\)?")
     };
 
     public static String removeLinks(String text) {
@@ -182,6 +182,33 @@ public final class Utils {
             } else {
                 start = matcher.end();
             }
+        }
+
+        Pattern redditVideoPattern = REGEX_PATTERNS[4];
+        matcher = redditVideoPattern.matcher(markdownStringBuilder);
+        start = 0;
+        while (matcher.find(start)) {
+            String id = matcher.group(1);
+            MediaMetadata mediaMetadata = mediaMetadataMap.get(id);
+            if (mediaMetadata == null) {
+                start = matcher.end();
+                continue;
+            }
+
+            int matchStart = matcher.start();
+            int matchEnd = matcher.end();
+            if (matchStart < markdownStringBuilder.length() && markdownStringBuilder.charAt(matchStart) == '[') {
+                mediaMetadata.caption = markdownStringBuilder.substring(matchStart + 1,
+                        markdownStringBuilder.indexOf("](", matchStart));
+                markdownStringBuilder.insert(matchStart, '!');
+                start = matchEnd + 1;
+            } else {
+                String replacingText = "![](" + markdownStringBuilder.substring(matchStart, matchEnd) + ")";
+                markdownStringBuilder.replace(matchStart, matchEnd, replacingText);
+                start = matchStart + replacingText.length();
+            }
+
+            matcher = redditVideoPattern.matcher(markdownStringBuilder);
         }
 
         return markdownStringBuilder.toString();
