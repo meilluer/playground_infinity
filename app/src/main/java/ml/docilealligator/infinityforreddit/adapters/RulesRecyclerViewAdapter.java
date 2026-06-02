@@ -109,8 +109,8 @@ public class RulesRecyclerViewAdapter extends RecyclerView.Adapter<RulesRecycler
         imageAndGifEntry = new ImageAndGifEntry(activity,
                 Glide.with(activity), SharedPreferencesUtils.EMBEDDED_MEDIA_ALL,
                 mediaMetadata -> {
-                    boolean isVideo = (mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
-                            || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null);
+                    boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                            || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null));
                     Intent imageIntent;
                     if (isVideo) {
                         imageIntent = new Intent(activity, ViewVideoActivity.class);
