@@ -219,7 +219,7 @@ public class ImageAndGifEntry extends MarkwonAdapter.Entry<ImageAndGifBlock, Ima
             holder.binding.captionTextViewMarkdownImageAndGifBlock.setText(node.mediaMetadata.caption);
         }
 
-        boolean isVideo = !node.mediaMetadata.isGIF && ((node.mediaMetadata.e != null && node.mediaMetadata.e.equalsIgnoreCase("video"))
+        boolean isVideo = !node.mediaMetadata.isGIF && ((node.mediaMetadata.e != null && (node.mediaMetadata.e.equalsIgnoreCase("video") || node.mediaMetadata.e.equalsIgnoreCase("RedditVideo")))
                 || (node.mediaMetadata.original != null && node.mediaMetadata.original.mp4Url != null));
         if (isVideo) {
             holder.binding.playButtonMarkdownImageAndGifBlock.setVisibility(View.VISIBLE);

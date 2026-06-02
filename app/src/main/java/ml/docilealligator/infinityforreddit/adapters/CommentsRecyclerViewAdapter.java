@@ -256,7 +256,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         boolean blurImage = (post.isNSFW() && needBlurNsfw && !(doNotBlurNsfwInNsfwSubreddits && mFragment != null && mFragment.getIsNsfwSubreddit())) || (post.isSpoiler() && needBlurSpoiler);
         mImageAndGifEntry = new ImageAndGifEntry(activity, mGlide, Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")), blurImage,
                 mediaMetadata -> {
-                    boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                    boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && (mediaMetadata.e.equalsIgnoreCase("video") || mediaMetadata.e.equalsIgnoreCase("RedditVideo")))
                             || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null));
                     Intent intent;
                     if (isVideo) {

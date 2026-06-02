@@ -211,7 +211,7 @@ public class WikiActivity extends BaseActivity {
         imageAndGifPlugin = new ImageAndGifPlugin();
         imageAndGifEntry = new ImageAndGifEntry(this,
                 mGlide, SharedPreferencesUtils.EMBEDDED_MEDIA_ALL, mediaMetadata -> {
-            boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+            boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && (mediaMetadata.e.equalsIgnoreCase("video") || mediaMetadata.e.equalsIgnoreCase("RedditVideo")))
                     || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null));
             Intent intent;
             if (isVideo) {

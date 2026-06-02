@@ -442,7 +442,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 mDataSavingMode, mDisableImagePreview,
                 (post.isNSFW() && mNeedBlurNsfw && !(mDoNotBlurNsfwInNsfwSubreddits && mFragment != null && mFragment.getIsNsfwSubreddit())) || (mPost.isSpoiler() && mNeedBlurSpoiler),
                 mediaMetadata -> {
-                    boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                    boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && (mediaMetadata.e.equalsIgnoreCase("video") || mediaMetadata.e.equalsIgnoreCase("RedditVideo")))
                             || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null));
                     Intent intent;
                     if (isVideo) {

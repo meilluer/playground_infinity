@@ -205,7 +205,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         mImageAndGifEntry = new ImageAndGifEntry(activity, Glide.with(activity),
                 Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
                 mediaMetadata -> {
-                    boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                    boolean isVideo = !mediaMetadata.isGIF && ((mediaMetadata.e != null && (mediaMetadata.e.equalsIgnoreCase("video") || mediaMetadata.e.equalsIgnoreCase("RedditVideo")))
                             || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null));
                     Intent intent;
                     if (isVideo) {
