@@ -271,8 +271,14 @@ public class JSONUtils {
                                 } else {
                                     downscaledItemJSON = downscales.getJSONObject(3);
                                 }
-                                downscaledItem = new MediaMetadata.MediaItem(downscaledItemJSON.getInt(JSONUtils.X_KEY),
-                                        downscaledItemJSON.getInt(JSONUtils.Y_KEY), downscaledItemJSON.getString(JSONUtils.U_KEY));
+                                if (downscaledItemJSON.has(JSONUtils.MP4_KEY)) {
+                                    downscaledItem = new MediaMetadata.MediaItem(downscaledItemJSON.getInt(JSONUtils.X_KEY),
+                                            downscaledItemJSON.getInt(JSONUtils.Y_KEY), downscaledItemJSON.getString(JSONUtils.U_KEY),
+                                            downscaledItemJSON.getString(JSONUtils.MP4_KEY));
+                                } else {
+                                    downscaledItem = new MediaMetadata.MediaItem(downscaledItemJSON.getInt(JSONUtils.X_KEY),
+                                            downscaledItemJSON.getInt(JSONUtils.Y_KEY), downscaledItemJSON.getString(JSONUtils.U_KEY));
+                                }
                             }
                         } else {
                             downscaledItem = originalItem;

@@ -38,6 +38,7 @@ public class ImageAndGifBlockParser extends AbstractBlockParser {
         private final Pattern redditPreviewPattern =  Pattern.compile("!\\[.*]\\(https://preview.redd.it/\\w+.(jpg|png|jpeg)((\\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*)|)\\)");
         private final Pattern iRedditPattern = Pattern.compile("!\\[.*]\\(https://i.redd.it/\\w+.(jpg|png|jpeg|gif)\\)");
         private final Pattern gifPattern = Pattern.compile("!\\[gif]\\(giphy\\|\\w+(\\|downsized)?\\)");
+        private final Pattern redditVideoPattern = Pattern.compile("(?:\\[.*]\\()?(https://reddit\\.com/link/\\w+/video/(\\w+)/player)\\)?");
         @Nullable
         private Map<String, MediaMetadata> mediaMetadataMap;
         private final int previewReddItLength = "https://preview.redd.it/".length();
@@ -80,6 +81,14 @@ public class ImageAndGifBlockParser extends AbstractBlockParser {
             if (matcher.find()) {
                 if (matcher.end() == line.length()) {
                     String id = line.substring("![gif](".length(), line.length() - 1);
+                    return mediaMetadataMap.containsKey(id) ? BlockStart.of(new ImageAndGifBlockParser(mediaMetadataMap.get(id))) : BlockStart.none();
+                }
+            }
+
+            matcher = redditVideoPattern.matcher(line);
+            if (matcher.find()) {
+                if (matcher.end() == line.length()) {
+                    String id = matcher.group(2);
                     return mediaMetadataMap.containsKey(id) ? BlockStart.of(new ImageAndGifBlockParser(mediaMetadataMap.get(id))) : BlockStart.none();
                 }
             }

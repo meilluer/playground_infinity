@@ -217,7 +217,21 @@ public class WikiActivity extends BaseActivity {
             if (isVideo) {
                 intent = new Intent(this, ViewVideoActivity.class);
                 intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_DIRECT);
-                intent.setData(Uri.parse(mediaMetadata.original.mp4Url != null ? mediaMetadata.original.mp4Url : mediaMetadata.original.url));
+                SharedPreferences shp = getDefaultSharedPreferences();
+                boolean dataSaving = false;
+                String dataSavingModeString = shp.getString(SharedPreferencesUtils.DATA_SAVING_MODE, SharedPreferencesUtils.DATA_SAVING_MODE_OFF);
+                if (dataSavingModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ALWAYS)) {
+                    dataSaving = true;
+                } else if (dataSavingModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ONLY_ON_CELLULAR_DATA)) {
+                    dataSaving = Utils.getConnectedNetwork(this) == Utils.NETWORK_TYPE_CELLULAR;
+                }
+                String videoUrl = null;
+                if (dataSaving && mediaMetadata.downscaled != null && mediaMetadata.downscaled.mp4Url != null) {
+                    videoUrl = mediaMetadata.downscaled.mp4Url;
+                } else if (mediaMetadata.original != null) {
+                    videoUrl = mediaMetadata.original.mp4Url != null ? mediaMetadata.original.mp4Url : mediaMetadata.original.url;
+                }
+                intent.setData(Uri.parse(videoUrl));
             } else {
                 intent = new Intent(this, ViewImageOrGifActivity.class);
                 if (mediaMetadata.isGIF) {
