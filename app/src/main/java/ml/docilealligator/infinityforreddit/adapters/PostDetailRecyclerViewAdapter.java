@@ -450,10 +450,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                         intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_DIRECT);
                         SharedPreferences shp = activity.getDefaultSharedPreferences();
                         boolean dataSaving = false;
-                        String dataSavingModeString = shp.getString(SharedPreferencesUtils.DATA_SAVING_MODE, SharedPreferencesUtils.DATA_SAVING_MODE_OFF);
-                        if (dataSavingModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ALWAYS)) {
+                        String dsModeString = shp.getString(SharedPreferencesUtils.DATA_SAVING_MODE, SharedPreferencesUtils.DATA_SAVING_MODE_OFF);
+                        if (dsModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ALWAYS)) {
                             dataSaving = true;
-                        } else if (dataSavingModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ONLY_ON_CELLULAR_DATA)) {
+                        } else if (dsModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ONLY_ON_CELLULAR_DATA)) {
                             dataSaving = Utils.getConnectedNetwork(activity) == Utils.NETWORK_TYPE_CELLULAR;
                         }
                         String videoUrl = null;
