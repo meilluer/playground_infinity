@@ -249,13 +249,20 @@ public class JSONUtils {
                             originalItem = new MediaMetadata.MediaItem(originalItemJSON.getInt(JSONUtils.X_KEY),
                                     originalItemJSON.getInt(JSONUtils.Y_KEY), originalItemJSON.getString(JSONUtils.U_KEY));
                         } else {
+                            String url;
+                            if (originalItemJSON.has(JSONUtils.GIF_KEY)) {
+                                url = originalItemJSON.getString(JSONUtils.GIF_KEY);
+                            } else {
+                                url = originalItemJSON.getString(JSONUtils.U_KEY);
+                            }
+
                             if (originalItemJSON.has(JSONUtils.MP4_KEY)) {
                                 originalItem = new MediaMetadata.MediaItem(originalItemJSON.getInt(JSONUtils.X_KEY),
-                                        originalItemJSON.getInt(JSONUtils.Y_KEY), originalItemJSON.getString(JSONUtils.GIF_KEY),
+                                        originalItemJSON.getInt(JSONUtils.Y_KEY), url,
                                         originalItemJSON.getString(JSONUtils.MP4_KEY));
                             } else {
                                 originalItem = new MediaMetadata.MediaItem(originalItemJSON.getInt(JSONUtils.X_KEY),
-                                        originalItemJSON.getInt(JSONUtils.Y_KEY), originalItemJSON.getString(JSONUtils.GIF_KEY));
+                                        originalItemJSON.getInt(JSONUtils.Y_KEY), url);
                             }
                         }
 
