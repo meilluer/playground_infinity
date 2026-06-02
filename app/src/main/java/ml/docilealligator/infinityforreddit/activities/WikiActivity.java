@@ -50,6 +50,7 @@ import ml.docilealligator.infinityforreddit.events.SwitchAccountEvent;
 import ml.docilealligator.infinityforreddit.markdown.EmoteCloseBracketInlineProcessor;
 import ml.docilealligator.infinityforreddit.markdown.EmotePlugin;
 import ml.docilealligator.infinityforreddit.markdown.EvenBetterLinkMovementMethod;
+import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity;
 import ml.docilealligator.infinityforreddit.markdown.ImageAndGifEntry;
 import ml.docilealligator.infinityforreddit.markdown.ImageAndGifPlugin;
 import ml.docilealligator.infinityforreddit.markdown.MarkdownUtils;
@@ -205,18 +206,29 @@ public class WikiActivity extends BaseActivity {
                     }
                     intent.putExtra(ViewImageOrGifActivity.EXTRA_SUBREDDIT_OR_USERNAME_KEY, mSubredditName);
                     intent.putExtra(ViewImageOrGifActivity.EXTRA_FILE_NAME_KEY, mediaMetadata.fileName);
+                    startActivity(intent);
                 });
         imageAndGifPlugin = new ImageAndGifPlugin();
         imageAndGifEntry = new ImageAndGifEntry(this,
                 mGlide, SharedPreferencesUtils.EMBEDDED_MEDIA_ALL, mediaMetadata -> {
-            Intent intent = new Intent(this, ViewImageOrGifActivity.class);
-            if (mediaMetadata.isGIF) {
-                intent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+            boolean isVideo = (mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                    || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null);
+            Intent intent;
+            if (isVideo) {
+                intent = new Intent(this, ViewVideoActivity.class);
+                intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_DIRECT);
+                intent.setData(Uri.parse(mediaMetadata.original.mp4Url != null ? mediaMetadata.original.mp4Url : mediaMetadata.original.url));
             } else {
-                intent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                intent = new Intent(this, ViewImageOrGifActivity.class);
+                if (mediaMetadata.isGIF) {
+                    intent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+                } else {
+                    intent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                }
             }
             intent.putExtra(ViewImageOrGifActivity.EXTRA_SUBREDDIT_OR_USERNAME_KEY, mSubredditName);
             intent.putExtra(ViewImageOrGifActivity.EXTRA_FILE_NAME_KEY, mediaMetadata.fileName);
+            startActivity(intent);
         });
         markwon = MarkdownUtils.createFullRedditMarkwon(this,
                 miscPlugin, emoteCloseBracketInlineProcessor, emotePlugin, imageAndGifPlugin, markdownColor, spoilerBackgroundColor, onLinkLongClickListener);

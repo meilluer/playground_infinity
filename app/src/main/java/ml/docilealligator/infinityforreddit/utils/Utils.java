@@ -80,6 +80,7 @@ public final class Utils {
             //For i.redd.it media, it only matches [caption](image-link. Notice there is no ) at the end.
             //i.redd.it: (\\[(?:(?!((?<!\\\\)\\[)).)*?]\\()?https://i.redd.it/\\w+.(jpg|png|jpeg|gif)"
             Pattern.compile("((?:\\[(?:(?!(?:(?<!\\\\)\\[)).)*?]\\()?https://preview.redd.it/\\w+.(?:jpg|png|jpeg)(?:(?:\\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*)|))|((?:\\[(?:(?!(?:(?<!\\\\)\\[)).)*?]\\()?https://i.redd.it/\\w+.(?:jpg|png|jpeg|gif))"),
+            Pattern.compile("(?:\\[(.*?)]\\()?(https://reddit\\.com/link/([^/]+)/video/([^/]+)/player)\\)?")
     };
 
     public static String removeLinks(String text) {

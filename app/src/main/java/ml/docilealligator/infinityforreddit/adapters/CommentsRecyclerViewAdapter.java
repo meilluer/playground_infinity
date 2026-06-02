@@ -72,6 +72,7 @@ import ml.docilealligator.infinityforreddit.markdown.CustomMarkwonAdapter;
 import ml.docilealligator.infinityforreddit.markdown.EmoteCloseBracketInlineProcessor;
 import ml.docilealligator.infinityforreddit.markdown.EmotePlugin;
 import ml.docilealligator.infinityforreddit.markdown.EvenBetterLinkMovementMethod;
+import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity;
 import ml.docilealligator.infinityforreddit.markdown.ImageAndGifEntry;
 import ml.docilealligator.infinityforreddit.markdown.ImageAndGifPlugin;
 import ml.docilealligator.infinityforreddit.markdown.MarkdownUtils;
@@ -255,11 +256,20 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         boolean blurImage = (post.isNSFW() && needBlurNsfw && !(doNotBlurNsfwInNsfwSubreddits && mFragment != null && mFragment.getIsNsfwSubreddit())) || (post.isSpoiler() && needBlurSpoiler);
         mImageAndGifEntry = new ImageAndGifEntry(activity, mGlide, Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")), blurImage,
                 mediaMetadata -> {
-                    Intent intent = new Intent(activity, ViewImageOrGifActivity.class);
-                    if (mediaMetadata.isGIF) {
-                        intent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+                    boolean isVideo = (mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                            || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null);
+                    Intent intent;
+                    if (isVideo) {
+                        intent = new Intent(activity, ViewVideoActivity.class);
+                        intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_DIRECT);
+                        intent.setData(Uri.parse(mediaMetadata.original.mp4Url != null ? mediaMetadata.original.mp4Url : mediaMetadata.original.url));
                     } else {
-                        intent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                        intent = new Intent(activity, ViewImageOrGifActivity.class);
+                        if (mediaMetadata.isGIF) {
+                            intent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+                        } else {
+                            intent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                        }
                     }
                     intent.putExtra(ViewImageOrGifActivity.EXTRA_IS_NSFW, post.isNSFW());
                     intent.putExtra(ViewImageOrGifActivity.EXTRA_SUBREDDIT_OR_USERNAME_KEY, post.getSubredditName());

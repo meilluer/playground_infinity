@@ -24,6 +24,15 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center" />
 
+        <ImageView
+            android:id="@+id/play_button_markdown_image_and_gif_block"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_play_circle_36dp"
+            android:visibility="gone"
+            android:contentDescription="@null" />
+
         <TextView
             android:id="@+id/load_image_error_text_view_markdown_image_and_gif_block"
             android:layout_width="match_parent"

@@ -54,6 +54,7 @@ import ml.docilealligator.infinityforreddit.markdown.CustomMarkwonAdapter;
 import ml.docilealligator.infinityforreddit.markdown.EmoteCloseBracketInlineProcessor;
 import ml.docilealligator.infinityforreddit.markdown.EmotePlugin;
 import ml.docilealligator.infinityforreddit.markdown.EvenBetterLinkMovementMethod;
+import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity;
 import ml.docilealligator.infinityforreddit.markdown.ImageAndGifEntry;
 import ml.docilealligator.infinityforreddit.markdown.ImageAndGifPlugin;
 import ml.docilealligator.infinityforreddit.markdown.MarkdownUtils;
@@ -182,19 +183,30 @@ public class SidebarFragment extends Fragment {
                     }
                     imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_SUBREDDIT_OR_USERNAME_KEY, subredditName);
                     imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_FILE_NAME_KEY, mediaMetadata.fileName);
+                    activity.startActivity(imageIntent);
                 });
         ImageAndGifPlugin imageAndGifPlugin = new ImageAndGifPlugin();
         imageAndGifEntry = new ImageAndGifEntry(activity,
                 Glide.with(this), SharedPreferencesUtils.EMBEDDED_MEDIA_ALL,
                 mediaMetadata -> {
-                    Intent imageIntent = new Intent(activity, ViewImageOrGifActivity.class);
-                    if (mediaMetadata.isGIF) {
-                        imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+                    boolean isVideo = (mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                            || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null);
+                    Intent imageIntent;
+                    if (isVideo) {
+                        imageIntent = new Intent(activity, ViewVideoActivity.class);
+                        imageIntent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_DIRECT);
+                        imageIntent.setData(Uri.parse(mediaMetadata.original.mp4Url != null ? mediaMetadata.original.mp4Url : mediaMetadata.original.url));
                     } else {
-                        imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                        imageIntent = new Intent(activity, ViewImageOrGifActivity.class);
+                        if (mediaMetadata.isGIF) {
+                            imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+                        } else {
+                            imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                        }
                     }
                     imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_SUBREDDIT_OR_USERNAME_KEY, subredditName);
                     imageIntent.putExtra(ViewImageOrGifActivity.EXTRA_FILE_NAME_KEY, mediaMetadata.fileName);
+                    activity.startActivity(imageIntent);
                 });
         Markwon markwon = MarkdownUtils.createFullRedditMarkwon(activity,
                 miscPlugin, emoteCloseBracketInlineProcessor, emotePlugin, imageAndGifPlugin, markdownColor,

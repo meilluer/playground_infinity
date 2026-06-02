@@ -218,6 +218,14 @@ public class ImageAndGifEntry extends MarkwonAdapter.Entry<ImageAndGifBlock, Ima
             holder.binding.captionTextViewMarkdownImageAndGifBlock.setVisibility(View.VISIBLE);
             holder.binding.captionTextViewMarkdownImageAndGifBlock.setText(node.mediaMetadata.caption);
         }
+
+        boolean isVideo = (node.mediaMetadata.e != null && node.mediaMetadata.e.equalsIgnoreCase("video"))
+                || (node.mediaMetadata.original != null && node.mediaMetadata.original.mp4Url != null);
+        if (isVideo) {
+            holder.binding.playButtonMarkdownImageAndGifBlock.setVisibility(View.VISIBLE);
+        } else {
+            holder.binding.playButtonMarkdownImageAndGifBlock.setVisibility(View.GONE);
+        }
     }
 
     private void showImageAsUrl(@NonNull Holder holder, @NonNull ImageAndGifBlock node) {
@@ -258,6 +266,7 @@ public class ImageAndGifEntry extends MarkwonAdapter.Entry<ImageAndGifBlock, Ima
 
         glide.clear(holder.binding.imageViewMarkdownImageAndGifBlock);
         holder.binding.progressBarMarkdownImageAndGifBlock.setVisibility(View.GONE);
+        holder.binding.playButtonMarkdownImageAndGifBlock.setVisibility(View.GONE);
         holder.binding.loadImageErrorTextViewMarkdownImageAndGifBlock.setVisibility(View.GONE);
         holder.binding.captionTextViewMarkdownImageAndGifBlock.setVisibility(View.GONE);
         holder.binding.captionTextViewMarkdownImageAndGifBlock.setGravity(Gravity.CENTER_HORIZONTAL);

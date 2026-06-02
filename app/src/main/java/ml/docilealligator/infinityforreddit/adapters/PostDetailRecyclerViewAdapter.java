@@ -442,11 +442,20 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 mDataSavingMode, mDisableImagePreview,
                 (post.isNSFW() && mNeedBlurNsfw && !(mDoNotBlurNsfwInNsfwSubreddits && mFragment != null && mFragment.getIsNsfwSubreddit())) || (mPost.isSpoiler() && mNeedBlurSpoiler),
                 mediaMetadata -> {
-                    Intent intent = new Intent(activity, ViewImageOrGifActivity.class);
-                    if (mediaMetadata.isGIF) {
-                        intent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+                    boolean isVideo = (mediaMetadata.e != null && mediaMetadata.e.equalsIgnoreCase("video"))
+                            || (mediaMetadata.original != null && mediaMetadata.original.mp4Url != null);
+                    Intent intent;
+                    if (isVideo) {
+                        intent = new Intent(activity, ViewVideoActivity.class);
+                        intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_DIRECT);
+                        intent.setData(Uri.parse(mediaMetadata.original.mp4Url != null ? mediaMetadata.original.mp4Url : mediaMetadata.original.url));
                     } else {
-                        intent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                        intent = new Intent(activity, ViewImageOrGifActivity.class);
+                        if (mediaMetadata.isGIF) {
+                            intent.putExtra(ViewImageOrGifActivity.EXTRA_GIF_URL_KEY, mediaMetadata.original.url);
+                        } else {
+                            intent.putExtra(ViewImageOrGifActivity.EXTRA_IMAGE_URL_KEY, mediaMetadata.original.url);
+                        }
                     }
                     intent.putExtra(ViewImageOrGifActivity.EXTRA_IS_NSFW, post.isNSFW());
                     intent.putExtra(ViewImageOrGifActivity.EXTRA_SUBREDDIT_OR_USERNAME_KEY, post.getSubredditName());
