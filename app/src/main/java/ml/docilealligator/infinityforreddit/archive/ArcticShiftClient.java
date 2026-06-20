@@ -36,12 +36,12 @@ class ArcticShiftClient {
     }
 
     List<ArcticShiftThing> searchPostsByAuthor(String author) throws IOException, JSONException {
-        return getThingList("/api/posts/search?sort=desc&limit=100&fields=id,author,title,selftext,subreddit,permalink,url,link_flair_text,created_utc,score,num_comments,over_18,spoiler&author="
+        return getThingList("/api/posts/search?sort=desc&limit=100&author="
                 + encode(author));
     }
 
     List<ArcticShiftThing> searchCommentsByAuthor(String author) throws IOException, JSONException {
-        return getThingList("/api/comments/search?sort=desc&limit=100&fields=id,author,body,subreddit,link_id,parent_id,created_utc,score&author="
+        return getThingList("/api/comments/search?sort=desc&limit=100&author="
                 + encode(author));
     }
 
