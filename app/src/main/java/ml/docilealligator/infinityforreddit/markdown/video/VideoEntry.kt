@@ -12,6 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowManager
+import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
 import androidx.media3.common.C
@@ -147,9 +148,9 @@ class VideoEntry(
         val pauseDrawable: Drawable
         var setDefaultResolutionAlready: Boolean = false
 
-        val muteButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById(R.id.mute_exo_playback_control_view)
-        val fullscreenButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById(R.id.fullscreen_exo_playback_control_view)
-        val playPauseButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById(R.id.exo_play)
+        val muteButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById<ImageView>(R.id.mute_exo_playback_control_view)
+        val fullscreenButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById<ImageView>(R.id.fullscreen_exo_playback_control_view)
+        val playPauseButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById<ImageView>(R.id.exo_play)
 
         init {
             playDrawable = AppCompatResources.getDrawable(baseActivity, R.drawable.ic_play_arrow_24dp)!!
