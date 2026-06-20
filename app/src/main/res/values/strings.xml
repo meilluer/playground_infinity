@@ -1099,6 +1099,7 @@
     <string name="downloading_reddit_video_failed_cannot_save_audio">Download failed: cannot save audio to cache directory</string>
     <string name="downloading_reddit_video_failed_cannot_mux">Download failed: cannot mux video and audio</string>
     <string name="downloading_reddit_video_failed_cannot_save_mux_video">Download failed: cannot save the video to public directory</string>
+    <string name="downloading_reddit_video_failed_invalid_video_url">Download failed: invalid video URL</string>
 
     <string name="downloading">Downloading</string>
     <string name="downloading_media_finished">Downloaded</string>

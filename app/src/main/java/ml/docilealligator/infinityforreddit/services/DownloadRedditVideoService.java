@@ -53,6 +53,7 @@ import ml.docilealligator.infinityforreddit.broadcastreceivers.DownloadedMediaDe
 import ml.docilealligator.infinityforreddit.customtheme.CustomThemeWrapper;
 import ml.docilealligator.infinityforreddit.utils.NotificationUtils;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
+import ml.docilealligator.infinityforreddit.utils.UtilsKt;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import retrofit2.Response;
@@ -66,13 +67,14 @@ public class DownloadRedditVideoService extends JobService {
     public static final String EXTRA_IS_NSFW = "EIN";
 
     private static final int NO_ERROR = -1;
-    private static final int ERROR_CANNOT_GET_CACHE_DIRECTORY = 0;
-    private static final int ERROR_VIDEO_FILE_CANNOT_DOWNLOAD = 1;
-    private static final int ERROR_VIDEO_FILE_CANNOT_SAVE = 2;
-    private static final int ERROR_AUDIO_FILE_CANNOT_SAVE = 3;
-    private static final int ERROR_MUX_FAILED = 4;
-    private static final int ERROR_MUXED_VIDEO_FILE_CANNOT_SAVE = 5;
-    private static final int ERROR_CANNOT_GET_DESTINATION_DIRECTORY = 6;
+    private static final int ERROR_INVALID_VIDEO_URL = 0;
+    private static final int ERROR_CANNOT_GET_CACHE_DIRECTORY = 1;
+    private static final int ERROR_VIDEO_FILE_CANNOT_DOWNLOAD = 2;
+    private static final int ERROR_VIDEO_FILE_CANNOT_SAVE = 3;
+    private static final int ERROR_AUDIO_FILE_CANNOT_SAVE = 4;
+    private static final int ERROR_MUX_FAILED = 5;
+    private static final int ERROR_MUXED_VIDEO_FILE_CANNOT_SAVE = 6;
+    private static final int ERROR_CANNOT_GET_DESTINATION_DIRECTORY = 7;
 
     private static int JOB_ID = 30000;
 
@@ -87,6 +89,7 @@ public class DownloadRedditVideoService extends JobService {
     @Inject
     Executor executor;
     private NotificationManagerCompat notificationManager;
+    private final String[] possibleVideoUrlSuffices = new String[]{"/CMAF_720.mp4", "/CMAF_480.mp4", "/CMAF_360.mp4"};
     private final String[] possibleAudioUrlSuffices = new String[]{"/CMAF_AUDIO_128.mp4", "/CMAF_AUDIO_64.mp4", "/DASH_AUDIO_128.mp4", "/DASH_audio.mp4", "/DASH_audio", "/audio.mp4", "/audio"};
 
     public DownloadRedditVideoService() {
@@ -121,7 +124,10 @@ public class DownloadRedditVideoService extends JobService {
         PersistableBundle intent = params.getExtras();
 
         String subredditName = intent.getString(EXTRA_SUBREDDIT);
-        String fileNameWithoutExtension = subredditName + "-" + intent.getString(EXTRA_POST_ID);
+        String fileNameWithoutExtension =
+                subredditName == null ?
+                        UtilsKt.getRandomString(6)
+                        : subredditName + "-" + intent.getString(EXTRA_POST_ID);
 
         NotificationChannelCompat serviceChannel =
                 new NotificationChannelCompat.Builder(
@@ -144,7 +150,13 @@ public class DownloadRedditVideoService extends JobService {
 
         String videoUrl = intent.getString(EXTRA_VIDEO_URL);
 
-        String audioUrlPrefix = Build.VERSION.SDK_INT > Build.VERSION_CODES.N ? videoUrl.substring(0, videoUrl.lastIndexOf('/')) : null;
+        if (videoUrl == null) {
+            downloadFinished(params, builder, null, ERROR_INVALID_VIDEO_URL, randomNotificationIdOffset);
+            return true;
+        }
+
+        int audioLastSlashIndex = videoUrl.lastIndexOf('/');
+        String audioUrlPrefix = Build.VERSION.SDK_INT > Build.VERSION_CODES.N && audioLastSlashIndex >= 0 ? videoUrl.substring(0, audioLastSlashIndex) : null;
 
         boolean isNsfw = intent.getInt(EXTRA_IS_NSFW, 0) == 1;
 
@@ -187,8 +199,8 @@ public class DownloadRedditVideoService extends JobService {
                 String finalFileNameWithoutExtension = fileNameWithoutExtension;
 
                 try {
-                    Response<ResponseBody> videoResponse = downloadFileRetrofit.downloadFile(videoUrl).execute();
-                    if (videoResponse.isSuccessful() && videoResponse.body() != null) {
+                    ResponseBody videoResponse = getVideoResponse(downloadFileRetrofit, videoUrl, -1);
+                    if (videoResponse != null) {
                         String externalCacheDirectoryPath = externalCacheDirectory.getAbsolutePath() + "/";
                         String destinationFileDirectory;
                         if (isNsfw && sharedPreferences.getBoolean(SharedPreferencesUtils.SAVE_NSFW_MEDIA_IN_DIFFERENT_FOLDER, false)) {
@@ -261,7 +273,7 @@ public class DownloadRedditVideoService extends JobService {
                                 randomNotificationIdOffset, null);
 
                         String videoFilePath = externalCacheDirectoryPath + finalFileNameWithoutExtension + "-cache.mp4";
-                        String savedVideoFilePath = writeResponseBodyToDisk(videoResponse.body(), videoFilePath);
+                        String savedVideoFilePath = writeResponseBodyToDisk(videoResponse, videoFilePath);
                         if (savedVideoFilePath == null) {
                             downloadFinished(params, builder, null, ERROR_VIDEO_FILE_CANNOT_SAVE, randomNotificationIdOffset);
                             return;
@@ -353,6 +365,31 @@ public class DownloadRedditVideoService extends JobService {
     @Override
     public boolean onStopJob(JobParameters params) {
         return false;
+    }
+
+    @Nullable
+    private ResponseBody getVideoResponse(DownloadFile downloadFileRetrofit, @NonNull String videoUrl, int videoSuffixIndex) throws IOException {
+        if (videoSuffixIndex >= possibleVideoUrlSuffices.length) {
+            return null;
+        }
+
+        if (videoSuffixIndex >= 0) {
+            int videoLastSlashIndex = videoUrl.lastIndexOf('/');
+            String videoUrlPrefix = videoLastSlashIndex >= 0 ? videoUrl.substring(0, videoLastSlashIndex) : null;
+            if (videoUrlPrefix == null) {
+                return null;
+            }
+
+            videoUrl = videoUrlPrefix + possibleVideoUrlSuffices[videoSuffixIndex];
+        }
+
+        Response<ResponseBody> videoResponse = downloadFileRetrofit.downloadFile(videoUrl).execute();
+        ResponseBody responseBody = videoResponse.body();
+        if (videoResponse.isSuccessful() && responseBody != null) {
+            return responseBody;
+        }
+
+        return getVideoResponse(downloadFileRetrofit, videoUrl, videoSuffixIndex < 0 ? 0 : videoSuffixIndex + 1);
     }
 
     @Nullable
@@ -582,6 +619,10 @@ public class DownloadRedditVideoService extends JobService {
     private void downloadFinished(JobParameters parameters, NotificationCompat.Builder builder, Uri destinationFileUri, int errorCode, int randomNotificationIdOffset) {
         if (errorCode != NO_ERROR) {
             switch (errorCode) {
+                case ERROR_INVALID_VIDEO_URL:
+                    updateNotification(builder, R.string.downloading_reddit_video_failed_invalid_video_url, -1,
+                            randomNotificationIdOffset, null);
+                    break;
                 case ERROR_CANNOT_GET_CACHE_DIRECTORY:
                     updateNotification(builder, R.string.downloading_reddit_video_failed_cannot_get_cache_directory, -1,
                             randomNotificationIdOffset, null);

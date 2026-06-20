@@ -381,10 +381,13 @@ public class SubmitPostService extends JobService {
             InputStream in = getContentResolver().openInputStream(mediaUri);
             String type = getContentResolver().getType(mediaUri);
             String cacheFilePath;
+            String lastPathSegment = mediaUri.getLastPathSegment();
+            String fileName = lastPathSegment == null
+                    ? "video" : lastPathSegment.replaceAll("[^a-zA-Z0-9._-]", "_");
             if (type != null && type.contains("gif")) {
-                cacheFilePath = getExternalCacheDir() + "/" + mediaUri.getLastPathSegment() + ".gif";
+                cacheFilePath = getExternalCacheDir() + "/" + fileName + ".gif";
             } else {
-                cacheFilePath = getExternalCacheDir() + "/" + mediaUri.getLastPathSegment() + ".mp4";
+                cacheFilePath = getExternalCacheDir() + "/" + fileName + ".mp4";
             }
 
             copyFileToCache(in, cacheFilePath);

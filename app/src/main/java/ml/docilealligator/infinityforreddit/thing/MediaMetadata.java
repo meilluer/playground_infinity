@@ -20,7 +20,7 @@ public class MediaMetadata implements Parcelable {
     public MediaMetadata(String id, String e, MediaItem original, MediaItem downscaled) {
         this.id = id;
         this.e = e;
-        isGIF = !e.equalsIgnoreCase("image");
+        isGIF = !e.equalsIgnoreCase("image") && !e.equalsIgnoreCase("video");
         String path = Uri.parse(original.url).getPath();
         this.fileName = path == null ? (isGIF ? "Animated.gif" : "Image.jpg") : path.substring(path.lastIndexOf('/') + 1);
         this.original = original;
@@ -118,5 +118,21 @@ public class MediaMetadata implements Parcelable {
             dest.writeString(url);
             dest.writeString(mp4Url);
         }
+    }
+
+    @Nullable
+    public static String getDownloadUrlForMarkdownParsedVideo(String hlsUrl) {
+        Uri uri = Uri.parse(hlsUrl);
+        java.util.List<String> pathSegments = uri.getPathSegments();
+        if (pathSegments.isEmpty()) {
+            return null;
+        }
+
+        Uri.Builder builder = uri.buildUpon().path(null);
+        for (int i = 0; i < pathSegments.size() - 1; i++) {
+            builder.appendPath(pathSegments.get(i));
+        }
+        builder.appendPath("CMAF_1080.mp4");
+        return builder.build().toString();
     }
 }

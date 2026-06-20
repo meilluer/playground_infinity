@@ -79,7 +79,8 @@ public final class Utils {
             //Matches preview.redd.it and i.redd.it media
             //For i.redd.it media, it only matches [caption](image-link. Notice there is no ) at the end.
             //i.redd.it: (\\[(?:(?!((?<!\\\\)\\[)).)*?]\\()?https://i.redd.it/\\w+.(jpg|png|jpeg|gif)"
-            Pattern.compile("((?:\\[(?:(?!(?:(?<!\\\\)\\[)).)*?]\\()?https://preview.redd.it/\\w+.(?:jpg|png|jpeg)(?:(?:\\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*)|))|((?:\\[(?:(?!(?:(?<!\\\\)\\[)).)*?]\\()?https://i.redd.it/\\w+.(?:jpg|png|jpeg|gif))"),
+            Pattern.compile("((?:\\[(.*?)]\\()?(https://preview.redd.it/(\\w+).(?:jpg|png|jpeg)(?:\\?+[-a-zA-Z0-9()@:%_+.~#?&/=]*|)))|((?:\\[(.*?)]\\()?(https://i.redd.it/(\\w+).(?:jpg|png|jpeg|gif)))"),
+            Pattern.compile("(?:\\[(.*?)]\\()?(https://reddit\\.com/link/([^/]+)/video/([^/]+)/player)")
     };
 
     public static String removeLinks(String text) {
@@ -99,91 +100,162 @@ public final class Utils {
         return regexed;
     }
 
-    public static String parseRedditImagesBlock(String markdown, @Nullable Map<String, MediaMetadata> mediaMetadataMap) {
+    public static ParseRedditMediaBlockResult parseRedditImagesBlock(String markdown, @Nullable Map<String, MediaMetadata> mediaMetadataMap) {
         if (mediaMetadataMap == null) {
-            return markdown;
+            StringBuilder markdownStringBuilder = new StringBuilder(markdown);
+            int start = 0;
+            while (true) {
+                Matcher videoMatcher = REGEX_PATTERNS[4].matcher(markdownStringBuilder);
+
+                if (videoMatcher.find(start)) {
+                    String id = videoMatcher.group(4);
+                    String linkId = videoMatcher.group(3);
+                    String caption = videoMatcher.group(1);
+
+                    if (mediaMetadataMap == null) {
+                        mediaMetadataMap = new java.util.HashMap<>();
+                    }
+
+                    MediaMetadata.MediaItem item = new MediaMetadata.MediaItem(0, 0, "https://v.redd.it/link/" + linkId + "/asset/" + id + "/HLSPlaylist.m3u8", null);
+                    MediaMetadata mediaMetadata = new MediaMetadata(id, "Video", item, item);
+                    mediaMetadataMap.put(id, mediaMetadata);
+
+                    mediaMetadata.caption = caption;
+
+                    if (markdownStringBuilder.charAt(videoMatcher.start()) == '[') {
+                        //Has caption
+                        markdownStringBuilder.insert(videoMatcher.start(), '!');
+                        start = videoMatcher.end() + 1;
+                    } else {
+                        String replacingText = "![](" + videoMatcher.group(2) + ")";
+                        markdownStringBuilder.replace(videoMatcher.start(), videoMatcher.end(), replacingText);
+                        start = replacingText.length() + videoMatcher.start();
+                    }
+                } else {
+                    break;
+                }
+            }
+
+            return new ParseRedditMediaBlockResult(markdownStringBuilder.toString(), mediaMetadataMap);
         }
 
+        // Replace "Processing img <id>..." placeholders with the actual URL from media_metadata.
+        // E.g. inline images/gifs in comments.
         StringBuilder markdownStringBuilder = new StringBuilder(markdown);
         Pattern previewReddItAndIReddItImagePattern = REGEX_PATTERNS[3];
-        Matcher matcher = previewReddItAndIReddItImagePattern.matcher(markdownStringBuilder);
         int start = 0;
         int previewReddItLength = "https://preview.redd.it/".length();
         int iReddItLength = "https://i.redd.it/".length();
-        while (matcher.find(start)) {
-            if (matcher.group(1) != null) {
-                String id;
-                String caption = null;
-                if (markdownStringBuilder.charAt(matcher.start()) == '[') {
-                    //Has caption
-                    int urlStartIndex = markdownStringBuilder.lastIndexOf("https://preview.redd.it/", matcher.end());
-                    id = markdownStringBuilder.substring(previewReddItLength + urlStartIndex,
-                            markdownStringBuilder.indexOf(".", previewReddItLength + urlStartIndex));
-                    //Minus "](".length()
-                    caption = markdownStringBuilder.substring(matcher.start() + 1, urlStartIndex - 2);
+        while (true) {
+            Matcher previewReddItAndIReddItImageMatcher = previewReddItAndIReddItImagePattern.matcher(markdownStringBuilder);
+            Matcher videoMatcher = REGEX_PATTERNS[4].matcher(markdownStringBuilder);
+
+            if (previewReddItAndIReddItImageMatcher.find(start)) {
+                if (previewReddItAndIReddItImageMatcher.group(1) != null) {
+                    String id;
+                    String caption = null;
+                    if (markdownStringBuilder.charAt(previewReddItAndIReddItImageMatcher.start()) == '[') {
+                        //Has caption
+                        int urlStartIndex = markdownStringBuilder.lastIndexOf("https://preview.redd.it/", previewReddItAndIReddItImageMatcher.end());
+                        id = markdownStringBuilder.substring(previewReddItLength + urlStartIndex,
+                                markdownStringBuilder.indexOf(".", previewReddItLength + urlStartIndex));
+                        //Minus "](".length()
+                        caption = markdownStringBuilder.substring(previewReddItAndIReddItImageMatcher.start() + 1, urlStartIndex - 2);
+                    } else {
+                        id = markdownStringBuilder.substring(previewReddItAndIReddItImageMatcher.start() + previewReddItLength,
+                                markdownStringBuilder.indexOf(".", previewReddItAndIReddItImageMatcher.start() + previewReddItLength));
+                    }
+
+                    MediaMetadata mediaMetadata = mediaMetadataMap.get(id);
+                    if (mediaMetadata == null) {
+                        start = previewReddItAndIReddItImageMatcher.end();
+                        continue;
+                    }
+
+                    mediaMetadata.caption = caption;
+
+                    if (markdownStringBuilder.charAt(previewReddItAndIReddItImageMatcher.start()) == '[') {
+                        //Has caption
+                        markdownStringBuilder.insert(previewReddItAndIReddItImageMatcher.start(), '!');
+                        start = previewReddItAndIReddItImageMatcher.end() + 1;
+                    } else {
+                        String replacingText = "![](" + markdownStringBuilder.substring(previewReddItAndIReddItImageMatcher.start(), previewReddItAndIReddItImageMatcher.end()) + ")";
+                        markdownStringBuilder.replace(previewReddItAndIReddItImageMatcher.start(), previewReddItAndIReddItImageMatcher.end(), replacingText);
+                        start = replacingText.length() + previewReddItAndIReddItImageMatcher.start();
+                    }
+                } else if (previewReddItAndIReddItImageMatcher.group(5) != null) {
+                    String id;
+                    String caption = null;
+                    if (markdownStringBuilder.charAt(previewReddItAndIReddItImageMatcher.start()) == '[') {
+                        //Has caption
+                        int urlStartIndex = markdownStringBuilder.lastIndexOf("https://i.redd.it/", previewReddItAndIReddItImageMatcher.end());
+                        id = markdownStringBuilder.substring(iReddItLength + urlStartIndex,
+                                markdownStringBuilder.indexOf(".", iReddItLength + urlStartIndex));
+                        //Minus "](".length()
+                        caption = markdownStringBuilder.substring(previewReddItAndIReddItImageMatcher.start() + 1, urlStartIndex - 2);
+                    } else {
+                        id = markdownStringBuilder.substring(previewReddItAndIReddItImageMatcher.start() + iReddItLength, markdownStringBuilder.indexOf(".", previewReddItAndIReddItImageMatcher.start() + iReddItLength));
+                    }
+
+                    MediaMetadata mediaMetadata = mediaMetadataMap.get(id);
+                    if (mediaMetadata == null) {
+                        start = previewReddItAndIReddItImageMatcher.end();
+                        continue;
+                    }
+
+                    mediaMetadata.caption = caption;
+
+                    if (markdownStringBuilder.charAt(previewReddItAndIReddItImageMatcher.start()) == '[') {
+                        //Has caption
+                        markdownStringBuilder.insert(previewReddItAndIReddItImageMatcher.start(), '!');
+                        start = previewReddItAndIReddItImageMatcher.end() + 1;
+                    } else {
+                        String replacingText = "![](" + markdownStringBuilder.substring(previewReddItAndIReddItImageMatcher.start(), previewReddItAndIReddItImageMatcher.end()) + ")";
+                        markdownStringBuilder.replace(previewReddItAndIReddItImageMatcher.start(), previewReddItAndIReddItImageMatcher.end(), replacingText);
+                        start = replacingText.length() + previewReddItAndIReddItImageMatcher.start();
+                    }
                 } else {
-                    id = markdownStringBuilder.substring(matcher.start() + previewReddItLength,
-                            markdownStringBuilder.indexOf(".", matcher.start() + previewReddItLength));
+                    start = previewReddItAndIReddItImageMatcher.end();
                 }
+            } else if (videoMatcher.find(start)) {
+                String id = videoMatcher.group(4);
+                String linkId = videoMatcher.group(3);
+                String caption = videoMatcher.group(1);
 
                 MediaMetadata mediaMetadata = mediaMetadataMap.get(id);
                 if (mediaMetadata == null) {
-                    start = matcher.end();
-                    continue;
+                    MediaMetadata.MediaItem item = new MediaMetadata.MediaItem(0, 0, "https://v.redd.it/link/" + linkId + "/asset/" + id + "/HLSPlaylist.m3u8", null);
+                    mediaMetadata = new MediaMetadata(id, "Video", item, item);
+                    mediaMetadataMap.put(id, mediaMetadata);
                 }
 
                 mediaMetadata.caption = caption;
 
-                if (markdownStringBuilder.charAt(matcher.start()) == '[') {
+                if (markdownStringBuilder.charAt(videoMatcher.start()) == '[') {
                     //Has caption
-                    markdownStringBuilder.insert(matcher.start(), '!');
-                    start = matcher.end() + 1;
+                    markdownStringBuilder.insert(videoMatcher.start(), '!');
+                    start = videoMatcher.end() + 1;
                 } else {
-                    String replacingText = "![](" + markdownStringBuilder.substring(matcher.start(), matcher.end()) + ")";
-                    markdownStringBuilder.replace(matcher.start(), matcher.end(), replacingText);
-                    start = replacingText.length() + matcher.start();
+                    String replacingText = "![](" + videoMatcher.group(2) + ")";
+                    markdownStringBuilder.replace(videoMatcher.start(), videoMatcher.end(), replacingText);
+                    start = replacingText.length() + videoMatcher.start();
                 }
-
-                matcher = previewReddItAndIReddItImagePattern.matcher(markdownStringBuilder);
-            } else if (matcher.group(2) != null) {
-                String id;
-                String caption = null;
-                if (markdownStringBuilder.charAt(matcher.start()) == '[') {
-                    //Has caption
-                    int urlStartIndex = markdownStringBuilder.lastIndexOf("https://i.redd.it/", matcher.end());
-                    id = markdownStringBuilder.substring(iReddItLength + urlStartIndex,
-                            markdownStringBuilder.indexOf(".", iReddItLength + urlStartIndex));
-                    //Minus "](".length()
-                    caption = markdownStringBuilder.substring(matcher.start() + 1, urlStartIndex - 2);
-                } else {
-                    id = markdownStringBuilder.substring(matcher.start() + iReddItLength, markdownStringBuilder.indexOf(".", matcher.start() + iReddItLength));
-                }
-
-                MediaMetadata mediaMetadata = mediaMetadataMap.get(id);
-                if (mediaMetadata == null) {
-                    start = matcher.end();
-                    continue;
-                }
-
-                mediaMetadata.caption = caption;
-
-                if (markdownStringBuilder.charAt(matcher.start()) == '[') {
-                    //Has caption
-                    markdownStringBuilder.insert(matcher.start(), '!');
-                    start = matcher.end() + 1;
-                } else {
-                    String replacingText = "![](" + markdownStringBuilder.substring(matcher.start(), matcher.end()) + ")";
-                    markdownStringBuilder.replace(matcher.start(), matcher.end(), replacingText);
-                    start = replacingText.length() + matcher.start();
-                }
-
-                matcher = previewReddItAndIReddItImagePattern.matcher(markdownStringBuilder);
             } else {
-                start = matcher.end();
+                break;
             }
         }
 
-        return markdownStringBuilder.toString();
+        return new ParseRedditMediaBlockResult(markdownStringBuilder.toString(), mediaMetadataMap);
+    }
+
+    public final static class ParseRedditMediaBlockResult {
+        public String parsedMarkdown;
+        public Map<String, MediaMetadata> mediaMetadataMap;
+
+        public ParseRedditMediaBlockResult(String parsedMarkdown, Map<String, MediaMetadata> mediaMetadataMap) {
+            this.parsedMarkdown = parsedMarkdown;
+            this.mediaMetadataMap = mediaMetadataMap;
+        }
     }
 
     public static String trimTrailingWhitespace(String source) {

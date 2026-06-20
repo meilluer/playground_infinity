@@ -106,12 +106,16 @@ import ml.docilealligator.infinityforreddit.databinding.ItemPostDetailVideoAutop
 import ml.docilealligator.infinityforreddit.databinding.ItemPostDetailVideoAutoplayLegacyControllerBinding;
 import ml.docilealligator.infinityforreddit.fragments.ViewPostDetailFragment;
 import ml.docilealligator.infinityforreddit.markdown.CustomMarkwonAdapter;
-import ml.docilealligator.infinityforreddit.markdown.EmoteCloseBracketInlineProcessor;
-import ml.docilealligator.infinityforreddit.markdown.EmotePlugin;
+import ml.docilealligator.infinityforreddit.markdown.emote.EmoteCloseBracketInlineProcessor;
+import ml.docilealligator.infinityforreddit.markdown.emote.EmotePlugin;
 import ml.docilealligator.infinityforreddit.markdown.EvenBetterLinkMovementMethod;
-import ml.docilealligator.infinityforreddit.markdown.ImageAndGifEntry;
-import ml.docilealligator.infinityforreddit.markdown.ImageAndGifPlugin;
+import ml.docilealligator.infinityforreddit.markdown.imageandgif.ImageAndGifEntry;
+import ml.docilealligator.infinityforreddit.markdown.imageandgif.ImageAndGifPlugin;
 import ml.docilealligator.infinityforreddit.markdown.MarkdownUtils;
+import ml.docilealligator.infinityforreddit.markdown.video.VideoEntry;
+import ml.docilealligator.infinityforreddit.markdown.video.VideoPlugin;
+import ml.docilealligator.infinityforreddit.thing.MediaMetadata;
+import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity;
 import ml.docilealligator.infinityforreddit.post.FetchStreamableVideo;
 import ml.docilealligator.infinityforreddit.post.Post;
 import ml.docilealligator.infinityforreddit.post.PostPagingSource;
@@ -161,8 +165,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
     private final EmoteCloseBracketInlineProcessor mEmoteCloseBracketInlineProcessor;
     private final EmotePlugin mEmotePlugin;
     private final ImageAndGifPlugin mImageAndGifPlugin;
+    private final VideoPlugin mVideoPlugin;
     private final Markwon mPostDetailMarkwon;
     private final ImageAndGifEntry mImageAndGifEntry;
+    private final VideoEntry mVideoEntry;
     private final CustomMarkwonAdapter mMarkwonAdapter;
     private final String mAccessToken;
     private final String mAccountName;
@@ -434,9 +440,10 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     }
                 });
         mImageAndGifPlugin = new ImageAndGifPlugin();
+        mVideoPlugin = new VideoPlugin();
         mPostDetailMarkwon = MarkdownUtils.createFullRedditMarkwon(mActivity,
-                miscPlugin, mEmoteCloseBracketInlineProcessor, mEmotePlugin, mImageAndGifPlugin, markdownColor,
-                postSpoilerBackgroundColor, onLinkLongClickListener);
+                miscPlugin, mEmoteCloseBracketInlineProcessor, mEmotePlugin, mImageAndGifPlugin,
+                mVideoPlugin, markdownColor, postSpoilerBackgroundColor, onLinkLongClickListener);
         mImageAndGifEntry = new ImageAndGifEntry(activity,
                 mGlide, Integer.parseInt(postDetailsSharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
                 mDataSavingMode, mDisableImagePreview,
@@ -456,7 +463,25 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                         activity.startActivity(intent);
                     }
                 });
-        mMarkwonAdapter = MarkdownUtils.createCustomTablesAndImagesAdapter(mActivity, mImageAndGifEntry);
+        mVideoEntry = new VideoEntry(activity,
+                Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
+                mediaMetadata -> {
+                    if (canStartActivity) {
+                        canStartActivity = false;
+                        if (mediaMetadata == null) {
+                            return;
+                        }
+
+                        Intent intent = new Intent(activity, ViewVideoActivity.class);
+                        intent.setData(Uri.parse(mediaMetadata.original.url));
+                        intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_TYPE, ViewVideoActivity.VIDEO_TYPE_MARKDOWN_PARSED);
+                        intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_DOWNLOAD_URL, MediaMetadata.getDownloadUrlForMarkdownParsedVideo(mediaMetadata.original.url));
+                        intent.putExtra(ViewVideoActivity.EXTRA_SUBREDDIT, post.getSubredditName());
+                        intent.putExtra(ViewVideoActivity.EXTRA_ID, mediaMetadata.id);
+                        activity.startActivity(intent);
+                    }
+                });
+        mMarkwonAdapter = MarkdownUtils.createCustomTablesAndImagesAdapter(mActivity, mImageAndGifEntry, mVideoEntry);
     }
 
     public void setCanStartActivity(boolean canStartActivity) {
@@ -836,6 +861,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 ((PostDetailBaseViewHolder) holder).contentMarkdownView.setAdapter(mMarkwonAdapter);
                 mEmoteCloseBracketInlineProcessor.setMediaMetadataMap(mPost.getMediaMetadataMap());
                 mImageAndGifPlugin.setMediaMetadataMap(mPost.getMediaMetadataMap());
+                mVideoPlugin.setMediaMetadataMap(mPost.getMediaMetadataMap());
                 mMarkwonAdapter.setMarkdown(mPostDetailMarkwon, mPost.getSelfText());
                 // noinspection NotifyDataSetChanged
                 mMarkwonAdapter.notifyDataSetChanged();

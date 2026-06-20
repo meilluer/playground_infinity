@@ -56,12 +56,16 @@ import ml.docilealligator.infinityforreddit.databinding.ItemCommentBinding;
 import ml.docilealligator.infinityforreddit.databinding.ItemFooterErrorBinding;
 import ml.docilealligator.infinityforreddit.databinding.ItemFooterLoadingBinding;
 import ml.docilealligator.infinityforreddit.markdown.CustomMarkwonAdapter;
-import ml.docilealligator.infinityforreddit.markdown.EmoteCloseBracketInlineProcessor;
-import ml.docilealligator.infinityforreddit.markdown.EmotePlugin;
+import ml.docilealligator.infinityforreddit.markdown.emote.EmoteCloseBracketInlineProcessor;
+import ml.docilealligator.infinityforreddit.markdown.emote.EmotePlugin;
 import ml.docilealligator.infinityforreddit.markdown.EvenBetterLinkMovementMethod;
-import ml.docilealligator.infinityforreddit.markdown.ImageAndGifEntry;
-import ml.docilealligator.infinityforreddit.markdown.ImageAndGifPlugin;
+import ml.docilealligator.infinityforreddit.markdown.imageandgif.ImageAndGifEntry;
+import ml.docilealligator.infinityforreddit.markdown.imageandgif.ImageAndGifPlugin;
 import ml.docilealligator.infinityforreddit.markdown.MarkdownUtils;
+import ml.docilealligator.infinityforreddit.markdown.video.VideoEntry;
+import ml.docilealligator.infinityforreddit.markdown.video.VideoPlugin;
+import ml.docilealligator.infinityforreddit.thing.MediaMetadata;
+import org.jetbrains.annotations.Nullable;
 import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
@@ -88,8 +92,10 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
     private final EmoteCloseBracketInlineProcessor mEmoteCloseBracketInlineProcessor;
     private final EmotePlugin mEmotePlugin;
     private final ImageAndGifPlugin mImageAndGifPlugin;
+    private final VideoPlugin mVideoPlugin;
     private final Markwon mMarkwon;
     private final ImageAndGifEntry mImageAndGifEntry;
+    private final VideoEntry mVideoEntry;
     private final RecyclerView.RecycledViewPool recycledViewPool;
     private final String mAccessToken;
     private final String mAccountName;
@@ -198,9 +204,10 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                     }
                 });
         mImageAndGifPlugin = new ImageAndGifPlugin();
+        mVideoPlugin = new VideoPlugin();
         mMarkwon = MarkdownUtils.createFullRedditMarkwon(mActivity,
-                miscPlugin, mEmoteCloseBracketInlineProcessor, mEmotePlugin, mImageAndGifPlugin, mCommentColor,
-                commentSpoilerBackgroundColor, onLinkLongClickListener);
+                miscPlugin, mEmoteCloseBracketInlineProcessor, mEmotePlugin, mImageAndGifPlugin,
+                mVideoPlugin, mCommentColor, commentSpoilerBackgroundColor, onLinkLongClickListener);
         mImageAndGifEntry = new ImageAndGifEntry(activity, Glide.with(activity),
                 Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
                 mediaMetadata -> {
@@ -215,6 +222,14 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                     if (canStartActivity) {
                         canStartActivity = false;
                         activity.startActivity(intent);
+                    }
+                });
+        mVideoEntry = new VideoEntry(activity,
+                Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
+                new VideoEntry.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(@Nullable MediaMetadata mediaMetadata) {
+
                     }
                 });
         recycledViewPool = new RecyclerView.RecycledViewPool();
@@ -272,6 +287,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
 
                 mEmoteCloseBracketInlineProcessor.setMediaMetadataMap(comment.getMediaMetadataMap());
                 mImageAndGifPlugin.setMediaMetadataMap(comment.getMediaMetadataMap());
+                mVideoPlugin.setMediaMetadataMap(comment.getMediaMetadataMap());
                 ((CommentBaseViewHolder) holder).markwonAdapter.setMarkdown(mMarkwon, comment.getCommentMarkdown());
                 // noinspection NotifyDataSetChanged
                 ((CommentBaseViewHolder) holder).markwonAdapter.notifyDataSetChanged();
@@ -598,7 +614,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                 }
             });
             commentMarkdownView.setLayoutManager(linearLayoutManager);
-            markwonAdapter = MarkdownUtils.createCustomTablesAndImagesAdapter(mActivity, mImageAndGifEntry);
+            markwonAdapter = MarkdownUtils.createCustomTablesAndImagesAdapter(mActivity, mImageAndGifEntry, mVideoEntry);
             markwonAdapter.setOnClickListener(view -> {
                 if (view instanceof SpoilerOnClickTextView) {
                     if (((SpoilerOnClickTextView) view).isSpoilerOnClick()) {
