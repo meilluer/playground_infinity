@@ -1,5 +1,7 @@
 package ml.docilealligator.infinityforreddit.archive;
 
+import android.util.Log;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,8 +20,12 @@ import java.util.List;
 import java.util.Map;
 
 class ArcticShiftClient {
+    private static final String TAG = "ArcticShiftClient";
     private static final String BASE_URL = "https://arctic-shift.photon-reddit.com";
-    private static final int TIMEOUT_MS = 5000;
+    private static final int TIMEOUT_MS = 15000;
+
+    // Debug info from the last request
+    String lastDebugInfo = "";
 
     Map<String, ArcticShiftThing> getPostsByIds(List<String> ids) throws IOException, JSONException {
         return getThings("/api/posts/ids?fields=id,author,title,selftext&ids=", ids);
@@ -76,7 +82,12 @@ class ArcticShiftClient {
 
     private List<ArcticShiftThing> getThingList(String pathAndQuery) throws IOException, JSONException {
         ArrayList<ArcticShiftThing> things = new ArrayList<>();
-        HttpURLConnection connection = (HttpURLConnection) new URL(BASE_URL + pathAndQuery).openConnection();
+        String fullUrl = BASE_URL + pathAndQuery;
+        Log.d(TAG, "Fetching: " + fullUrl);
+        StringBuilder debugBuilder = new StringBuilder();
+        debugBuilder.append("URL: ").append(fullUrl).append("\n");
+
+        HttpURLConnection connection = (HttpURLConnection) new URL(fullUrl).openConnection();
         connection.setConnectTimeout(TIMEOUT_MS);
         connection.setReadTimeout(TIMEOUT_MS);
         connection.setRequestMethod("GET");
@@ -84,14 +95,47 @@ class ArcticShiftClient {
 
         try {
             int responseCode = connection.getResponseCode();
+            debugBuilder.append("HTTP ").append(responseCode).append("\n");
+            Log.d(TAG, "Response code: " + responseCode);
+
             if (responseCode < 200 || responseCode >= 300) {
+                // Try to read error body
+                try {
+                    InputStream errorStream = connection.getErrorStream();
+                    if (errorStream != null) {
+                        String errorBody = readBody(errorStream);
+                        debugBuilder.append("Error: ").append(errorBody).append("\n");
+                        Log.e(TAG, "Error body: " + errorBody);
+                    }
+                } catch (Exception ignored) {}
+                lastDebugInfo = debugBuilder.toString();
                 return things;
             }
 
-            JSONArray data = dataFromResponse(connection);
+            String rawBody = readBody(connection.getInputStream());
+            debugBuilder.append("Raw body (first 500 chars): ").append(rawBody.substring(0, Math.min(500, rawBody.length()))).append("\n");
+            Log.d(TAG, "Raw body: " + rawBody.substring(0, Math.min(500, rawBody.length())));
+
+            JSONObject response = new JSONObject(rawBody);
+            JSONArray data = response.optJSONArray("data");
+            debugBuilder.append("Has 'data' key: ").append(data != null).append("\n");
+
+            if (data == null) {
+                // Log all top-level keys to see what the response looks like
+                debugBuilder.append("Top-level keys: ").append(response.keys().toString()).append("\n");
+                Log.w(TAG, "No 'data' array in response. Keys: " + response.keys());
+                lastDebugInfo = debugBuilder.toString();
+                return things;
+            }
+
+            debugBuilder.append("data array length: ").append(data.length()).append("\n");
+            Log.d(TAG, "data array length: " + data.length());
+
             for (int i = 0; i < data.length(); i++) {
                 things.add(parseThing(data.getJSONObject(i)));
             }
+            debugBuilder.append("Parsed things: ").append(things.size()).append("\n");
+            lastDebugInfo = debugBuilder.toString();
             return things;
         } finally {
             connection.disconnect();

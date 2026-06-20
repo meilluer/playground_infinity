@@ -444,21 +444,41 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
             return;
         }
         mExecutor.execute(() -> {
-            ArrayList<Comment> archivedComments = new ArcticShiftUserListingFetcher().fetchComments(usernameArg);
+            ArcticShiftUserListingFetcher fetcher = new ArcticShiftUserListingFetcher();
+            ArrayList<Comment> archivedComments = fetcher.fetchComments(usernameArg);
+            String debugInfo = fetcher.getLastDebugInfo();
+            String errorInfo = fetcher.getLastError();
             mActivity.mHandler.post(() -> {
                 if (!isAdded() || mActivity == null || mActivity.isFinishing() || mActivity.isDestroyed()) {
                     return;
                 }
 
                 binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(false);
+
+                // Build debug text
+                StringBuilder msg = new StringBuilder();
+                msg.append("Comments found: ").append(archivedComments.size()).append("\n");
+                if (!errorInfo.isEmpty()) {
+                    msg.append("ERROR: ").append(errorInfo).append("\n");
+                }
+                msg.append("\n").append(debugInfo);
+
                 if (archivedComments.isEmpty()) {
+                    // Show debug info inline in the error text view
+                    binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.VISIBLE);
+                    binding.fetchCommentsInfoImageViewCommentsListingFragment.setVisibility(View.GONE);
+                    binding.fetchCommentsInfoTextViewCommentsListingFragment.setText(msg.toString());
+                    binding.fetchCommentsInfoTextViewCommentsListingFragment.setTextIsSelectable(true);
                     binding.fetchCommentsInfoButtonCommentsListingFragment.setOnClickListener(view -> loadCommentsFromArchive());
                     binding.fetchCommentsInfoButtonCommentsListingFragment.setVisibility(View.VISIBLE);
-                    showErrorView(R.string.no_comments);
                     return;
                 }
 
-                binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.GONE);
+                // Show debug info above the loaded comments
+                binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.VISIBLE);
+                binding.fetchCommentsInfoImageViewCommentsListingFragment.setVisibility(View.GONE);
+                binding.fetchCommentsInfoTextViewCommentsListingFragment.setText(msg.toString());
+                binding.fetchCommentsInfoTextViewCommentsListingFragment.setTextIsSelectable(true);
 
                 androidx.paging.PagedList.Config config = new androidx.paging.PagedList.Config.Builder()
                         .setEnablePlaceholders(false)

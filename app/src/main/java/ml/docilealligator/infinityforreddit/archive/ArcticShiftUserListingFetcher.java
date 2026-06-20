@@ -10,17 +10,37 @@ import ml.docilealligator.infinityforreddit.utils.Utils;
 
 public class ArcticShiftUserListingFetcher {
     private final ArcticShiftClient client = new ArcticShiftClient();
+    private String lastDebugInfo = "";
+    private String lastError = "";
+
+    public String getLastDebugInfo() {
+        return lastDebugInfo;
+    }
+
+    public String getLastError() {
+        return lastError;
+    }
 
     public ArrayList<Post> fetchPosts(String author) {
         ArrayList<Post> posts = new ArrayList<>();
+        lastError = "";
+        lastDebugInfo = "";
         try {
-            for (ArcticShiftThing thing : client.searchPostsByAuthor(author)) {
+            java.util.List<ArcticShiftThing> things = client.searchPostsByAuthor(author);
+            lastDebugInfo = client.lastDebugInfo;
+            int skipped = 0;
+            for (ArcticShiftThing thing : things) {
                 Post post = toPost(thing);
                 if (post != null) {
                     posts.add(post);
+                } else {
+                    skipped++;
                 }
             }
+            lastDebugInfo += "Converted: " + posts.size() + ", Skipped (null title/id): " + skipped + "\n";
         } catch (Exception e) {
+            lastError = e.getClass().getSimpleName() + ": " + e.getMessage();
+            lastDebugInfo = client.lastDebugInfo;
             e.printStackTrace();
         }
         return posts;
@@ -28,14 +48,24 @@ public class ArcticShiftUserListingFetcher {
 
     public ArrayList<Comment> fetchComments(String author) {
         ArrayList<Comment> comments = new ArrayList<>();
+        lastError = "";
+        lastDebugInfo = "";
         try {
-            for (ArcticShiftThing thing : client.searchCommentsByAuthor(author)) {
+            java.util.List<ArcticShiftThing> things = client.searchCommentsByAuthor(author);
+            lastDebugInfo = client.lastDebugInfo;
+            int skipped = 0;
+            for (ArcticShiftThing thing : things) {
                 Comment comment = toComment(thing);
                 if (comment != null) {
                     comments.add(comment);
+                } else {
+                    skipped++;
                 }
             }
+            lastDebugInfo += "Converted: " + comments.size() + ", Skipped (null body/id): " + skipped + "\n";
         } catch (Exception e) {
+            lastError = e.getClass().getSimpleName() + ": " + e.getMessage();
+            lastDebugInfo = client.lastDebugInfo;
             e.printStackTrace();
         }
         return comments;

@@ -1003,23 +1003,44 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         binding.fetchPostInfoButtonPostFragment.setVisibility(View.GONE);
         binding.swipeRefreshLayoutPostFragment.setRefreshing(true);
         mExecutor.execute(() -> {
-            ArrayList<Post> archivedPosts = new ArcticShiftUserListingFetcher().fetchPosts(username);
+            ArcticShiftUserListingFetcher fetcher = new ArcticShiftUserListingFetcher();
+            ArrayList<Post> archivedPosts = fetcher.fetchPosts(username);
+            String debugInfo = fetcher.getLastDebugInfo();
+            String errorInfo = fetcher.getLastError();
             mHandler.post(() -> {
                 if (!isAdded() || activity == null || activity.isFinishing() || activity.isDestroyed()) {
                     return;
                 }
 
                 binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
+
+                // Build debug text
+                StringBuilder msg = new StringBuilder();
+                msg.append("Posts found: ").append(archivedPosts.size()).append("\n");
+                if (!errorInfo.isEmpty()) {
+                    msg.append("ERROR: ").append(errorInfo).append("\n");
+                }
+                msg.append("\n").append(debugInfo);
+
                 if (archivedPosts.isEmpty()) {
+                    // Show debug info inline in the error text view
+                    binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
+                    binding.fetchPostInfoImageViewPostFragment.setVisibility(View.GONE);
+                    binding.fetchPostInfoTextViewPostFragment.setText(msg.toString());
+                    binding.fetchPostInfoTextViewPostFragment.setTextIsSelectable(true);
                     binding.fetchPostInfoButtonPostFragment.setOnClickListener(view -> loadPostsFromArchive());
                     binding.fetchPostInfoButtonPostFragment.setVisibility(View.VISIBLE);
-                    showErrorView(R.string.no_posts);
                     return;
                 }
 
+                // Show debug info above the loaded posts
+                binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
+                binding.fetchPostInfoImageViewPostFragment.setVisibility(View.GONE);
+                binding.fetchPostInfoTextViewPostFragment.setText(msg.toString());
+                binding.fetchPostInfoTextViewPostFragment.setTextIsSelectable(true);
+
                 isShowingArchivePosts = true;
                 hasPost = true;
-                binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.GONE);
                 mAdapter.submitData(getViewLifecycleOwner().getLifecycle(), PagingData.from(archivedPosts));
             });
         });
