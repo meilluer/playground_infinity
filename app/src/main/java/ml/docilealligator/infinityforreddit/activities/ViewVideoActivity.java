@@ -138,6 +138,7 @@ public class ViewVideoActivity extends AppCompatActivity implements CustomFontRe
     public static final String EXTRA_STREAMABLE_SHORT_CODE = "ESSC";
     public static final String EXTRA_IS_NSFW = "EIN";
     public static final String EXTRA_VIDEO_TYPE = "EVT";
+    public static final int VIDEO_TYPE_MARKDOWN_PARSED = 8;
     public static final int VIDEO_TYPE_IMGUR = 7;
     public static final int VIDEO_TYPE_STREAMABLE = 5;
     public static final int VIDEO_TYPE_V_REDD_IT = 4;
@@ -545,7 +546,7 @@ public class ViewVideoActivity extends AppCompatActivity implements CustomFontRe
             public void onTracksChanged(@NonNull Tracks tracks) {
                 ImmutableList<Tracks.Group> trackGroups = tracks.getGroups();
                 if (!trackGroups.isEmpty()) {
-                    if (videoType == VIDEO_TYPE_NORMAL) {
+                    if (videoType == VIDEO_TYPE_NORMAL || videoType == VIDEO_TYPE_MARKDOWN_PARSED) {
                         binding.getVideoQualityButton().setVisibility(View.VISIBLE);
                         binding.getVideoQualityButton().setOnClickListener(view -> {
                             TrackSelectionDialogBuilder builder = new TrackSelectionDialogBuilder(ViewVideoActivity.this, getString(R.string.select_video_quality), player, C.TRACK_TYPE_VIDEO);
@@ -622,7 +623,7 @@ public class ViewVideoActivity extends AppCompatActivity implements CustomFontRe
 
                     for (Tracks.Group trackGroup : tracks.getGroups()) {
                         if (trackGroup.getType() == C.TRACK_TYPE_AUDIO) {
-                            if (videoType == VIDEO_TYPE_NORMAL && trackGroup.length > 1) {
+                            if ((videoType == VIDEO_TYPE_NORMAL || videoType == VIDEO_TYPE_MARKDOWN_PARSED) && trackGroup.length > 1) {
                                 // Reddit video HLS usually has two audio tracks. The first is mono.
                                 // The second (index 1) is stereo.
                                 // Select the stereo audio track if possible.
@@ -793,7 +794,7 @@ public class ViewVideoActivity extends AppCompatActivity implements CustomFontRe
                         }
                     });
         } else {
-            if (videoType == VIDEO_TYPE_NORMAL) {
+            if (videoType == VIDEO_TYPE_NORMAL || videoType == VIDEO_TYPE_MARKDOWN_PARSED) {
                 // Prepare the player with the source.
                 player.prepare();
                 player.setMediaSource(new HlsMediaSource.Factory(dataSourceFactory).createMediaSource(MediaItem.fromUri(mVideoUri)));
@@ -1005,7 +1006,7 @@ public class ViewVideoActivity extends AppCompatActivity implements CustomFontRe
     private void download() {
         isDownloading = false;
 
-        if (videoType != VIDEO_TYPE_NORMAL) {
+        if (videoType != VIDEO_TYPE_NORMAL && videoType != VIDEO_TYPE_MARKDOWN_PARSED) {
             PersistableBundle extras = new PersistableBundle();
             if (post != null && post.getPostType() == Post.GIF_TYPE) {
                 extras.putString(DownloadMediaService.EXTRA_URL, post.getVideoUrl());
