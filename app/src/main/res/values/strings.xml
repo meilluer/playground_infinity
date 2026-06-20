@@ -135,6 +135,8 @@
     <string name="search_users_error">Error searching users.\nTap to retry.</string>
     <string name="no_posts">No posts found</string>
     <string name="no_comments">No comments found</string>
+    <string name="load_posts_from_archive">Load post from archive</string>
+    <string name="load_comments_from_archive">Load comment from archive</string>
     <string name="no_subreddits">No subreddits found</string>
     <string name="no_users">No users found</string>
     <string name="no_multi_reddits">No Multireddits found</string>

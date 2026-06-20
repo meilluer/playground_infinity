@@ -59,6 +59,10 @@ import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import retrofit2.Retrofit;
 
+import java.util.ArrayList;
+import java.util.List;
+import ml.docilealligator.infinityforreddit.archive.ArcticShiftUserListingFetcher;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -321,8 +325,14 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
                 if (hasComment) {
                     binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.GONE);
                 } else {
-                    binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(null);
-                    showErrorView(R.string.no_comments);
+                    boolean areSavedComments = getArguments() != null && getArguments().getBoolean(EXTRA_ARE_SAVED_COMMENTS);
+                    String usernameArg = getArguments() != null ? getArguments().getString(EXTRA_USERNAME) : null;
+                    if (!areSavedComments && usernameArg != null && !usernameArg.isEmpty()) {
+                        showLoadCommentsFromArchiveView();
+                    } else {
+                        binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(null);
+                        showErrorView(R.string.no_comments);
+                    }
                 }
             });
 
@@ -402,6 +412,60 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
         if (mActivity.typeface != null) {
             binding.fetchCommentsInfoTextViewCommentsListingFragment.setTypeface(mActivity.typeface);
         }
+    }
+
+    private void showLoadCommentsFromArchiveView() {
+        showErrorView(R.string.load_comments_from_archive);
+        binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(view -> loadCommentsFromArchive());
+    }
+
+    private void loadCommentsFromArchive() {
+        binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(null);
+        binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(true);
+        String usernameArg = getArguments() != null ? getArguments().getString(EXTRA_USERNAME) : null;
+        if (usernameArg == null) {
+            binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(false);
+            return;
+        }
+        mExecutor.execute(() -> {
+            ArrayList<Comment> archivedComments = new ArcticShiftUserListingFetcher().fetchComments(usernameArg);
+            mActivity.mHandler.post(() -> {
+                if (!isAdded() || mActivity == null || mActivity.isFinishing() || mActivity.isDestroyed()) {
+                    return;
+                }
+
+                binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(false);
+                if (archivedComments.isEmpty()) {
+                    binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(view -> loadCommentsFromArchive());
+                    showErrorView(R.string.no_comments);
+                    return;
+                }
+
+                binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.GONE);
+
+                androidx.paging.PagedList.Config config = new androidx.paging.PagedList.Config.Builder()
+                        .setEnablePlaceholders(false)
+                        .setPageSize(archivedComments.size())
+                        .build();
+
+                androidx.paging.PagedList<Comment> pagedList = new androidx.paging.PagedList.Builder<>(
+                        new androidx.paging.PositionalDataSource<Comment>() {
+                            @Override
+                            public void loadInitial(@NonNull androidx.paging.PositionalDataSource.LoadInitialParams params, @NonNull androidx.paging.PositionalDataSource.LoadInitialCallback<Comment> callback) {
+                                callback.onResult(archivedComments, 0, archivedComments.size());
+                            }
+
+                            @Override
+                            public void loadRange(@NonNull androidx.paging.PositionalDataSource.LoadRangeParams params, @NonNull androidx.paging.PositionalDataSource.LoadRangeCallback<Comment> callback) {
+                            }
+                        }, config)
+                        .setNotifyExecutor(runnable -> mActivity.mHandler.post(runnable))
+                        .setFetchExecutor(mExecutor)
+                        .build();
+
+                mAdapter.submitList(pagedList);
+            });
+        });
     }
 
     private void showErrorView(int stringResId) {

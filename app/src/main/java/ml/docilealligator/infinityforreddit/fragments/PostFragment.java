@@ -20,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.paging.LoadState;
+import androidx.paging.PagingData;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -55,6 +56,7 @@ import ml.docilealligator.infinityforreddit.activities.ViewSubredditDetailActivi
 import ml.docilealligator.infinityforreddit.adapters.Paging3LoadingStateAdapter;
 import ml.docilealligator.infinityforreddit.adapters.PostRecyclerViewAdapter;
 import ml.docilealligator.infinityforreddit.apis.StreamableAPI;
+import ml.docilealligator.infinityforreddit.archive.ArcticShiftUserListingFetcher;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.FABMoreOptionsBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.customviews.LinearLayoutManagerBugFixed;
 import ml.docilealligator.infinityforreddit.databinding.FragmentPostBinding;
@@ -146,6 +148,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
     private ReadPostsListInterface readPostsList;
     private FragmentPostBinding binding;
     private final Handler mHandler = new Handler();
+    private boolean isShowingArchivePosts;
 
     public PostFragment() {
         // Required empty public constructor
@@ -972,8 +975,42 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
             stopLazyMode();
         }
 
+        if (postType == PostPagingSource.TYPE_USER && PostPagingSource.USER_WHERE_SUBMITTED.equals(where)) {
+            showLoadPostsFromArchiveView();
+        } else {
+            binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
+            showErrorView(R.string.no_posts);
+        }
+    }
+
+    private void showLoadPostsFromArchiveView() {
+        showErrorView(R.string.load_posts_from_archive);
+        binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(view -> loadPostsFromArchive());
+    }
+
+    private void loadPostsFromArchive() {
         binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
-        showErrorView(R.string.no_posts);
+        binding.swipeRefreshLayoutPostFragment.setRefreshing(true);
+        mExecutor.execute(() -> {
+            ArrayList<Post> archivedPosts = new ArcticShiftUserListingFetcher().fetchPosts(username);
+            mHandler.post(() -> {
+                if (!isAdded() || activity == null || activity.isFinishing() || activity.isDestroyed()) {
+                    return;
+                }
+
+                binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
+                if (archivedPosts.isEmpty()) {
+                    binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(view -> loadPostsFromArchive());
+                    showErrorView(R.string.no_posts);
+                    return;
+                }
+
+                isShowingArchivePosts = true;
+                hasPost = true;
+                binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.GONE);
+                mAdapter.submitData(getViewLifecycleOwner().getLifecycle(), PagingData.from(archivedPosts));
+            });
+        });
     }
 
     public void changeSortType(SortType sortType) {
@@ -1073,6 +1110,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
     public void refresh() {
         binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.GONE);
         hasPost = false;
+        isShowingArchivePosts = false;
         if (isInLazyMode) {
             stopLazyMode();
         }
