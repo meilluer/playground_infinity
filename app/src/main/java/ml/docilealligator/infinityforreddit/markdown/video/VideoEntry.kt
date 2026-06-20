@@ -1,6 +1,8 @@
 package ml.docilealligator.infinityforreddit.markdown.video
 
 import android.content.Intent
+import android.graphics.Point
+import android.graphics.Rect
 import android.graphics.drawable.Drawable
 import android.text.SpannableString
 import android.text.Spanned
@@ -14,7 +16,6 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
 import androidx.media3.common.C
 import androidx.media3.common.PlaybackException
-import androidx.media3.common.Player
 import androidx.media3.common.Tracks
 import androidx.media3.common.TrackSelectionOverride
 import androidx.recyclerview.widget.RecyclerView
@@ -24,7 +25,6 @@ import io.noties.markwon.recycler.MarkwonAdapter
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import ml.docilealligator.infinityforreddit.SaveMemoryCenterInisdeDownsampleStrategy
 import ml.docilealligator.infinityforreddit.R
-import ml.docilealligator.infinityforreddit.HeadphoneManager
 import ml.docilealligator.infinityforreddit.activities.BaseActivity
 import ml.docilealligator.infinityforreddit.activities.LinkResolverActivity
 import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity
@@ -36,6 +36,7 @@ import ml.docilealligator.infinityforreddit.thing.MediaMetadata
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils
 import ml.docilealligator.infinityforreddit.videoautoplay.ExoCreator
 import ml.docilealligator.infinityforreddit.videoautoplay.ExoPlayerViewHelper
+import ml.docilealligator.infinityforreddit.videoautoplay.Playable
 import ml.docilealligator.infinityforreddit.videoautoplay.ToroPlayer
 import ml.docilealligator.infinityforreddit.videoautoplay.ToroUtil
 import ml.docilealligator.infinityforreddit.videoautoplay.media.PlaybackInfo
@@ -200,7 +201,7 @@ class VideoEntry(
                     } else {
                         ExoPlayerViewHelper(this, url.toUri())
                     }
-                    helper?.addEventListener(object : Player.Listener {
+                    helper?.addEventListener(object : Playable.EventListener {
                         override fun onTracksChanged(tracks: Tracks) {
                             val trackGroups = tracks.groups
                             if (!trackGroups.isEmpty()) {
@@ -359,14 +360,29 @@ class VideoEntry(
             val parentHolder = container?.let { getCommentViewHolder(it) }
             val viewToEvaluate = parentHolder?.itemView ?: itemView
             
-            return autoplayVideo && ToroUtil.visibleAreaOffset(
-                viewToEvaluate,
-                viewToEvaluate.parent
-            ) >= startAutoplayVisibleAreaOffset
+            return autoplayVideo && visibleAreaOffset(viewToEvaluate) >= startAutoplayVisibleAreaOffset
         }
 
         override fun getPlayerOrder(): Int {
             return absoluteAdapterPosition
+        }
+
+        private fun visibleAreaOffset(view: View): Float {
+            if (view.parent == null) {
+                return 0f
+            }
+
+            val drawRect = Rect()
+            view.getDrawingRect(drawRect)
+            val drawArea = drawRect.width() * drawRect.height()
+            val visibleRect = Rect()
+            val visible = view.getGlobalVisibleRect(visibleRect, Point())
+
+            return if (visible && drawArea > 0) {
+                visibleRect.height() * visibleRect.width() / drawArea.toFloat()
+            } else {
+                0f
+            }
         }
     }
 
