@@ -127,7 +127,8 @@ public class LiveActivityWorker extends Worker {
 
                 mRedditDataRoomDatabase.followedThingDao().update(thing);
 
-                if (itemTopContentCreatedUtc > newestActivityCreatedUtc) {
+                if (itemTopContent != null && !itemTopContent.trim().isEmpty()
+                        && itemTopContentCreatedUtc > newestActivityCreatedUtc) {
                     headlineThing = thing;
                     topContent = itemTopContent;
                     newestActivityCreatedUtc = itemTopContentCreatedUtc;
@@ -199,15 +200,18 @@ public class LiveActivityWorker extends Worker {
         JSONArray commentArray = new JSONArray(commentResponse.body());
         JSONArray comments = commentArray.getJSONObject(1).getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
         JSONObject targetComment = findCommentById(comments, thing.getFullName());
-        if (targetComment == null || !targetComment.has("replies") || targetComment.isNull("replies")) {
+        JSONObject repliesObject = targetComment == null || targetComment.isNull("replies")
+                ? null
+                : targetComment.optJSONObject("replies");
+        if (repliesObject == null) {
             return new ActivitySnapshot(0, null, -1);
         }
 
-        JSONObject repliesData = targetComment.getJSONObject("replies").getJSONObject(JSONUtils.DATA_KEY);
+        JSONObject repliesData = repliesObject.getJSONObject(JSONUtils.DATA_KEY);
         JSONArray replies = repliesData.getJSONArray(JSONUtils.CHILDREN_KEY);
         
         JSONObject latestReply = null;
-        double maxCreatedUtc = 0;
+        double maxCreatedUtc = -1;
         int replyCount = 0;
         for (int i = 0; i < replies.length(); i++) {
             JSONObject replyObj = replies.getJSONObject(i);
@@ -236,8 +240,9 @@ public class LiveActivityWorker extends Worker {
             if (data.getString(JSONUtils.NAME_KEY).equals(fullName)) {
                 return data;
             }
-            if (data.has("replies") && !data.isNull("replies")) {
-                JSONArray replies = data.getJSONObject("replies").getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
+            JSONObject repliesObject = data.isNull("replies") ? null : data.optJSONObject("replies");
+            if (repliesObject != null) {
+                JSONArray replies = repliesObject.getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
                 JSONObject found = findCommentById(replies, fullName);
                 if (found != null) {
                     return found;

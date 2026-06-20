@@ -60,9 +60,7 @@ public class LiveActivityNotificationManager {
         String collapsedSubtitle = totalFollowedCount == 1
                 ? "r/" + headlineThing.getSubreddit() + " • " + elapsedTime
                 : headlineThing.getTitle() + " • " + elapsedTime;
-        String expandedSubtitle = !TextUtils.isEmpty(topContent)
-                ? topContent
-                : "r/" + headlineThing.getSubreddit() + " • " + elapsedTime;
+        String expandedSubtitle = !TextUtils.isEmpty(topContent) ? topContent : "";
 
         String contentText = expandedSubtitle;
 
