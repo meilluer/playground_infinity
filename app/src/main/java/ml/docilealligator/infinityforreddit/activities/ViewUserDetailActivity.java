@@ -182,6 +182,7 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
     private String description;
     private boolean subscriptionReady = false;
     private boolean mFetchUserInfoSuccess = false;
+    private boolean mUserDataLoaded = false;
     private int expandedTabTextColor;
     private int expandedTabBackgroundColor;
     private int expandedTabIndicatorColor;
@@ -454,6 +455,7 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
                 .get(UserViewModel.class);
         userViewModel.getUserLiveData().observe(this, userData -> {
             if (userData != null) {
+                mUserDataLoaded = true;
                 if (userData.getBanner().equals("")) {
                     binding.bannerImageViewViewUserDetailActivity.setOnClickListener(null);
                 } else {
@@ -1185,7 +1187,7 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
 
     private void fetchUserInfo() {
         if (!mFetchUserInfoSuccess) {
-            FetchUserData.fetchUserData(mExecutor, mHandler, mRetrofit, username, new FetchUserData.FetchUserDataListener() {
+            FetchUserData.FetchUserDataListener listener = new FetchUserData.FetchUserDataListener() {
                 @Override
                 public void onFetchUserDataSuccess(UserData userData, int inboxCount) {
                     mExecutor.execute(() -> {
@@ -1198,10 +1200,18 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
 
                 @Override
                 public void onFetchUserDataFailed() {
-                    showMessage(R.string.cannot_fetch_user_info, true);
+                    if (!mUserDataLoaded) {
+                        showMessage(R.string.cannot_fetch_user_info, true);
+                    }
                     mFetchUserInfoSuccess = false;
                 }
-            });
+            };
+
+            if (accountName.equals(ml.docilealligator.infinityforreddit.account.Account.ANONYMOUS_ACCOUNT)) {
+                FetchUserData.fetchUserData(mExecutor, mHandler, mRetrofit, username, listener);
+            } else {
+                FetchUserData.fetchUserData(mExecutor, mHandler, mRedditDataRoomDatabase, mOauthRetrofit, mRetrofit, accessToken, username, listener);
+            }
         }
     }
 
