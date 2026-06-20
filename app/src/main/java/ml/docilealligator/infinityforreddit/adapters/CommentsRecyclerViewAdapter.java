@@ -1471,9 +1471,22 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             super(itemView);
         }
 
+        private void findActiveVideoHolder() {
+            if (activeVideoHolder == null && commentMarkdownView != null) {
+                for (int i = 0; i < commentMarkdownView.getChildCount(); i++) {
+                    RecyclerView.ViewHolder holder = commentMarkdownView.getChildViewHolder(commentMarkdownView.getChildAt(i));
+                    if (holder instanceof VideoEntry.Holder) {
+                        activeVideoHolder = (VideoEntry.Holder) holder;
+                        break;
+                    }
+                }
+            }
+        }
+
         @NonNull
         @Override
         public View getPlayerView() {
+            findActiveVideoHolder();
             if (activeVideoHolder != null && mAutoplayCommentsVideo) {
                 return activeVideoHolder.getPlayerView();
             }
@@ -1483,6 +1496,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         @NonNull
         @Override
         public PlaybackInfo getCurrentPlaybackInfo() {
+            findActiveVideoHolder();
             if (activeVideoHolder != null && mAutoplayCommentsVideo) {
                 return activeVideoHolder.getCurrentPlaybackInfo();
             }
@@ -1491,6 +1505,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         @Override
         public void initialize(@NonNull Container container, @NonNull PlaybackInfo playbackInfo) {
+            findActiveVideoHolder();
             if (activeVideoHolder != null && mAutoplayCommentsVideo) {
                 activeVideoHolder.initialize(container, playbackInfo);
             }
@@ -1498,6 +1513,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         @Override
         public void play() {
+            findActiveVideoHolder();
             if (activeVideoHolder != null && mAutoplayCommentsVideo) {
                 activeVideoHolder.play();
             }
@@ -1505,6 +1521,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         @Override
         public void pause() {
+            findActiveVideoHolder();
             if (activeVideoHolder != null && mAutoplayCommentsVideo) {
                 activeVideoHolder.pause();
             }
@@ -1512,6 +1529,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         @Override
         public boolean isPlaying() {
+            findActiveVideoHolder();
             if (activeVideoHolder != null && mAutoplayCommentsVideo) {
                 return activeVideoHolder.isPlaying();
             }
@@ -1527,6 +1545,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         @Override
         public boolean wantsToPlay() {
+            findActiveVideoHolder();
             if (activeVideoHolder != null && mAutoplayCommentsVideo) {
                 return activeVideoHolder.wantsToPlay();
             }
