@@ -334,6 +334,11 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 new VideoEntry.OnItemClickListener() {
             @Override
             public void onItemClick(@org.jetbrains.annotations.Nullable MediaMetadata mediaMetadata) {
+                onItemClick(mediaMetadata, -1L);
+            }
+
+            @Override
+            public void onItemClick(@org.jetbrains.annotations.Nullable MediaMetadata mediaMetadata, long playbackPosition) {
                 if (canStartActivity) {
                     canStartActivity = false;
                     if (mediaMetadata == null) {
@@ -348,6 +353,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         intent.putExtra(ViewVideoActivity.EXTRA_SUBREDDIT, post.getSubredditName());
                     }
                     intent.putExtra(ViewVideoActivity.EXTRA_ID, mediaMetadata.id);
+                    intent.putExtra(ViewVideoActivity.EXTRA_PROGRESS_SECONDS, playbackPosition);
                     activity.startActivity(intent);
                 }
             }

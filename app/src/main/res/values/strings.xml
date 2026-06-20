@@ -243,6 +243,9 @@
     <string name="comment_continue_thread">Continue thread</string>
     <string name="restore_comment">Restore comment</string>
     <string name="restore_comment_failed">Could not restore this comment</string>
+    <string name="restore_post">Restore post</string>
+    <string name="restore_post_failed">Could not restore this post</string>
+    <string name="restore_post_success">Successfully restored post</string>
 
     <string name="loading">Loading</string>
 

@@ -724,16 +724,11 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                                      boolean hasMoreComments,
                                                      @Nullable Runnable afterAddComments) {
         mExecutor.execute(() -> {
-            new ArcticShiftRestorer().restorePost(mPost);
-
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (!isAdded() || mCommentsAdapter == null) {
                     return;
                 }
 
-                if (mPostAdapter != null) {
-                    mPostAdapter.updatePost(mPost);
-                }
                 mCommentsAdapter.addComments(expandedComments, hasMoreComments);
                 if (afterAddComments != null) {
                     afterAddComments.run();
@@ -799,6 +794,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         if (mMenu != null) {
             MenuItem saveItem = mMenu.findItem(R.id.action_save_view_post_detail_fragment);
             MenuItem hideItem = mMenu.findItem(R.id.action_hide_view_post_detail_fragment);
+
+            MenuItem restorePostItem = mMenu.findItem(R.id.action_restore_post_view_post_detail_fragment);
+            boolean canRestorePost = mPost != null && (shouldRestore(mPost.getSelfTextPlain()) || shouldRestore(mPost.getSelfText()));
+            restorePostItem.setVisible(canRestorePost);
 
             mMenu.findItem(R.id.action_comment_view_post_detail_fragment).setVisible(true);
             mMenu.findItem(R.id.action_sort_view_post_detail_fragment).setVisible(true);
@@ -1052,7 +1051,28 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         int itemId = item.getItemId();
-        if (itemId == R.id.action_search_view_post_detail_fragment) {
+        if (itemId == R.id.action_restore_post_view_post_detail_fragment) {
+            if (mPost != null) {
+                item.setEnabled(false);
+                mExecutor.execute(() -> {
+                    new ArcticShiftRestorer().restorePost(mPost);
+                    new Handler(Looper.getMainLooper()).post(() -> {
+                        item.setEnabled(true);
+                        boolean restored = !shouldRestore(mPost.getSelfTextPlain()) && !shouldRestore(mPost.getSelfText());
+                        if (restored) {
+                            if (mPostAdapter != null) {
+                                mPostAdapter.updatePost(mPost);
+                            }
+                            setupMenu();
+                            Toast.makeText(activity, R.string.restore_post_success, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(activity, R.string.restore_post_failed, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                });
+            }
+            return true;
+        } else if (itemId == R.id.action_search_view_post_detail_fragment) {
             if (activity.toggleSearchPanelVisibility() && mCommentsAdapter != null) {
                 mCommentsAdapter.resetCommentSearchIndex();
             }
@@ -2502,6 +2522,14 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                 }
             }
         }, 1000); // Delay for scroll
+    }
+
+    private boolean shouldRestore(String text) {
+        if (android.text.TextUtils.isEmpty(text)) {
+            return false;
+        }
+        String normalized = text.trim().toLowerCase();
+        return normalized.equals("[deleted]") || normalized.equals("[removed]");
     }
 
     @Override

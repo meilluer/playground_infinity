@@ -147,6 +147,10 @@ class VideoEntry(
         val pauseDrawable: Drawable
         var setDefaultResolutionAlready: Boolean = false
 
+        val muteButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById(R.id.mute_exo_playback_control_view)
+        val fullscreenButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById(R.id.fullscreen_exo_playback_control_view)
+        val playPauseButton: ImageView? = binding.playerViewMarkdownVideoBlock.findViewById(R.id.exo_play)
+
         init {
             playDrawable = AppCompatResources.getDrawable(baseActivity, R.drawable.ic_play_arrow_24dp)!!
             pauseDrawable = AppCompatResources.getDrawable(baseActivity, R.drawable.ic_pause_24dp)!!
@@ -177,6 +181,35 @@ class VideoEntry(
                     )
                     true
                 }
+
+            muteButton?.setOnClickListener {
+                helper?.let { helper ->
+                    if (helper.volume != 0f) {
+                        muteButton.setImageDrawable(AppCompatResources.getDrawable(baseActivity, R.drawable.ic_mute_24dp))
+                        helper.volume = 0f
+                        volume = 0f
+                    } else {
+                        muteButton.setImageDrawable(AppCompatResources.getDrawable(baseActivity, R.drawable.ic_unmute_24dp))
+                        helper.volume = 1f
+                        volume = 1f
+                    }
+                }
+            }
+
+            fullscreenButton?.setOnClickListener {
+                val resumePosition = helper?.latestPlaybackInfo?.resumePosition ?: -1L
+                onItemClickListener.onItemClick(videoBlock?.mediaMetadata, resumePosition)
+            }
+
+            playPauseButton?.setOnClickListener {
+                if (isPlaying) {
+                    pause()
+                    isManuallyPaused = true
+                } else {
+                    isManuallyPaused = false
+                    play()
+                }
+            }
         }
 
         override fun getPlayerView(): View {
@@ -282,6 +315,17 @@ class VideoEntry(
                                          volume = if (it) 0f else 1f
                                      }
                                      helper?.volume = volume
+                                     muteButton?.let { button ->
+                                         button.visibility = View.VISIBLE
+                                         button.setImageDrawable(
+                                             AppCompatResources.getDrawable(
+                                                 baseActivity,
+                                                 if (volume == 0f) R.drawable.ic_mute_24dp else R.drawable.ic_unmute_24dp
+                                             )
+                                         )
+                                     }
+                                 } else {
+                                     muteButton?.visibility = View.GONE
                                  }
                             }
                         }
@@ -326,6 +370,7 @@ class VideoEntry(
                 } else {
                     helper.play()
                 }
+                playPauseButton?.setImageDrawable(pauseDrawable)
                 baseActivity.window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
@@ -333,6 +378,7 @@ class VideoEntry(
         override fun pause() {
             helper?.let { helper ->
                 helper.pause()
+                playPauseButton?.setImageDrawable(playDrawable)
                 baseActivity.window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
             }
         }
@@ -388,5 +434,8 @@ class VideoEntry(
 
     interface OnItemClickListener {
         fun onItemClick(mediaMetadata: MediaMetadata?)
+        fun onItemClick(mediaMetadata: MediaMetadata?, playbackPosition: Long) {
+            onItemClick(mediaMetadata)
+        }
     }
 }
