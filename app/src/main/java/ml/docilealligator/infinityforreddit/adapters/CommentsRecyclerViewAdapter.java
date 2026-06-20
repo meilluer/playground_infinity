@@ -230,7 +230,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         }
         mDataSavingMode = dataSavingModeActive;
         
-        mDataSavingModeDefaultResolution = Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.REDDIT_VIDEO_DEFAULT_RESOLUTION_DATA_SAVING, "0"));
+        mDataSavingModeDefaultResolution = Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.REDDIT_VIDEO_DEFAULT_RESOLUTION, "360"));
         mNonDataSavingModeDefaultResolution = Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.REDDIT_VIDEO_DEFAULT_RESOLUTION_NO_DATA_SAVING, "0"));
         mGlide = Glide.with(activity);
         mSecondaryTextColor = customThemeWrapper.getSecondaryTextColor();
