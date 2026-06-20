@@ -53,13 +53,17 @@ public class LiveActivityNotificationManager {
         }
 
         String compactStats = totalScore + "U " + totalReplyCount + "R";
-        String title = totalFollowedCount == 1 ? headlineThing.getTitle() : totalFollowedCount + " live activities";
+        String collapsedTitle = totalFollowedCount == 1 ? headlineThing.getTitle() : totalFollowedCount + " live activities";
+        String expandedTitle = headlineThing.getTitle();
         
         long lastUpdated = headlineThing.getLastUpdated() > 0 ? headlineThing.getLastUpdated() : System.currentTimeMillis();
         String elapsedTime = Utils.getElapsedTime(context, lastUpdated);
-        String subtitle = totalFollowedCount == 1
+        String collapsedSubtitle = totalFollowedCount == 1
                 ? "r/" + headlineThing.getSubreddit() + " • " + elapsedTime
                 : headlineThing.getTitle() + " • " + elapsedTime;
+        String expandedSubtitle = !TextUtils.isEmpty(topContent)
+                ? topContent
+                : "r/" + headlineThing.getSubreddit() + " • " + elapsedTime;
 
         String contentText = !TextUtils.isEmpty(topContent) ? topContent : compactStats;
 
@@ -72,8 +76,8 @@ public class LiveActivityNotificationManager {
 
             Notification.Builder builder = new Notification.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
-                    .setContentTitle(title)
-                    .setSubText(subtitle)
+                    .setContentTitle(expandedTitle)
+                    .setSubText("r/" + headlineThing.getSubreddit() + " • " + elapsedTime)
                     .setContentText(contentText)
                     .setOngoing(true)
                     .setOnlyAlertOnce(true)
@@ -94,24 +98,19 @@ public class LiveActivityNotificationManager {
                 .setCategory(NotificationCompat.CATEGORY_SERVICE);
 
         RemoteViews collapsedView = new RemoteViews(context.getPackageName(), R.layout.notification_live_activity);
-        collapsedView.setTextViewText(R.id.title, title);
-        collapsedView.setTextViewText(R.id.subreddit, subtitle);
+        collapsedView.setTextViewText(R.id.title, collapsedTitle);
+        collapsedView.setTextViewText(R.id.subreddit, collapsedSubtitle);
         collapsedView.setTextViewText(R.id.upvotes, "Upvotes " + totalScore);
         collapsedView.setTextViewText(R.id.comments, (headlineThing.getType() == FollowedThing.TYPE_COMMENT ? "Replies " : "Comments ") + totalReplyCount);
         collapsedView.setViewVisibility(R.id.expanded_content, View.GONE);
         collapsedView.setViewVisibility(R.id.unfollow_button, View.GONE);
 
         RemoteViews expandedView = new RemoteViews(context.getPackageName(), R.layout.notification_live_activity);
-        expandedView.setTextViewText(R.id.title, title);
-        expandedView.setTextViewText(R.id.subreddit, subtitle);
+        expandedView.setTextViewText(R.id.title, expandedTitle);
+        expandedView.setTextViewText(R.id.subreddit, expandedSubtitle);
         expandedView.setTextViewText(R.id.upvotes, "Upvotes " + totalScore);
         expandedView.setTextViewText(R.id.comments, (headlineThing.getType() == FollowedThing.TYPE_COMMENT ? "Replies " : "Comments ") + totalReplyCount);
-        if (!TextUtils.isEmpty(topContent)) {
-            expandedView.setViewVisibility(R.id.expanded_content, View.VISIBLE);
-            expandedView.setTextViewText(R.id.expanded_content, topContent);
-        } else {
-            expandedView.setViewVisibility(R.id.expanded_content, View.GONE);
-        }
+        expandedView.setViewVisibility(R.id.expanded_content, View.GONE);
         expandedView.setViewVisibility(R.id.unfollow_button, View.VISIBLE);
         expandedView.setOnClickPendingIntent(R.id.unfollow_button, unfollowPendingIntent);
 

@@ -81,6 +81,7 @@ public class LiveActivityWorker extends Worker {
 
         FollowedThing headlineThing = null;
         String topContent = null;
+        double newestActivityCreatedUtc = -1;
 
         try {
             for (FollowedThing thing : followedThings) {
@@ -112,17 +113,25 @@ public class LiveActivityWorker extends Worker {
                 thing.setLastUpdated(System.currentTimeMillis());
 
                 String itemTopContent = null;
+                double itemTopContentCreatedUtc = -1;
                 if (thing.getType() == FollowedThing.TYPE_POST) {
-                    itemTopContent = fetchLatestPostComment(redditAPI, isAnonymous, account, thing.getId());
+                    ActivitySnapshot activitySnapshot = fetchLatestPostComment(redditAPI, isAnonymous, account, thing.getId());
+                    itemTopContent = activitySnapshot.latestContentBody;
+                    itemTopContentCreatedUtc = activitySnapshot.latestContentCreatedUtc;
                 } else {
-                    CommentReplySnapshot replySnapshot = fetchLatestCommentReply(redditAPI, isAnonymous, account, thing);
-                    thing.setCommentCount(replySnapshot.replyCount);
-                    itemTopContent = replySnapshot.latestReplyBody;
+                    ActivitySnapshot activitySnapshot = fetchLatestCommentReply(redditAPI, isAnonymous, account, thing);
+                    thing.setCommentCount(activitySnapshot.replyCount);
+                    itemTopContent = activitySnapshot.latestContentBody;
+                    itemTopContentCreatedUtc = activitySnapshot.latestContentCreatedUtc;
                 }
 
                 mRedditDataRoomDatabase.followedThingDao().update(thing);
 
-                if (headlineThing == null || thing.getLastUpdated() > headlineThing.getLastUpdated()) {
+                if (itemTopContentCreatedUtc > newestActivityCreatedUtc) {
+                    headlineThing = thing;
+                    topContent = itemTopContent;
+                    newestActivityCreatedUtc = itemTopContentCreatedUtc;
+                } else if (headlineThing == null) {
                     headlineThing = thing;
                     topContent = itemTopContent;
                 }
@@ -148,13 +157,13 @@ public class LiveActivityWorker extends Worker {
         return Result.success();
     }
 
-    private String fetchLatestPostComment(RedditAPI redditAPI, boolean isAnonymous, Account account, String postId)
+    private ActivitySnapshot fetchLatestPostComment(RedditAPI redditAPI, boolean isAnonymous, Account account, String postId)
             throws IOException, JSONException {
         Response<String> commentResponse = isAnonymous
                 ? redditAPI.getPostWithSort(postId, "new").execute()
                 : redditAPI.getPostWithSortOauth(postId, "new", APIUtils.getOAuthHeader(account.getAccessToken())).execute();
         if (!commentResponse.isSuccessful() || commentResponse.body() == null) {
-            return null;
+            return new ActivitySnapshot(0, null, -1);
         }
 
         JSONArray commentArray = new JSONArray(commentResponse.body());
@@ -168,10 +177,12 @@ public class LiveActivityWorker extends Worker {
                 break;
             }
         }
-        return latestComment != null && latestComment.has("body") ? latestComment.getString("body") : null;
+        String latestCommentBody = latestComment != null && latestComment.has("body") ? latestComment.getString("body") : null;
+        double latestCommentCreatedUtc = latestComment != null ? latestComment.optDouble("created_utc", -1) : -1;
+        return new ActivitySnapshot(0, latestCommentBody, latestCommentCreatedUtc);
     }
 
-    private CommentReplySnapshot fetchLatestCommentReply(RedditAPI redditAPI, boolean isAnonymous, Account account,
+    private ActivitySnapshot fetchLatestCommentReply(RedditAPI redditAPI, boolean isAnonymous, Account account,
                                                          FollowedThing thing) throws IOException, JSONException {
         String postId = thing.getLinkId();
         if (postId.startsWith("t3_")) {
@@ -182,14 +193,14 @@ public class LiveActivityWorker extends Worker {
                 ? redditAPI.getPostWithSort(postId, "new").execute()
                 : redditAPI.getPostWithSortOauth(postId, "new", APIUtils.getOAuthHeader(account.getAccessToken())).execute();
         if (!commentResponse.isSuccessful() || commentResponse.body() == null) {
-            return new CommentReplySnapshot(thing.getCommentCount(), null);
+            return new ActivitySnapshot(thing.getCommentCount(), null, -1);
         }
 
         JSONArray commentArray = new JSONArray(commentResponse.body());
         JSONArray comments = commentArray.getJSONObject(1).getJSONObject(JSONUtils.DATA_KEY).getJSONArray(JSONUtils.CHILDREN_KEY);
         JSONObject targetComment = findCommentById(comments, thing.getFullName());
         if (targetComment == null || !targetComment.has("replies") || targetComment.isNull("replies")) {
-            return new CommentReplySnapshot(0, null);
+            return new ActivitySnapshot(0, null, -1);
         }
 
         JSONObject repliesData = targetComment.getJSONObject("replies").getJSONObject(JSONUtils.DATA_KEY);
@@ -212,7 +223,7 @@ public class LiveActivityWorker extends Worker {
         }
 
         String latestReplyBody = latestReply != null && latestReply.has("body") ? latestReply.getString("body") : null;
-        return new CommentReplySnapshot(replyCount, latestReplyBody);
+        return new ActivitySnapshot(replyCount, latestReplyBody, maxCreatedUtc);
     }
 
     private JSONObject findCommentById(JSONArray comments, String fullName) throws JSONException {
@@ -236,13 +247,15 @@ public class LiveActivityWorker extends Worker {
         return null;
     }
 
-    private static class CommentReplySnapshot {
+    private static class ActivitySnapshot {
         final int replyCount;
-        final String latestReplyBody;
+        final String latestContentBody;
+        final double latestContentCreatedUtc;
 
-        CommentReplySnapshot(int replyCount, String latestReplyBody) {
+        ActivitySnapshot(int replyCount, String latestContentBody, double latestContentCreatedUtc) {
             this.replyCount = replyCount;
-            this.latestReplyBody = latestReplyBody;
+            this.latestContentBody = latestContentBody;
+            this.latestContentCreatedUtc = latestContentCreatedUtc;
         }
     }
 }
