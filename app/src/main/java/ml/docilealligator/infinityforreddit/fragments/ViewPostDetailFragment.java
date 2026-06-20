@@ -724,8 +724,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                                      boolean hasMoreComments,
                                                      @Nullable Runnable afterAddComments) {
         mExecutor.execute(() -> {
-            ArrayList<Comment> commentsToRestore = topLevelComments == null ? expandedComments : topLevelComments;
-            new ArcticShiftRestorer().restore(mPost, commentsToRestore);
+            new ArcticShiftRestorer().restorePost(mPost);
 
             new Handler(Looper.getMainLooper()).post(() -> {
                 if (!isAdded() || mCommentsAdapter == null) {

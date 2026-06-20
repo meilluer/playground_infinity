@@ -49,6 +49,7 @@ import ml.docilealligator.infinityforreddit.activities.LinkResolverActivity;
 import ml.docilealligator.infinityforreddit.activities.ViewImageOrGifActivity;
 import ml.docilealligator.infinityforreddit.activities.ViewPostDetailActivity;
 import ml.docilealligator.infinityforreddit.activities.ViewUserDetailActivity;
+import ml.docilealligator.infinityforreddit.archive.ArcticShiftRestorer;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.CommentMoreBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.UrlMenuBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.comment.Comment;
@@ -602,6 +603,10 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 ((CommentBaseViewHolder) holder).mMarkwonAdapter.setMarkdown(mCommentMarkwon, comment.getCommentMarkdown());
                 // noinspection NotifyDataSetChanged
                 ((CommentBaseViewHolder) holder).mMarkwonAdapter.notifyDataSetChanged();
+                ArcticShiftRestorer arcticShiftRestorer = new ArcticShiftRestorer();
+                boolean canRestoreComment = arcticShiftRestorer.canRestoreComment(comment);
+                ((CommentBaseViewHolder) holder).restoreCommentButton.setVisibility(canRestoreComment ? View.VISIBLE : View.GONE);
+                ((CommentBaseViewHolder) holder).commentMarkdownView.setVisibility(canRestoreComment ? View.GONE : View.VISIBLE);
 
                 if (!mHideTheNumberOfVotes) {
                     String commentText = "";
@@ -1446,6 +1451,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         TextView commentTimeTextView;
         TextView topScoreTextView;
         RecyclerView commentMarkdownView;
+        MaterialButton restoreCommentButton;
         TextView editedTextView;
         ConstraintLayout bottomConstraintLayout;
         MaterialButton upvoteButton;
@@ -1539,6 +1545,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                          TextView commentTimeTextView,
                          TextView topScoreTextView,
                          RecyclerView commentMarkdownView,
+                         MaterialButton restoreCommentButton,
                          TextView editedTextView,
                          ConstraintLayout bottomConstraintLayout,
                          MaterialButton upvoteButton,
@@ -1559,6 +1566,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             this.commentTimeTextView = commentTimeTextView;
             this.topScoreTextView = topScoreTextView;
             this.commentMarkdownView = commentMarkdownView;
+            this.restoreCommentButton = restoreCommentButton;
             this.editedTextView = editedTextView;
             this.bottomConstraintLayout = bottomConstraintLayout;
             this.upvoteButton = upvoteButton;
@@ -1678,6 +1686,30 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                             Utils.getFormattedTime(mLocale, comment.getEditedTimeMillis(), mTimeFormatPattern)
                     ), Toast.LENGTH_SHORT).show();
                 }
+            });
+
+            restoreCommentButton.setOnClickListener(view -> {
+                Comment comment = getCurrentComment(this);
+                if (comment == null) {
+                    return;
+                }
+
+                restoreCommentButton.setEnabled(false);
+                mExecutor.execute(() -> {
+                    boolean restored = new ArcticShiftRestorer().restoreComment(comment);
+                    new Handler(mActivity.getMainLooper()).post(() -> {
+                        restoreCommentButton.setEnabled(true);
+                        if (!restored) {
+                            Toast.makeText(mActivity, R.string.restore_comment_failed, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        int position = getBindingAdapterPosition();
+                        if (position != RecyclerView.NO_POSITION) {
+                            notifyItemChanged(position);
+                        }
+                    });
+                });
             });
 
             moreButton.setOnClickListener(view -> {
@@ -2110,6 +2142,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     binding.commentTimeTextViewItemPostComment,
                     binding.topScoreTextViewItemPostComment,
                     binding.commentMarkdownViewItemPostComment,
+                    binding.restoreCommentButtonItemPostComment,
                     binding.editedTextViewItemPostComment,
                     binding.bottomConstraintLayoutItemPostComment,
                     binding.upvoteButtonItemPostComment,

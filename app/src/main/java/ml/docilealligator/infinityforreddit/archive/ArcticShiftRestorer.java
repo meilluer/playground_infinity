@@ -4,7 +4,6 @@ import android.text.Html;
 import android.text.TextUtils;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -15,16 +14,30 @@ import ml.docilealligator.infinityforreddit.utils.Utils;
 public class ArcticShiftRestorer {
     private final ArcticShiftClient client = new ArcticShiftClient();
 
-    public void restore(Post post, List<Comment> comments) {
+    public void restorePost(Post post) {
         try {
-            restorePost(post);
-            restoreComments(comments);
+            restoreDeletedPost(post);
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void restorePost(Post post) throws Exception {
+    public boolean restoreComment(Comment comment) {
+        try {
+            return restoreDeletedComment(comment);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean canRestoreComment(Comment comment) {
+        return comment != null
+                && comment.getPlaceholderType() == Comment.NOT_PLACEHOLDER
+                && (shouldRestore(comment.getCommentRawText()) || shouldRestore(comment.getCommentMarkdown()));
+    }
+
+    private void restoreDeletedPost(Post post) throws Exception {
         if (post == null || !shouldRestore(post.getSelfTextPlain()) && !shouldRestore(post.getSelfText())) {
             return;
         }
@@ -46,51 +59,25 @@ public class ArcticShiftRestorer {
         }
     }
 
-    private void restoreComments(List<Comment> comments) throws Exception {
-        ArrayList<Comment> deletedComments = new ArrayList<>();
-        collectDeletedComments(comments, deletedComments);
-        if (deletedComments.isEmpty()) {
-            return;
+    private boolean restoreDeletedComment(Comment comment) throws Exception {
+        if (!canRestoreComment(comment)) {
+            return false;
         }
 
-        ArrayList<String> ids = new ArrayList<>();
-        for (Comment comment : deletedComments) {
-            ids.add(comment.getId());
+        Map<String, ArcticShiftThing> archivedComments = client.getCommentsByIds(singleton(comment.getId()));
+        ArcticShiftThing archivedComment = archivedComments.get(comment.getId());
+        if (archivedComment == null || !isUseful(archivedComment.body)) {
+            return false;
         }
 
-        Map<String, ArcticShiftThing> archivedComments = client.getCommentsByIds(ids);
-        for (Comment comment : deletedComments) {
-            ArcticShiftThing archivedComment = archivedComments.get(comment.getId());
-            if (archivedComment == null || !isUseful(archivedComment.body)) {
-                continue;
-            }
-
-            String restoredMarkdown = Utils.modifyMarkdown(Utils.trimTrailingWhitespace(archivedComment.body));
-            comment.setCommentMarkdown(restoredMarkdown);
-            comment.setCommentRawText(Html.fromHtml(restoredMarkdown).toString());
-        }
-    }
-
-    private void collectDeletedComments(List<Comment> comments, List<Comment> deletedComments) {
-        if (comments == null) {
-            return;
+        if (isUseful(archivedComment.author)) {
+            comment.setAuthor(archivedComment.author);
         }
 
-        LinkedHashSet<String> seenIds = new LinkedHashSet<>();
-        collectDeletedComments(comments, deletedComments, seenIds);
-    }
-
-    private void collectDeletedComments(List<Comment> comments, List<Comment> deletedComments, LinkedHashSet<String> seenIds) {
-        for (Comment comment : comments) {
-            if (comment == null || comment.getPlaceholderType() != Comment.NOT_PLACEHOLDER) {
-                continue;
-            }
-
-            if (seenIds.add(comment.getId()) && shouldRestore(comment.getCommentRawText())) {
-                deletedComments.add(comment);
-            }
-            collectDeletedComments(comment.getChildren(), deletedComments, seenIds);
-        }
+        String restoredMarkdown = Utils.modifyMarkdown(Utils.trimTrailingWhitespace(archivedComment.body));
+        comment.setCommentMarkdown(restoredMarkdown);
+        comment.setCommentRawText(Html.fromHtml(restoredMarkdown).toString());
+        return true;
     }
 
     private boolean shouldRestore(String text) {
