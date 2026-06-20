@@ -268,7 +268,7 @@ public class ImageAndGifEntry extends MarkwonAdapter.Entry<ImageAndGifBlock, Ima
     }
 
     public class Holder extends MarkwonAdapter.Holder {
-        MarkdownImageAndGifBlockBinding binding;
+        public MarkdownImageAndGifBlockBinding binding;
         RequestListener<Drawable> requestListener;
         ImageAndGifBlock imageAndGifBlock;
 

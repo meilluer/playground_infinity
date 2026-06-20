@@ -21,6 +21,7 @@ import io.noties.markwon.MarkwonSpansFactory;
 import io.noties.markwon.MarkwonVisitor;
 import io.noties.markwon.core.CorePlugin;
 import io.noties.markwon.inlineparser.MarkwonInlineParserPlugin;
+import ml.docilealligator.infinityforreddit.markdown.BlockQuoteWithExceptionParser;
 
 public class SpoilerParserPlugin extends AbstractMarkwonPlugin {
     private final int textColor;

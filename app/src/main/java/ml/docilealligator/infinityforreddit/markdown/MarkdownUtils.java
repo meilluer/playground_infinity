@@ -76,6 +76,19 @@ public class MarkdownUtils {
     }
 
     @NonNull
+    public static Markwon createFullRedditMarkwon(@NonNull Context context,
+                                                  @NonNull MarkwonPlugin miscPlugin,
+                                                  @NonNull EmoteCloseBracketInlineProcessor emoteCloseBracketInlineProcessor,
+                                                  @NonNull EmotePlugin emotePlugin,
+                                                  @NonNull ImageAndGifPlugin imageAndGifPlugin,
+                                                  int markdownColor,
+                                                  int spoilerBackgroundColor,
+                                                  @Nullable EvenBetterLinkMovementMethod.OnLinkLongClickListener onLinkLongClickListener) {
+        return createFullRedditMarkwon(context, miscPlugin, emoteCloseBracketInlineProcessor, emotePlugin,
+                imageAndGifPlugin, new VideoPlugin(), markdownColor, spoilerBackgroundColor, onLinkLongClickListener);
+    }
+
+    @NonNull
     public static Markwon createContentSubmissionRedditMarkwon(@NonNull Context context,
                                                                @NonNull UploadedImagePlugin uploadedImagePlugin) {
         return Markwon.builder(context)
@@ -185,6 +198,17 @@ public class MarkdownUtils {
                         .textLayoutIsRoot(R.layout.view_table_entry_cell)))
                 .include(ImageAndGifBlock.class, imageAndGifEntry)
                 .include(VideoBlock.class, videoEntry)
+                .build();
+    }
+
+    @NonNull
+    public static CustomMarkwonAdapter createCustomTablesAndImagesAdapter(@NonNull BaseActivity activity,
+                                                                          ImageAndGifEntry imageAndGifEntry) {
+        return CustomMarkwonAdapter.builder(activity, R.layout.adapter_default_entry, R.id.text)
+                .include(TableBlock.class, TableEntry.create(builder -> builder
+                        .tableLayout(R.layout.adapter_table_block, R.id.table_layout)
+                        .textLayoutIsRoot(R.layout.view_table_entry_cell)))
+                .include(ImageAndGifBlock.class, imageAndGifEntry)
                 .build();
     }
 
