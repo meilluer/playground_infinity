@@ -89,6 +89,12 @@ import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils;
 import ml.docilealligator.infinityforreddit.utils.TtsManager;
 import ml.docilealligator.infinityforreddit.utils.Utils;
 import retrofit2.Retrofit;
+import ml.docilealligator.infinityforreddit.videoautoplay.ToroPlayer;
+import ml.docilealligator.infinityforreddit.videoautoplay.media.PlaybackInfo;
+import ml.docilealligator.infinityforreddit.videoautoplay.widget.Container;
+import ml.docilealligator.infinityforreddit.videoautoplay.ExoCreator;
+import ml.docilealligator.infinityforreddit.utils.HeadphoneManager;
+import ml.docilealligator.infinityforreddit.managers.VideoMuteManager;
 
 public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     public static final int DIVIDER_NORMAL = 0;
@@ -174,6 +180,16 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     private int mSearchCommentIndex = -1;
 
+    private ExoCreator mExoCreator;
+    private boolean mAutoplayCommentsVideo;
+    private boolean mAutoplayNsfwVideos;
+    private boolean mMuteAutoplayingVideos;
+    private boolean mMuteNSFWVideo;
+    private boolean mUnmuteAutoplayWithHeadphones;
+    private boolean mDataSavingMode;
+    private int mDataSavingModeDefaultResolution;
+    private int mNonDataSavingModeDefaultResolution;
+
     private boolean canStartActivity = true;
     private long mLastReadTime = -1;
 
@@ -185,6 +201,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                                        boolean isSingleCommentThreadMode,
                                        SharedPreferences sharedPreferences,
                                        SharedPreferences nsfwAndSpoilerSharedPreferences,
+                                       ExoCreator exoCreator,
                                        CommentRecyclerViewAdapterCallback commentRecyclerViewAdapterCallback) {
         mActivity = activity;
         mFragment = fragment;
@@ -194,6 +211,27 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         mAccessToken = accessToken;
         mAccountName = accountName;
         mSharedPreferences = sharedPreferences;
+        mExoCreator = exoCreator;
+
+        mAutoplayCommentsVideo = sharedPreferences.getBoolean(SharedPreferencesUtils.AUTOPLAY_VIDEO_IN_COMMENTS, false);
+        mAutoplayNsfwVideos = sharedPreferences.getBoolean(SharedPreferencesUtils.AUTOPLAY_NSFW_VIDEOS, true);
+        mMuteAutoplayingVideos = sharedPreferences.getBoolean(SharedPreferencesUtils.MUTE_AUTOPLAYING_VIDEOS, true);
+        mUnmuteAutoplayWithHeadphones = sharedPreferences.getBoolean(SharedPreferencesUtils.UNMUTE_AUTOPLAY_WITH_HEADPHONES, true);
+        
+        mMuteNSFWVideo = sharedPreferences.getBoolean(SharedPreferencesUtils.MUTE_NSFW_VIDEO, false);
+        
+        int networkType = Utils.getConnectedNetwork(activity);
+        String dataSavingModeString = sharedPreferences.getString(SharedPreferencesUtils.DATA_SAVING_MODE, SharedPreferencesUtils.DATA_SAVING_MODE_OFF);
+        boolean dataSavingModeActive = false;
+        if (dataSavingModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ALWAYS)) {
+            dataSavingModeActive = true;
+        } else if (dataSavingModeString.equals(SharedPreferencesUtils.DATA_SAVING_MODE_ONLY_ON_CELLULAR_DATA)) {
+            dataSavingModeActive = networkType == Utils.NETWORK_TYPE_CELLULAR;
+        }
+        mDataSavingMode = dataSavingModeActive;
+        
+        mDataSavingModeDefaultResolution = Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.REDDIT_VIDEO_DEFAULT_RESOLUTION_DATA_SAVING, "0"));
+        mNonDataSavingModeDefaultResolution = Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.REDDIT_VIDEO_DEFAULT_RESOLUTION_NO_DATA_SAVING, "0"));
         mGlide = Glide.with(activity);
         mSecondaryTextColor = customThemeWrapper.getSecondaryTextColor();
         mCommentTextColor = customThemeWrapper.getCommentColor();
@@ -276,7 +314,23 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         activity.startActivity(intent);
                     }
                 });
-        mVideoEntry = new VideoEntry(activity, Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")), new VideoEntry.OnItemClickListener() {
+        mVideoEntry = new VideoEntry(activity,
+                Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
+                mExoCreator,
+                mAutoplayCommentsVideo,
+                mAutoplayNsfwVideos,
+                post.isNSFW(),
+                mNonDataSavingModeDefaultResolution,
+                mDataSavingModeDefaultResolution,
+                mDataSavingMode,
+                new VideoMuteManager() {
+                    @Override
+                    public Boolean getMasterMutingOption() {
+                        HeadphoneManager headphoneManager = HeadphoneManager.getInstance(activity);
+                        return (mMuteAutoplayingVideos || (post.isNSFW() && mMuteNSFWVideo)) && !(mUnmuteAutoplayWithHeadphones && headphoneManager.areHeadphonesConnected());
+                    }
+                },
+                new VideoEntry.OnItemClickListener() {
             @Override
             public void onItemClick(@org.jetbrains.annotations.Nullable MediaMetadata mediaMetadata) {
                 if (canStartActivity) {
@@ -1309,6 +1363,10 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
     public void onViewRecycled(@NonNull RecyclerView.ViewHolder holder) {
         if (holder instanceof CommentBaseViewHolder) {
             CommentBaseViewHolder cbh = (CommentBaseViewHolder) holder;
+            if (cbh.activeVideoHolder != null) {
+                cbh.activeVideoHolder.release();
+                cbh.activeVideoHolder = null;
+            }
 
             cbh.itemView.setBackgroundColor(mCommentBackgroundColor);
             cbh.authorTextView.setTextColor(mUsernameColor);
@@ -1379,7 +1437,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         void onTtsLongClick(Comment comment);
     }
 
-    public class CommentBaseViewHolder extends RecyclerView.ViewHolder {
+    public class CommentBaseViewHolder extends RecyclerView.ViewHolder implements ToroPlayer {
+        public VideoEntry.Holder activeVideoHolder;
         LinearLayout linearLayout;
         ImageView authorIconImageView;
         TextView authorTextView;
@@ -1404,6 +1463,73 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
         CommentBaseViewHolder(@NonNull View itemView) {
             super(itemView);
+        }
+
+        @NonNull
+        @Override
+        public View getPlayerView() {
+            if (activeVideoHolder != null && mAutoplayCommentsVideo) {
+                return activeVideoHolder.getPlayerView();
+            }
+            return itemView;
+        }
+
+        @NonNull
+        @Override
+        public PlaybackInfo getCurrentPlaybackInfo() {
+            if (activeVideoHolder != null && mAutoplayCommentsVideo) {
+                return activeVideoHolder.getCurrentPlaybackInfo();
+            }
+            return new PlaybackInfo();
+        }
+
+        @Override
+        public void initialize(@NonNull Container container, @NonNull PlaybackInfo playbackInfo) {
+            if (activeVideoHolder != null && mAutoplayCommentsVideo) {
+                activeVideoHolder.initialize(container, playbackInfo);
+            }
+        }
+
+        @Override
+        public void play() {
+            if (activeVideoHolder != null && mAutoplayCommentsVideo) {
+                activeVideoHolder.play();
+            }
+        }
+
+        @Override
+        public void pause() {
+            if (activeVideoHolder != null && mAutoplayCommentsVideo) {
+                activeVideoHolder.pause();
+            }
+        }
+
+        @Override
+        public boolean isPlaying() {
+            if (activeVideoHolder != null && mAutoplayCommentsVideo) {
+                return activeVideoHolder.isPlaying();
+            }
+            return false;
+        }
+
+        @Override
+        public void release() {
+            if (activeVideoHolder != null) {
+                activeVideoHolder.release();
+            }
+        }
+
+        @Override
+        public boolean wantsToPlay() {
+            if (activeVideoHolder != null && mAutoplayCommentsVideo) {
+                return activeVideoHolder.wantsToPlay();
+            }
+            return false;
+        }
+
+        @Override
+        public int getPlayerOrder() {
+            return getAbsoluteAdapterPosition();
         }
 
         void setBaseView(LinearLayout linearLayout,

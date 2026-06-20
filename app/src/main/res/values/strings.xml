@@ -412,6 +412,7 @@
     <string name="settings_mute_autoplaying_videos_title">Mute Autoplaying Videos</string>
     <string name="settings_unmute_autoplay_with_headphones_title">Unmute Autoplay with Headphones</string>
     <string name="settings_autoplay_nsfw_videos_title">Autoplay Sensitive Videos</string>
+    <string name="settings_autoplay_video_in_comments_title">Autoplay Videos in Comments</string>
     <string name="settings_start_autoplay_visible_area_offset_portrait_title">Autoplay Videos Visible Area Offset (Portrait)</string>
     <string name="settings_start_autoplay_visible_area_offset_portrait_summary">Start autoplaying videos when %1$d%% of them are visible</string>
     <string name="settings_start_autoplay_visible_area_offset_landscape_title">Autoplay Videos Visible Area Offset (Landscape)</string>

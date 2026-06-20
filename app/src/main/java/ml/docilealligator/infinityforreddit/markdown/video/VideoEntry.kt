@@ -1,35 +1,78 @@
 package ml.docilealligator.infinityforreddit.markdown.video
 
 import android.content.Intent
+import android.graphics.drawable.Drawable
+import android.text.SpannableString
+import android.text.Spanned
+import android.text.style.URLSpan
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.WindowManager
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.net.toUri
+import androidx.media3.common.C
+import androidx.media3.common.PlaybackException
+import androidx.media3.common.Player
+import androidx.media3.common.Tracks
+import androidx.media3.common.TrackSelectionOverride
+import androidx.recyclerview.widget.RecyclerView
+import com.google.common.collect.ImmutableList
 import io.noties.markwon.Markwon
 import io.noties.markwon.recycler.MarkwonAdapter
 import me.saket.bettermovementmethod.BetterLinkMovementMethod
 import ml.docilealligator.infinityforreddit.SaveMemoryCenterInisdeDownsampleStrategy
+import ml.docilealligator.infinityforreddit.R
+import ml.docilealligator.infinityforreddit.HeadphoneManager
 import ml.docilealligator.infinityforreddit.activities.BaseActivity
 import ml.docilealligator.infinityforreddit.activities.LinkResolverActivity
+import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity
+import ml.docilealligator.infinityforreddit.adapters.CommentsRecyclerViewAdapter
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.UrlMenuBottomSheetFragment
 import ml.docilealligator.infinityforreddit.databinding.MarkdownVideoBlockBinding
+import ml.docilealligator.infinityforreddit.managers.VideoMuteManager
 import ml.docilealligator.infinityforreddit.thing.MediaMetadata
 import ml.docilealligator.infinityforreddit.utils.SharedPreferencesUtils
+import ml.docilealligator.infinityforreddit.videoautoplay.ExoCreator
+import ml.docilealligator.infinityforreddit.videoautoplay.ExoPlayerViewHelper
+import ml.docilealligator.infinityforreddit.videoautoplay.ToroPlayer
+import ml.docilealligator.infinityforreddit.videoautoplay.ToroUtil
+import ml.docilealligator.infinityforreddit.videoautoplay.media.PlaybackInfo
+import ml.docilealligator.infinityforreddit.videoautoplay.widget.Container
+import kotlin.math.min
 
 class VideoEntry(
     private val baseActivity: BaseActivity,
     embeddedMediaType: Int,
-    /*private val exoCreator: ExoCreator,
+    private val exoCreator: ExoCreator?,
     private val autoplayVideo: Boolean,
     private val autoplayNsfwVideos: Boolean,
     private val isNSFW: Boolean,
     private var nonDataSavingModeDefaultResolution: Int = 0,
     private var dataSavingModeDefaultResolution: Int = 0,
-    private var dataSavingMode: Boolean,
-    private val videoMuteManager: VideoMuteManager,*/
+    private var dataSavingMode: Boolean = false,
+    private val videoMuteManager: VideoMuteManager?,
     private val onItemClickListener: OnItemClickListener
 ): MarkwonAdapter.Entry<VideoBlock, VideoEntry.Holder>() {
+
+    constructor(
+        baseActivity: BaseActivity,
+        embeddedMediaType: Int,
+        onItemClickListener: OnItemClickListener
+    ) : this(
+        baseActivity,
+        embeddedMediaType,
+        null,
+        false,
+        false,
+        false,
+        0,
+        0,
+        false,
+        null,
+        onItemClickListener
+    )
     private val saveMemoryCenterInsideDownsampleStrategy: SaveMemoryCenterInisdeDownsampleStrategy
     private val colorAccent: Int
     private val primaryTextColor: Int
@@ -66,60 +109,46 @@ class VideoEntry(
             holder.binding.captionTextViewMarkdownVideoBlock.text = node.mediaMetadata.caption
         }
 
-        /*if (dataSavingMode) {
+        if (dataSavingMode) {
             showVideoAsUrl(holder, node)
         } else {
             if ((autoplayVideo && !isNSFW) || (autoplayNsfwVideos && isNSFW)) {
-                if (node.mediaMetadata.caption != null) {
-                    holder.binding.captionTextViewMarkdownVideoBlock.setVisibility(View.VISIBLE)
-                    holder.binding.captionTextViewMarkdownVideoBlock.setText(node.mediaMetadata.caption)
-                }
+                holder.binding.playerViewMarkdownVideoBlock.visibility = View.VISIBLE
+                holder.binding.previewPlayIconMarkdownVideoBlock.visibility = View.GONE
             } else {
                 showVideoAsUrl(holder, node)
             }
-        }*/
+        }
     }
 
-    /*private fun showVideoAsUrl(holder: Holder, node: VideoBlock) {
+    private fun showVideoAsUrl(holder: Holder, node: VideoBlock) {
         holder.binding.playerViewMarkdownVideoBlock.visibility = View.GONE
-        holder.binding.captionTextViewMarkdownVideoBlock.visibility = View.VISIBLE
-        holder.binding.captionTextViewMarkdownVideoBlock.setGravity(Gravity.NO_GRAVITY)
-        val spannableString = SpannableString(node.mediaMetadata.caption ?: node.mediaMetadata.original.url)
-        spannableString.setSpan(
-            URLSpan(node.mediaMetadata.original.url),
-            0,
-            spannableString.length,
-            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        holder.binding.captionTextViewMarkdownVideoBlock.text = spannableString
-    }*/
+        holder.binding.previewPlayIconMarkdownVideoBlock.visibility = View.VISIBLE
+    }
 
     override fun onViewRecycled(holder: Holder) {
         super.onViewRecycled(holder)
-        //holder.binding.errorLoadingVideoImageViewMarkdownVideoBlock.setVisibility(View.GONE)
+        holder.binding.errorLoadingVideoImageViewMarkdownVideoBlock.visibility = View.GONE
         holder.binding.captionTextViewMarkdownVideoBlock.visibility = View.GONE
-        holder.binding.captionTextViewMarkdownVideoBlock.setGravity(Gravity.CENTER_HORIZONTAL)
+        holder.binding.captionTextViewMarkdownVideoBlock.gravity = Gravity.CENTER_HORIZONTAL
+        holder.release()
     }
-
-    /*fun setDataSavingMode(dataSavingMode: Boolean) {
-        this.dataSavingMode = dataSavingMode
-    }*/
 
     inner class Holder(
         val binding: MarkdownVideoBlockBinding
-    ) : MarkwonAdapter.Holder(binding.getRoot()) {
+    ) : MarkwonAdapter.Holder(binding.getRoot()), ToroPlayer {
         var videoBlock: VideoBlock? = null
-        /*var container: Container? = null
+        var container: Container? = null
         var helper: ExoPlayerViewHelper? = null
         var volume = 0f
         var isManuallyPaused = false
         val playDrawable: Drawable
         val pauseDrawable: Drawable
-        var setDefaultResolutionAlready: Boolean = false*/
+        var setDefaultResolutionAlready: Boolean = false
 
         init {
-            /*playDrawable = AppCompatResources.getDrawable(baseActivity, R.drawable.ic_play_arrow_24dp)!!
-            pauseDrawable = AppCompatResources.getDrawable(baseActivity, R.drawable.ic_pause_24dp)!!*/
+            playDrawable = AppCompatResources.getDrawable(baseActivity, R.drawable.ic_play_arrow_24dp)!!
+            pauseDrawable = AppCompatResources.getDrawable(baseActivity, R.drawable.ic_pause_24dp)!!
 
             binding.captionTextViewMarkdownVideoBlock.setTextColor(postContentColor)
             binding.captionTextViewMarkdownVideoBlock.setLinkTextColor(linkColor)
@@ -149,7 +178,7 @@ class VideoEntry(
                 }
         }
 
-        /*override fun getPlayerView(): View {
+        override fun getPlayerView(): View {
             return binding.playerViewMarkdownVideoBlock
         }
 
@@ -166,44 +195,15 @@ class VideoEntry(
                     this.container = container
                 }
                 if (helper == null) {
-                    helper = ExoPlayerViewHelper(this, url.toUri(), null, exoCreator)
-                    helper?.addEventListener(object : DefaultEventListener() {
-                        override fun onEvents(player: Player, events: Player.Events) {
-                            if (events.containsAny(
-                                    Player.EVENT_PLAY_WHEN_READY_CHANGED,
-                                    Player.EVENT_PLAYBACK_STATE_CHANGED,
-                                    Player.EVENT_PLAYBACK_SUPPRESSION_REASON_CHANGED
-                                )
-                            ) {
-                                playPauseButton.setImageDrawable(if (Util.shouldShowPlayButton(player)) playDrawable else pauseDrawable)
-                            }
-                        }
-
+                    helper = if (exoCreator != null) {
+                        ExoPlayerViewHelper(this, url.toUri(), null, exoCreator)
+                    } else {
+                        ExoPlayerViewHelper(this, url.toUri())
+                    }
+                    helper?.addEventListener(object : Player.Listener {
                         override fun onTracksChanged(tracks: Tracks) {
-                            val trackGroups: ImmutableList<Tracks.Group> = tracks.getGroups()
+                            val trackGroups = tracks.groups
                             if (!trackGroups.isEmpty()) {
-                                videoQualityButton.setVisibility(View.VISIBLE)
-                                videoQualityButton.setOnClickListener(View.OnClickListener { view: View? ->
-                                    val builder = TrackSelectionDialogBuilder(
-                                        baseActivity,
-                                        baseActivity.getString(R.string.select_video_quality),
-                                        helper.getPlayer(),
-                                        C.TRACK_TYPE_VIDEO
-                                    ).apply {
-                                        setShowDisableOption(true)
-                                        setAllowAdaptiveSelections(false)
-                                    }
-                                    val dialog =
-                                        builder.setTheme(R.style.MaterialAlertDialogTheme).build()
-                                    dialog.show()
-                                    if (dialog is AlertDialog) {
-                                        dialog.getButton(AlertDialog.BUTTON_POSITIVE)
-                                            .setTextColor(primaryTextColor)
-                                        dialog.getButton(AlertDialog.BUTTON_NEGATIVE)
-                                            .setTextColor(primaryTextColor)
-                                    }
-                                })
-
                                 if (!setDefaultResolutionAlready) {
                                     var desiredResolution = 0
                                     if (dataSavingMode) {
@@ -218,13 +218,13 @@ class VideoEntry(
                                         var trackSelectionOverride: TrackSelectionOverride? = null
                                         var bestTrackIndex = -1
                                         var bestResolution = -1
-                                        var worstResolution = Int.Companion.MAX_VALUE
+                                        var worstResolution = Int.MAX_VALUE
                                         var worstTrackIndex = -1
                                         var bestTrackGroup: Tracks.Group? = null
                                         var worstTrackGroup: Tracks.Group? = null
-                                        for (trackGroup in tracks.getGroups()) {
+                                        for (trackGroup in tracks.groups) {
                                             if (trackGroup.type == C.TRACK_TYPE_VIDEO) {
-                                                for (trackIndex in 0..<trackGroup.length) {
+                                                for (trackIndex in 0 until trackGroup.length) {
                                                     val trackResolution = min(
                                                         trackGroup.getTrackFormat(trackIndex).height,
                                                         trackGroup.getTrackFormat(trackIndex).width
@@ -245,20 +245,20 @@ class VideoEntry(
 
                                         if (bestTrackIndex != -1 && bestTrackGroup != null) {
                                             trackSelectionOverride = TrackSelectionOverride(
-                                                bestTrackGroup.getMediaTrackGroup(),
-                                                ImmutableList.of<Int?>(bestTrackIndex)
+                                                bestTrackGroup.mediaTrackGroup,
+                                                ImmutableList.of(bestTrackIndex)
                                             )
                                         } else if (worstTrackIndex != -1 && worstTrackGroup != null) {
                                             trackSelectionOverride = TrackSelectionOverride(
-                                                worstTrackGroup.getMediaTrackGroup(),
-                                                ImmutableList.of<Int?>(worstTrackIndex)
+                                                worstTrackGroup.mediaTrackGroup,
+                                                ImmutableList.of(worstTrackIndex)
                                             )
                                         }
 
                                         if (trackSelectionOverride != null) {
-                                            helper?.let {
-                                                it.player.trackSelectionParameters =
-                                                    it.player.trackSelectionParameters
+                                            helper?.player?.let { player ->
+                                                player.trackSelectionParameters =
+                                                    player.trackSelectionParameters
                                                         .buildUpon()
                                                         .addOverride(trackSelectionOverride)
                                                         .build()
@@ -268,34 +268,52 @@ class VideoEntry(
                                     setDefaultResolutionAlready = true
                                 }
 
-                                for (i in trackGroups.indices) {
-                                    val mimeType = trackGroups[i]!!.getTrackFormat(0).sampleMimeType
-                                    if (mimeType != null && mimeType.contains("audio")) {
-                                        videoMuteManager.getMasterMutingOption()?.let {
-                                            volume = if (it) 0f else 1f
-                                        }
-                                        helper?.volume = volume
-                                        muteButton.setVisibility(View.VISIBLE)
-                                        if (volume != 0f) {
-                                            muteButton.setImageDrawable(baseActivity.getDrawable(R.drawable.ic_unmute_24dp))
-                                        } else {
-                                            muteButton.setImageDrawable(baseActivity.getDrawable(R.drawable.ic_mute_24dp))
-                                        }
+                                var hasAudio = false
+                                for (trackGroup in tracks.groups) {
+                                    if (trackGroup.type == C.TRACK_TYPE_AUDIO) {
+                                        hasAudio = true
                                         break
                                     }
                                 }
-                            } else {
-                                muteButton.setVisibility(View.GONE)
+
+                                 if (hasAudio) {
+                                     videoMuteManager?.getMasterMutingOption()?.let {
+                                         volume = if (it) 0f else 1f
+                                     }
+                                     helper?.volume = volume
+                                 }
                             }
                         }
 
                         override fun onPlayerError(error: PlaybackException) {
-                            binding.errorLoadingVideoImageViewMarkdownVideoBlock.setVisibility(View.VISIBLE)
+                            binding.errorLoadingVideoImageViewMarkdownVideoBlock.visibility = View.VISIBLE
                         }
                     })
                 }
+
+                val commentViewHolder = getCommentViewHolder(container)
+                if (commentViewHolder != null) {
+                    commentViewHolder.activeVideoHolder = this@Holder
+                }
+
                 helper?.initialize(container, playbackInfo)
             }
+        }
+
+        private fun getCommentViewHolder(container: RecyclerView): CommentsRecyclerViewAdapter.CommentBaseViewHolder? {
+            var current: View? = itemView
+            while (current != null && current != container) {
+                val parent = current.parent
+                if (parent == container) {
+                    val holder = container.getChildViewHolder(current)
+                    if (holder is CommentsRecyclerViewAdapter.CommentBaseViewHolder) {
+                        return holder
+                    }
+                    break
+                }
+                current = parent as? View
+            }
+            return null
         }
 
         override fun play() {
@@ -319,7 +337,7 @@ class VideoEntry(
         }
 
         override fun isPlaying(): Boolean {
-            return helper?.isPlaying() ?: false
+            return helper?.isPlaying ?: false
         }
 
         override fun release() {
@@ -331,15 +349,25 @@ class VideoEntry(
         }
 
         override fun wantsToPlay(): Boolean {
-            return canPlayVideo && ToroUtil.visibleAreaOffset(
-                this,
-                itemView.parent
-            ) >= mStartAutoplayVisibleAreaOffset
+            val resources = baseActivity.resources
+            val startAutoplayVisibleAreaOffset = if (resources.configuration.orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT) {
+                baseActivity.getDefaultSharedPreferences().getInt(SharedPreferencesUtils.START_AUTOPLAY_VISIBLE_AREA_OFFSET_PORTRAIT, 75) / 100.0
+            } else {
+                baseActivity.getDefaultSharedPreferences().getInt(SharedPreferencesUtils.START_AUTOPLAY_VISIBLE_AREA_OFFSET_LANDSCAPE, 50) / 100.0
+            }
+            
+            val parentHolder = container?.let { getCommentViewHolder(it) }
+            val viewToEvaluate = parentHolder?.itemView ?: itemView
+            
+            return autoplayVideo && ToroUtil.visibleAreaOffset(
+                viewToEvaluate,
+                viewToEvaluate.parent
+            ) >= startAutoplayVisibleAreaOffset
         }
 
         override fun getPlayerOrder(): Int {
-            TODO("Not yet implemented")
-        }*/
+            return absoluteAdapterPosition
+        }
     }
 
     interface OnItemClickListener {

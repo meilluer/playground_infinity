@@ -631,6 +631,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                     this, mCustomThemeWrapper, mExecutor, mRetrofit, mOauthRetrofit,
                     activity.accessToken, activity.accountName, mPost, mLocale, mSingleCommentId,
                     isSingleCommentThreadMode, mSharedPreferences, mNsfwAndSpoilerSharedPreferences,
+                    mExoCreator,
                     new CommentsRecyclerViewAdapter.CommentRecyclerViewAdapterCallback() {
                         @Override
                         public void retryFetchingComments() {
@@ -1423,6 +1424,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                     mRetrofit, mOauthRetrofit, activity.accessToken, activity.accountName, mPost, mLocale,
                                     mSingleCommentId, isSingleCommentThreadMode, mSharedPreferences,
                                     mNsfwAndSpoilerSharedPreferences,
+                                    mExoCreator,
                                     new CommentsRecyclerViewAdapter.CommentRecyclerViewAdapterCallback() {
                                         @Override
                                         public void retryFetchingComments() {
