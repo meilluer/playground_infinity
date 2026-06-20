@@ -52,7 +52,6 @@ public class LiveActivityNotificationManager {
             totalReplyCount += followedThing.getCommentCount();
         }
 
-        String compactStats = totalScore + "U " + totalReplyCount + "R";
         String collapsedTitle = totalFollowedCount == 1 ? headlineThing.getTitle() : totalFollowedCount + " live activities";
         String expandedTitle = headlineThing.getTitle();
         
@@ -65,7 +64,7 @@ public class LiveActivityNotificationManager {
                 ? topContent
                 : "r/" + headlineThing.getSubreddit() + " • " + elapsedTime;
 
-        String contentText = !TextUtils.isEmpty(topContent) ? topContent : compactStats;
+        String contentText = expandedSubtitle;
 
         if (Build.VERSION.SDK_INT >= 36) {
             // Construct the chip text with high-aesthetic emojis for upvotes (🔺) and replies (💬)
@@ -77,7 +76,7 @@ public class LiveActivityNotificationManager {
             Notification.Builder builder = new Notification.Builder(context, CHANNEL_ID)
                     .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
                     .setContentTitle(expandedTitle)
-                    .setSubText("r/" + headlineThing.getSubreddit() + " • " + elapsedTime)
+                    .setSubText(expandedSubtitle)
                     .setContentText(contentText)
                     .setOngoing(true)
                     .setOnlyAlertOnce(true)
@@ -92,6 +91,9 @@ public class LiveActivityNotificationManager {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.ic_notifications_day_night_24dp)
+                .setContentTitle(expandedTitle)
+                .setSubText(expandedSubtitle)
+                .setContentText(contentText)
                 .setOngoing(true)
                 .setOnlyAlertOnce(true)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
