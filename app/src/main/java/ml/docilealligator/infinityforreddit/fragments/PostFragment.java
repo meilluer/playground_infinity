@@ -908,6 +908,7 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                 }
             } else if (refreshLoadState instanceof LoadState.Error) {
                 binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(view -> refresh());
+                binding.fetchPostInfoButtonPostFragment.setVisibility(View.GONE);
                 showErrorView(R.string.load_posts_error);
             }
             if (!(refreshLoadState instanceof LoadState.Loading) && appendLoadState instanceof LoadState.NotLoading) {
@@ -979,17 +980,27 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
             showLoadPostsFromArchiveView();
         } else {
             binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
+            binding.fetchPostInfoButtonPostFragment.setVisibility(View.GONE);
             showErrorView(R.string.no_posts);
         }
     }
 
     private void showLoadPostsFromArchiveView() {
-        showErrorView(R.string.load_posts_from_archive);
-        binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(view -> loadPostsFromArchive());
+        showErrorView(R.string.no_posts);
+        binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
+        binding.fetchPostInfoButtonPostFragment.setVisibility(View.VISIBLE);
+        binding.fetchPostInfoButtonPostFragment.setText(R.string.load_posts_from_archive);
+        binding.fetchPostInfoButtonPostFragment.setBackgroundColor(mCustomThemeWrapper.getColorPrimaryLightTheme());
+        binding.fetchPostInfoButtonPostFragment.setTextColor(mCustomThemeWrapper.getButtonTextColor());
+        if (activity.typeface != null) {
+            binding.fetchPostInfoButtonPostFragment.setTypeface(activity.typeface);
+        }
+        binding.fetchPostInfoButtonPostFragment.setOnClickListener(view -> loadPostsFromArchive());
     }
 
     private void loadPostsFromArchive() {
-        binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(null);
+        binding.fetchPostInfoButtonPostFragment.setOnClickListener(null);
+        binding.fetchPostInfoButtonPostFragment.setVisibility(View.GONE);
         binding.swipeRefreshLayoutPostFragment.setRefreshing(true);
         mExecutor.execute(() -> {
             ArrayList<Post> archivedPosts = new ArcticShiftUserListingFetcher().fetchPosts(username);
@@ -1000,7 +1011,8 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
 
                 binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
                 if (archivedPosts.isEmpty()) {
-                    binding.fetchPostInfoLinearLayoutPostFragment.setOnClickListener(view -> loadPostsFromArchive());
+                    binding.fetchPostInfoButtonPostFragment.setOnClickListener(view -> loadPostsFromArchive());
+                    binding.fetchPostInfoButtonPostFragment.setVisibility(View.VISIBLE);
                     showErrorView(R.string.no_posts);
                     return;
                 }
@@ -1230,6 +1242,11 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
         binding.fetchPostInfoTextViewPostFragment.setTextColor(mCustomThemeWrapper.getSecondaryTextColor());
         if (activity.typeface != null) {
             binding.fetchPostInfoTextViewPostFragment.setTypeface(activity.typeface);
+        }
+        binding.fetchPostInfoButtonPostFragment.setBackgroundColor(mCustomThemeWrapper.getColorPrimaryLightTheme());
+        binding.fetchPostInfoButtonPostFragment.setTextColor(mCustomThemeWrapper.getButtonTextColor());
+        if (activity.typeface != null) {
+            binding.fetchPostInfoButtonPostFragment.setTypeface(activity.typeface);
         }
     }
 

@@ -331,6 +331,7 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
                         showLoadCommentsFromArchiveView();
                     } else {
                         binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(null);
+                        binding.fetchCommentsInfoButtonCommentsListingFragment.setVisibility(View.GONE);
                         showErrorView(R.string.no_comments);
                     }
                 }
@@ -342,6 +343,7 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
                 } else if (networkState.getStatus().equals(NetworkState.Status.FAILED)) {
                     binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(false);
                     binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(view -> refresh());
+                    binding.fetchCommentsInfoButtonCommentsListingFragment.setVisibility(View.GONE);
                     showErrorView(R.string.load_comments_failed);
                 } else {
                     binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(true);
@@ -412,15 +414,29 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
         if (mActivity.typeface != null) {
             binding.fetchCommentsInfoTextViewCommentsListingFragment.setTypeface(mActivity.typeface);
         }
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setBackgroundColor(customThemeWrapper.getColorPrimaryLightTheme());
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setTextColor(customThemeWrapper.getButtonTextColor());
+        if (mActivity.typeface != null) {
+            binding.fetchCommentsInfoButtonCommentsListingFragment.setTypeface(mActivity.typeface);
+        }
     }
 
     private void showLoadCommentsFromArchiveView() {
-        showErrorView(R.string.load_comments_from_archive);
-        binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(view -> loadCommentsFromArchive());
+        showErrorView(R.string.no_comments);
+        binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(null);
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setVisibility(View.VISIBLE);
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setText(R.string.load_comments_from_archive);
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setBackgroundColor(customThemeWrapper.getColorPrimaryLightTheme());
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setTextColor(customThemeWrapper.getButtonTextColor());
+        if (mActivity.typeface != null) {
+            binding.fetchCommentsInfoButtonCommentsListingFragment.setTypeface(mActivity.typeface);
+        }
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setOnClickListener(view -> loadCommentsFromArchive());
     }
 
     private void loadCommentsFromArchive() {
-        binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(null);
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setOnClickListener(null);
+        binding.fetchCommentsInfoButtonCommentsListingFragment.setVisibility(View.GONE);
         binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(true);
         String usernameArg = getArguments() != null ? getArguments().getString(EXTRA_USERNAME) : null;
         if (usernameArg == null) {
@@ -436,7 +452,8 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
 
                 binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(false);
                 if (archivedComments.isEmpty()) {
-                    binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setOnClickListener(view -> loadCommentsFromArchive());
+                    binding.fetchCommentsInfoButtonCommentsListingFragment.setOnClickListener(view -> loadCommentsFromArchive());
+                    binding.fetchCommentsInfoButtonCommentsListingFragment.setVisibility(View.VISIBLE);
                     showErrorView(R.string.no_comments);
                     return;
                 }
