@@ -41,7 +41,7 @@ class ArcticShiftClient {
     }
 
     List<ArcticShiftThing> searchCommentsByAuthor(String author) throws IOException, JSONException {
-        return getThingList("/api/comments/search?sort=desc&limit=100&fields=id,author,body,subreddit,permalink,link_id,parent_id,created_utc,score&author="
+        return getThingList("/api/comments/search?sort=desc&limit=100&fields=id,author,body,subreddit,link_id,parent_id,created_utc,score&author="
                 + encode(author));
     }
 
