@@ -157,10 +157,7 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                         }
                         mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
                     } else {
-                        mBaseActivity.getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
-                                .edit()
-                                .putBoolean("enable_live_activity", true)
-                                .apply();
+                        LiveActivityUtils.enableLiveActivity(mBaseActivity);
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mBaseActivity);
                         String durationStr = sharedPreferences.getString("live_activity_follow_duration", "0");
                         int durationHours = Integer.parseInt(durationStr);
@@ -170,6 +167,7 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
                                 FollowedThing.TYPE_POST, mPost.getTitle(), mPost.getSubredditName(), 
                                 null, mPost.getScore(), mPost.getNComments(), mBaseActivity.accountName, System.currentTimeMillis(), expirationTime);
                         mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                        LiveActivityUtils.showCachedNotification(mBaseActivity, mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings(), newFollowedThing);
                         LiveActivityUtils.scheduleWorker(mBaseActivity);
                         LiveActivityUtils.triggerImmediateUpdate(mBaseActivity);
                         mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());

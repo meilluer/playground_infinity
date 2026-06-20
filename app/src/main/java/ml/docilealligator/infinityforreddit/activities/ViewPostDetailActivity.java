@@ -1015,10 +1015,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
                     invalidateOptionsMenu();
                 });
             } else {
-                getSharedPreferences(SharedPreferencesUtils.DEFAULT_PREFERENCES_FILE, Context.MODE_PRIVATE)
-                        .edit()
-                        .putBoolean("enable_live_activity", true)
-                        .apply();
+                LiveActivityUtils.enableLiveActivity(this);
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
                 String durationStr = sharedPreferences.getString("live_activity_follow_duration", "0");
                 int durationHours = Integer.parseInt(durationStr);
@@ -1028,6 +1025,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
                         FollowedThing.TYPE_POST, post.getTitle(), post.getSubredditName(), 
                         null, post.getScore(), post.getNComments(), accountName, System.currentTimeMillis(), expirationTime);
                 mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                LiveActivityUtils.showCachedNotification(this, mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings(), newFollowedThing);
                 LiveActivityUtils.scheduleWorker(this);
                 LiveActivityUtils.triggerImmediateUpdate(this);
                 runOnUiThread(() -> {

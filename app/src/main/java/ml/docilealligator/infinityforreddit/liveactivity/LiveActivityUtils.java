@@ -8,6 +8,7 @@ import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class LiveActivityUtils {
@@ -39,6 +40,18 @@ public class LiveActivityUtils {
     public static void cancelWorker(Context context) {
         WorkManager.getInstance(context).cancelUniqueWork(LiveActivityWorker.UNIQUE_WORKER_NAME);
         LiveActivityNotificationManager.cancelNotification(context);
+    }
+
+    public static void enableLiveActivity(Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context)
+                .edit()
+                .putBoolean("enable_live_activity", true)
+                .apply();
+    }
+
+    public static void showCachedNotification(Context context, List<FollowedThing> followedThings,
+                                              FollowedThing headlineThing) {
+        LiveActivityNotificationManager.updateNotification(context, followedThings, headlineThing, null);
     }
 
     public static void triggerImmediateUpdate(Context context) {

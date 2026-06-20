@@ -13,7 +13,12 @@ public class NotificationPreferenceFragment extends CustomFontPreferenceFragment
         setPreferencesFromResource(R.xml.notification_preferences, rootKey);
 
         findPreference("enable_live_activity").setOnPreferenceChangeListener((preference, newValue) -> {
-            LiveActivityUtils.scheduleWorker(requireContext());
+            if ((Boolean) newValue) {
+                LiveActivityUtils.enableLiveActivity(requireContext());
+                LiveActivityUtils.scheduleWorker(requireContext());
+            } else {
+                LiveActivityUtils.cancelWorker(requireContext());
+            }
             return true;
         });
 
