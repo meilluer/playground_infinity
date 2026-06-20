@@ -84,6 +84,7 @@ import ml.docilealligator.infinityforreddit.adapters.CommentsRecyclerViewAdapter
 import ml.docilealligator.infinityforreddit.adapters.PostDetailRecyclerViewAdapter;
 import ml.docilealligator.infinityforreddit.apis.RedditAPI;
 import ml.docilealligator.infinityforreddit.apis.StreamableAPI;
+import ml.docilealligator.infinityforreddit.archive.ArcticShiftRestorer;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.FlairBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.bottomsheetfragments.PostCommentSortTypeBottomSheetFragment;
 import ml.docilealligator.infinityforreddit.comment.Comment;
@@ -708,13 +709,91 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
             } else if (isFetchingComments) {
                 fetchCommentsRespectRecommendedSort(false);
             } else {
-                mCommentsAdapter.addComments(comments, hasMoreChildren);
-                if (isLoadingMoreChildren) {
-                    isLoadingMoreChildren = false;
-                    fetchMoreComments();
-                }
+                restoreArchivedThingsAndAddComments(null, comments, hasMoreChildren, () -> {
+                    if (isLoadingMoreChildren) {
+                        isLoadingMoreChildren = false;
+                        fetchMoreComments();
+                    }
+                });
             }
         }
+    }
+
+    private void restoreArchivedThingsAndAddComments(@Nullable ArrayList<Comment> topLevelComments,
+                                                     @NonNull ArrayList<Comment> expandedComments,
+                                                     boolean hasMoreComments,
+                                                     @Nullable Runnable afterAddComments) {
+        mExecutor.execute(() -> {
+            ArrayList<Comment> commentsToRestore = topLevelComments == null ? expandedComments : topLevelComments;
+            new ArcticShiftRestorer().restore(mPost, commentsToRestore);
+
+            new Handler(Looper.getMainLooper()).post(() -> {
+                if (!isAdded() || mCommentsAdapter == null) {
+                    return;
+                }
+
+                if (mPostAdapter != null) {
+                    mPostAdapter.updatePost(mPost);
+                }
+                mCommentsAdapter.addComments(expandedComments, hasMoreComments);
+                if (afterAddComments != null) {
+                    afterAddComments.run();
+                }
+            });
+        });
+    }
+
+    private void setupLoadMoreCommentsOnScrollListenerIfNeeded() {
+        if (children.size() <= 0) {
+            return;
+        }
+
+        RecyclerView recyclerView = mCommentsRecyclerView == null
+                ? binding.postDetailRecyclerViewViewPostDetailFragment
+                : mCommentsRecyclerView;
+        recyclerView.clearOnScrollListeners();
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                if (!mIsSmoothScrolling && !mLockFab) {
+                    if (!recyclerView.canScrollVertically(1)) {
+                        activity.hideFab();
+                    } else {
+                        if (dy > 0) {
+                            if (mSwipeUpToHideFab) {
+                                activity.showFab();
+                            } else {
+                                activity.hideFab();
+                            }
+                        } else {
+                            if (mSwipeUpToHideFab) {
+                                activity.hideFab();
+                            } else {
+                                activity.showFab();
+                            }
+                        }
+                    }
+                }
+
+                if (!isLoadingMoreChildren && loadMoreChildrenSuccess) {
+                    int visibleItemCount = recyclerView.getLayoutManager().getChildCount();
+                    int totalItemCount = recyclerView.getLayoutManager().getItemCount();
+                    int firstVisibleItemPosition = ((LinearLayoutManagerBugFixed) recyclerView.getLayoutManager()).findFirstVisibleItemPosition();
+
+                    if ((visibleItemCount + firstVisibleItemPosition >= totalItemCount) && firstVisibleItemPosition >= 0) {
+                        fetchMoreComments();
+                    }
+                }
+            }
+
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                    mIsSmoothScrolling = false;
+                }
+            }
+        });
     }
 
     private void setupMenu() {
@@ -1480,55 +1559,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                                                 ViewPostDetailFragment.this.children = moreChildrenIds;
 
                                                                 hasMoreChildren = children.size() != 0;
-                                                                mCommentsAdapter.addComments(expandedComments, hasMoreChildren);
-
-                                                                restoreScrollPosition();
-
-                                                                if (children.size() > 0) {
-                                                                    (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).clearOnScrollListeners();
-                                                                    (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).addOnScrollListener(new RecyclerView.OnScrollListener() {
-                                                                        @Override
-                                                                        public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                                                                            super.onScrolled(recyclerView, dx, dy);
-                                                                            if (!mIsSmoothScrolling && !mLockFab) {
-                                                                                if (!recyclerView.canScrollVertically(1)) {
-                                                                                    activity.hideFab();
-                                                                                } else {
-                                                                                    if (dy > 0) {
-                                                                                        if (mSwipeUpToHideFab) {
-                                                                                            activity.showFab();
-                                                                                        } else {
-                                                                                            activity.hideFab();
-                                                                                        }
-                                                                                    } else {
-                                                                                        if (mSwipeUpToHideFab) {
-                                                                                            activity.hideFab();
-                                                                                        } else {
-                                                                                            activity.showFab();
-                                                                                        }
-                                                                                    }
-                                                                                }
-                                                                            }
-
-                                                                            if (!isLoadingMoreChildren && loadMoreChildrenSuccess) {
-                                                                                int visibleItemCount = (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).getLayoutManager().getChildCount();
-                                                                                int totalItemCount = (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).getLayoutManager().getItemCount();
-                                                                                int firstVisibleItemPosition = ((LinearLayoutManagerBugFixed) (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).getLayoutManager()).findFirstVisibleItemPosition();
-
-                                                                                if ((visibleItemCount + firstVisibleItemPosition >= totalItemCount) && firstVisibleItemPosition >= 0) {
-                                                                                    fetchMoreComments();
-                                                                                }
-                                                                            }
-                                                                        }
-
-                                                                        @Override
-                                                                        public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                                                                            if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                                                                                mIsSmoothScrolling = false;
-                                                                            }
-                                                                        }
-                                                                    });
-                                                                }
+                                                                restoreArchivedThingsAndAddComments(topLevelComments, expandedComments, hasMoreChildren, () -> {
+                                                                    restoreScrollPosition();
+                                                                    setupLoadMoreCommentsOnScrollListenerIfNeeded();
+                                                                });
                                                             }
 
                                                             @Override
@@ -1631,14 +1665,14 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                 ViewPostDetailFragment.this.children = children;
                                 comments = expandedComments;
                                 hasMoreChildren = children.size() != 0;
-                                mCommentsAdapter.addComments(expandedComments, hasMoreChildren);
-
-                                if (!changeRefreshState && !isRefreshing) {
-                                    restoreScrollPosition();
-                                }
-                                if (changeRefreshState) {
-                                    isRefreshing = false;
-                                }
+                                restoreArchivedThingsAndAddComments(topLevelComments, expandedComments, hasMoreChildren, () -> {
+                                    if (!changeRefreshState && !isRefreshing) {
+                                        restoreScrollPosition();
+                                    }
+                                    if (changeRefreshState) {
+                                        isRefreshing = false;
+                                    }
+                                });
                                 isFetchingComments = false;
                             }
 
@@ -1676,62 +1710,18 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
 
                         comments = expandedComments;
                         hasMoreChildren = children.size() != 0;
-                        mCommentsAdapter.addComments(expandedComments, hasMoreChildren);
+                        restoreArchivedThingsAndAddComments(null, expandedComments, hasMoreChildren, () -> {
+                            if (!changeRefreshState && !isRefreshing) {
+                                restoreScrollPosition();
+                            }
 
-                        if (!changeRefreshState && !isRefreshing) {
-                            restoreScrollPosition();
-                        }
+                            setupLoadMoreCommentsOnScrollListenerIfNeeded();
+                            if (changeRefreshState) {
+                                isRefreshing = false;
+                            }
 
-                        if (children.size() > 0) {
-                            (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).clearOnScrollListeners();
-                            (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).addOnScrollListener(new RecyclerView.OnScrollListener() {
-                                @Override
-                                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
-                                    super.onScrolled(recyclerView, dx, dy);
-                                    if (!mIsSmoothScrolling && !mLockFab) {
-                                        if (!recyclerView.canScrollVertically(1)) {
-                                            activity.hideFab();
-                                        } else {
-                                            if (dy > 0) {
-                                                if (mSwipeUpToHideFab) {
-                                                    activity.showFab();
-                                                } else {
-                                                    activity.hideFab();
-                                                }
-                                            } else {
-                                                if (mSwipeUpToHideFab) {
-                                                    activity.hideFab();
-                                                } else {
-                                                    activity.showFab();
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    if (!isLoadingMoreChildren && loadMoreChildrenSuccess) {
-                                        int visibleItemCount = (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).getLayoutManager().getChildCount();
-                                        int totalItemCount = (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).getLayoutManager().getItemCount();
-                                        int firstVisibleItemPosition = ((LinearLayoutManagerBugFixed) (mCommentsRecyclerView == null ? binding.postDetailRecyclerViewViewPostDetailFragment : mCommentsRecyclerView).getLayoutManager()).findFirstVisibleItemPosition();
-
-                                        if ((visibleItemCount + firstVisibleItemPosition >= totalItemCount) && firstVisibleItemPosition >= 0) {
-                                            fetchMoreComments();
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
-                                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                                        mIsSmoothScrolling = false;
-                                    }
-                                }
-                            });
-                        }
-                        if (changeRefreshState) {
-                            isRefreshing = false;
-                        }
-
-                        isFetchingComments = false;
+                            isFetchingComments = false;
+                        });
                     }
 
                     @Override
@@ -1766,9 +1756,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                                           ArrayList<String> moreChildrenIds) {
                         children = moreChildrenIds;
                         hasMoreChildren = !children.isEmpty();
-                        mCommentsAdapter.addComments(expandedComments, hasMoreChildren);
-                        isLoadingMoreChildren = false;
-                        loadMoreChildrenSuccess = true;
+                        restoreArchivedThingsAndAddComments(topLevelComments, expandedComments, hasMoreChildren, () -> {
+                            isLoadingMoreChildren = false;
+                            loadMoreChildrenSuccess = true;
+                        });
                     }
 
                     @Override
