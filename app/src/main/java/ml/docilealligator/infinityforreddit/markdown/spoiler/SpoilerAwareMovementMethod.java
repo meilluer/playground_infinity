@@ -10,6 +10,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import ml.docilealligator.infinityforreddit.markdown.EvenBetterLinkMovementMethod;
+
 /**
  * Extension of {@link EvenBetterLinkMovementMethod} that handles {@link SpoilerSpan}s
  */

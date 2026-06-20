@@ -11,6 +11,7 @@ import org.commonmark.node.Link;
 import org.commonmark.node.Node;
 import org.commonmark.node.Paragraph;
 import org.commonmark.node.Text;
+import ml.docilealligator.infinityforreddit.markdown.spoiler.SpoilerNode;
 
 import java.util.ArrayList;
 import java.util.List;
