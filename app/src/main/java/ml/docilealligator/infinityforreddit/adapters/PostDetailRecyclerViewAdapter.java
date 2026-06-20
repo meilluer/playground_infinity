@@ -465,7 +465,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 });
         mVideoEntry = new VideoEntry(activity,
                 Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
-                mediaMetadata -> {
+                (mediaMetadata, playbackPosition) -> {
                     if (canStartActivity) {
                         canStartActivity = false;
                         if (mediaMetadata == null) {
@@ -478,6 +478,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                         intent.putExtra(ViewVideoActivity.EXTRA_VIDEO_DOWNLOAD_URL, MediaMetadata.getDownloadUrlForMarkdownParsedVideo(mediaMetadata.original.url));
                         intent.putExtra(ViewVideoActivity.EXTRA_SUBREDDIT, post.getSubredditName());
                         intent.putExtra(ViewVideoActivity.EXTRA_ID, mediaMetadata.id);
+                        intent.putExtra(ViewVideoActivity.EXTRA_PROGRESS_SECONDS, playbackPosition);
                         activity.startActivity(intent);
                     }
                 });

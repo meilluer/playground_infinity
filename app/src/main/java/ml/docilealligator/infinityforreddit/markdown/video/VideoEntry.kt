@@ -164,7 +164,7 @@ class VideoEntry(
             }
 
             binding.frameLayoutMarkdownVideoBlock.setOnClickListener {
-                onItemClickListener.onItemClick(videoBlock?.mediaMetadata)
+                onItemClickListener.onItemClick(videoBlock?.mediaMetadata, -1L)
             }
 
             binding.captionTextViewMarkdownVideoBlock.movementMethod = BetterLinkMovementMethod.newInstance()
@@ -434,9 +434,6 @@ class VideoEntry(
     }
 
     interface OnItemClickListener {
-        fun onItemClick(mediaMetadata: MediaMetadata?)
-        fun onItemClick(mediaMetadata: MediaMetadata?, playbackPosition: Long) {
-            onItemClick(mediaMetadata)
-        }
+        fun onItemClick(mediaMetadata: MediaMetadata?, playbackPosition: Long)
     }
 }

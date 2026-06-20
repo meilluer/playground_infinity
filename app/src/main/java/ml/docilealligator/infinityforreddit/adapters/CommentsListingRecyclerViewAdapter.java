@@ -228,7 +228,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                 Integer.parseInt(sharedPreferences.getString(SharedPreferencesUtils.EMBEDDED_MEDIA_TYPE, "15")),
                 new VideoEntry.OnItemClickListener() {
                     @Override
-                    public void onItemClick(@Nullable MediaMetadata mediaMetadata) {
+                    public void onItemClick(@Nullable MediaMetadata mediaMetadata, long playbackPosition) {
 
                     }
                 });
