@@ -455,16 +455,14 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
 
                 binding.swipeRefreshLayoutViewCommentsListingFragment.setRefreshing(false);
 
-                // Build debug text
-                StringBuilder msg = new StringBuilder();
-                msg.append("Comments found: ").append(archivedComments.size()).append("\n");
-                if (!errorInfo.isEmpty()) {
-                    msg.append("ERROR: ").append(errorInfo).append("\n");
-                }
-                msg.append("\n").append(debugInfo);
-
                 if (archivedComments.isEmpty()) {
-                    // Show debug info inline in the error text view
+                    // Show debug info inline only on error/empty
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("Comments found: 0\n");
+                    if (!errorInfo.isEmpty()) {
+                        msg.append("ERROR: ").append(errorInfo).append("\n");
+                    }
+                    msg.append("\n").append(debugInfo);
                     binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.VISIBLE);
                     binding.fetchCommentsInfoImageViewCommentsListingFragment.setVisibility(View.GONE);
                     binding.fetchCommentsInfoTextViewCommentsListingFragment.setText(msg.toString());
@@ -474,11 +472,8 @@ public class CommentsListingFragment extends Fragment implements FragmentCommuni
                     return;
                 }
 
-                // Show debug info above the loaded comments
-                binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.VISIBLE);
-                binding.fetchCommentsInfoImageViewCommentsListingFragment.setVisibility(View.GONE);
-                binding.fetchCommentsInfoTextViewCommentsListingFragment.setText(msg.toString());
-                binding.fetchCommentsInfoTextViewCommentsListingFragment.setTextIsSelectable(true);
+                // Success — hide info panel and show comments
+                binding.fetchCommentsInfoLinearLayoutCommentsListingFragment.setVisibility(View.GONE);
 
                 androidx.paging.PagedList.Config config = new androidx.paging.PagedList.Config.Builder()
                         .setEnablePlaceholders(false)

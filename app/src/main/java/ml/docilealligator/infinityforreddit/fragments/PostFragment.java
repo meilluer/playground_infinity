@@ -1014,16 +1014,14 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
 
                 binding.swipeRefreshLayoutPostFragment.setRefreshing(false);
 
-                // Build debug text
-                StringBuilder msg = new StringBuilder();
-                msg.append("Posts found: ").append(archivedPosts.size()).append("\n");
-                if (!errorInfo.isEmpty()) {
-                    msg.append("ERROR: ").append(errorInfo).append("\n");
-                }
-                msg.append("\n").append(debugInfo);
-
                 if (archivedPosts.isEmpty()) {
-                    // Show debug info inline in the error text view
+                    // Show debug info inline only on error/empty
+                    StringBuilder msg = new StringBuilder();
+                    msg.append("Posts found: 0\n");
+                    if (!errorInfo.isEmpty()) {
+                        msg.append("ERROR: ").append(errorInfo).append("\n");
+                    }
+                    msg.append("\n").append(debugInfo);
                     binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
                     binding.fetchPostInfoImageViewPostFragment.setVisibility(View.GONE);
                     binding.fetchPostInfoTextViewPostFragment.setText(msg.toString());
@@ -1033,12 +1031,8 @@ public class PostFragment extends PostFragmentBase implements FragmentCommunicat
                     return;
                 }
 
-                // Show debug info above the loaded posts
-                binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.VISIBLE);
-                binding.fetchPostInfoImageViewPostFragment.setVisibility(View.GONE);
-                binding.fetchPostInfoTextViewPostFragment.setText(msg.toString());
-                binding.fetchPostInfoTextViewPostFragment.setTextIsSelectable(true);
-
+                // Success — hide info panel and show posts
+                binding.fetchPostInfoLinearLayoutPostFragment.setVisibility(View.GONE);
                 isShowingArchivePosts = true;
                 hasPost = true;
                 mAdapter.submitData(getViewLifecycleOwner().getLifecycle(), PagingData.from(archivedPosts));
