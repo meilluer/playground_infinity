@@ -2697,31 +2697,11 @@ public class PostRecyclerViewAdapter extends PagingDataAdapter<Post, RecyclerVie
         void loadVideo(int position) {
             Post post = getPost();
             if (post.isRedgifs() && !post.isLoadRedgifsOrStreamableVideoSuccess()) {
-                fetchRedgifsOrStreamableVideoCall =
-                        mRedgifsRetrofit.create(RedgifsAPI.class).getRedgifsData(
-                                APIUtils.getRedgifsOAuthHeader(mCurrentAccountSharedPreferences
-                                        .getString(SharedPreferencesUtils.REDGIFS_ACCESS_TOKEN, "")),
-                                post.getRedgifsId(), APIUtils.USER_AGENT);
-                FetchRedgifsVideoLinks.fetchRedgifsVideoLinksInRecyclerViewAdapter(mExecutor, new Handler(),
-                        fetchRedgifsOrStreamableVideoCall,
-                        new FetchVideoLinkListener() {
-                            @Override
-                            public void onFetchRedgifsVideoLinkSuccess(String webm, String mp4) {
-                                post.setVideoDownloadUrl(mp4);
-                                post.setVideoUrl(mp4);
-                                post.setLoadRedgifsOrStreamableVideoSuccess(true);
-                                if (position == getAdapterPosition()) {
-                                    bindVideoUri(Uri.parse(post.getVideoUrl()));
-                                }
-                            }
-
-                            @Override
-                            public void failed(@Nullable Integer messageRes) {
-                                if (position == getAdapterPosition()) {
-                                    loadFallbackDirectVideo();
-                                }
-                            }
-                        });
+                post.setVideoDownloadUrl(post.getVideoUrl());
+                post.setLoadRedgifsOrStreamableVideoSuccess(true);
+                if (position == getAdapterPosition()) {
+                    bindVideoUri(Uri.parse(post.getVideoUrl()));
+                }
             } else if(post.isStreamable() && !post.isLoadRedgifsOrStreamableVideoSuccess()) {
                 fetchRedgifsOrStreamableVideoCall =
                         mStreamableApiProvider.get().getStreamableData(post.getStreamableShortCode());

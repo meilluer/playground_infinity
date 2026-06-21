@@ -43,8 +43,12 @@ public class VideoLinkFetcher {
                 FetchStreamableVideo.fetchStreamableVideo(executor, handler, streamableApiProvider, shortCode, fetchVideoLinkListener);
                 break;
             case ViewVideoActivity.VIDEO_TYPE_REDGIFS:
-                FetchRedgifsVideoLinks.fetchRedgifsVideoLinks(executor, handler, redgifsRetrofit,
-                        currentAccountSharedPreferences, redgifsId, fetchVideoLinkListener);
+                String cleanId = redgifsId;
+                if (cleanId != null && cleanId.contains("-")) {
+                    cleanId = cleanId.substring(0, cleanId.indexOf('-'));
+                }
+                String mp4Url = "https://media.redgifs.com/" + cleanId + ".mp4";
+                handler.post(() -> fetchVideoLinkListener.onFetchRedgifsVideoLinkSuccess(mp4Url, mp4Url));
                 break;
             case ViewVideoActivity.VIDEO_TYPE_V_REDD_IT:
                 loadVReddItVideo(executor, handler, retrofit, vReddItRetrofit, redgifsRetrofit, streamableApiProvider,
@@ -62,8 +66,11 @@ public class VideoLinkFetcher {
             StreamableVideo streamableVideo = FetchStreamableVideo.fetchStreamableVideoSync(streamableApiProvider, shortCode);
             return streamableVideo == null ? null : (streamableVideo.mp4 == null ? null : streamableVideo.mp4.url);
         } else if (videoType == ViewVideoActivity.VIDEO_TYPE_REDGIFS) {
-            return FetchRedgifsVideoLinks.fetchRedgifsVideoLinkSync(redgifsRetrofit,
-                    currentAccountSharedPreferences, redgifsId);
+            String cleanId = redgifsId;
+            if (cleanId != null && cleanId.contains("-")) {
+                cleanId = cleanId.substring(0, cleanId.indexOf('-'));
+            }
+            return "https://media.redgifs.com/" + cleanId + ".mp4";
         }
 
         return null;
@@ -96,8 +103,9 @@ public class VideoLinkFetcher {
                                             }
                                             fetchVideoLinkListener.onChangeFileName("Redgifs-" + redgifsId + ".mp4");
 
-                                            FetchRedgifsVideoLinks.fetchRedgifsVideoLinks(executor, handler, redgifsRetrofit,
-                                                    currentAccountSharedPreferences, redgifsId, fetchVideoLinkListener);
+                                            String finalRedgifsId = redgifsId;
+                                            String mp4Url = "https://media.redgifs.com/" + finalRedgifsId + ".mp4";
+                                            handler.post(() -> fetchVideoLinkListener.onFetchRedgifsVideoLinkSuccess(mp4Url, mp4Url));
                                         } else if (post.isStreamable()) {
                                             String shortCode = post.getStreamableShortCode();
                                             fetchVideoLinkListener.onChangeFileName("Streamable-" + shortCode + ".mp4");

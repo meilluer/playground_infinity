@@ -903,27 +903,9 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 }
 
                 if (mPost.isRedgifs() && !mPost.isLoadRedgifsOrStreamableVideoSuccess()) {
-                    ((PostDetailBaseVideoAutoplayViewHolder) holder).fetchRedgifsOrStreamableVideoCall =
-                            mRedgifsRetrofit.create(RedgifsAPI.class)
-                                    .getRedgifsData(APIUtils.getRedgifsOAuthHeader(
-                                            mCurrentAccountSharedPreferences.getString(SharedPreferencesUtils.REDGIFS_ACCESS_TOKEN, "")),
-                                            mPost.getRedgifsId(), APIUtils.sUserAgent);
-                    FetchRedgifsVideoLinks.fetchRedgifsVideoLinksInRecyclerViewAdapter(mExecutor, new Handler(),
-                            ((PostDetailBaseVideoAutoplayViewHolder) holder).fetchRedgifsOrStreamableVideoCall,
-                            new FetchVideoLinkListener() {
-                                @Override
-                                public void onFetchRedgifsVideoLinkSuccess(String webm, String mp4) {
-                                    mPost.setVideoDownloadUrl(mp4);
-                                    mPost.setVideoUrl(mp4);
-                                    mPost.setLoadRedgifsOrStreamableVideoSuccess(true);
-                                    ((PostDetailBaseVideoAutoplayViewHolder) holder).bindVideoUri(Uri.parse(mPost.getVideoUrl()));
-                                }
-
-                                @Override
-                                public void failed(@Nullable Integer messageRes) {
-                                    ((PostDetailBaseVideoAutoplayViewHolder) holder).loadFallbackDirectVideo();
-                                }
-                            });
+                    mPost.setVideoDownloadUrl(mPost.getVideoUrl());
+                    mPost.setLoadRedgifsOrStreamableVideoSuccess(true);
+                    ((PostDetailBaseVideoAutoplayViewHolder) holder).bindVideoUri(Uri.parse(mPost.getVideoUrl()));
                 } else if(mPost.isStreamable() && !mPost.isLoadRedgifsOrStreamableVideoSuccess()) {
                     ((PostDetailBaseVideoAutoplayViewHolder) holder).fetchRedgifsOrStreamableVideoCall =
                             mStreamableApiProvider.get().getStreamableData(mPost.getStreamableShortCode());
