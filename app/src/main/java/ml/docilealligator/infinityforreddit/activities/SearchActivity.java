@@ -255,6 +255,10 @@ public class SearchActivity extends BaseActivity implements SavedSubredditsRecyc
 
             @Override
             public void afterTextChanged(Editable s) {
+                if (Account.ANONYMOUS_ACCOUNT.equals(accountName)) {
+                    return;
+                }
+
                 String currentQuery = s.toString().trim();
                 if (!currentQuery.isEmpty()) {
                     binding.clearSearchEditViewSearchActivity.setVisibility(View.VISIBLE);

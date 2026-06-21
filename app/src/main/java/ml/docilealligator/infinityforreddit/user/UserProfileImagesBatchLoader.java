@@ -3,6 +3,7 @@ package ml.docilealligator.infinityforreddit.user;
 import android.os.Handler;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 
 import org.json.JSONException;
@@ -21,6 +22,7 @@ import java.util.concurrent.Executor;
 import ml.docilealligator.infinityforreddit.RedditDataRoomDatabase;
 import ml.docilealligator.infinityforreddit.apis.RedditAPI;
 import ml.docilealligator.infinityforreddit.comment.Comment;
+import ml.docilealligator.infinityforreddit.utils.APIUtils;
 import ml.docilealligator.infinityforreddit.utils.JSONUtils;
 import ml.docilealligator.infinityforreddit.viewmodels.ViewPostDetailActivityViewModel;
 import retrofit2.Response;
@@ -33,6 +35,7 @@ public class UserProfileImagesBatchLoader {
     private final Handler mHandler;
     private final RedditDataRoomDatabase mRedditDataRoomDatabase;
     private final Retrofit mRetrofit;
+    private final Retrofit mOauthRetrofit;
     private final Map<String, String> mAuthorFullNameToImageMap;
     private final Queue<Comment> mCommentQueue;
     private final Map<String, ViewPostDetailActivityViewModel.LoadIconListener> mAuthorFullNameToListenerMap;
@@ -41,11 +44,12 @@ public class UserProfileImagesBatchLoader {
     private boolean mIsLoadingBatch = false;
 
     public UserProfileImagesBatchLoader(Executor executor, Handler handler, RedditDataRoomDatabase redditDataRoomDatabase,
-                                           Retrofit retrofit) {
+                                           Retrofit retrofit, Retrofit oauthRetrofit) {
         mExecutor = executor;
         mHandler = handler;
         mRedditDataRoomDatabase = redditDataRoomDatabase;
         mRetrofit = retrofit;
+        mOauthRetrofit = oauthRetrofit;
         mAuthorFullNameToImageMap = new HashMap<>();
         mCommentQueue = new LinkedList<>();
         mAuthorFullNameToListenerMap = new HashMap<>();
@@ -53,7 +57,7 @@ public class UserProfileImagesBatchLoader {
         mLoadingAuthorFullNames = new HashSet<>();
     }
 
-    public void loadAuthorImages(List<Comment> comments, @NonNull ViewPostDetailActivityViewModel.LoadIconListener loadIconListener) {
+    public void loadAuthorImages(@Nullable String accessToken, List<Comment> comments, @NonNull ViewPostDetailActivityViewModel.LoadIconListener loadIconListener) {
         String authorFullName = comments.get(0).getAuthorFullName();
         if (mAuthorFullNameToImageMap.containsKey(authorFullName)) {
             loadIconListener.loadIconSuccess(authorFullName, mAuthorFullNameToImageMap.get(authorFullName));
@@ -65,11 +69,11 @@ public class UserProfileImagesBatchLoader {
         mCallingComments.add(comments.get(0));
 
         if (!mIsLoadingBatch) {
-            loadNextBatch();
+            loadNextBatch(accessToken);
         }
     }
 
-    private void loadNextBatch() {
+    private void loadNextBatch(String accessToken) {
         if (mCommentQueue.isEmpty()) {
             return;
         }
@@ -92,7 +96,7 @@ public class UserProfileImagesBatchLoader {
                             if (userData != null) {
                                 String iconImageUrl = userData.getIconUrl();
                                 String authorFullName = c.getAuthorFullName();
-                                mAuthorFullNameToImageMap.put(authorFullName, iconImageUrl);
+                                mAuthorFullNameToImageMap.put(authorFullName, iconImageUrl == null ? "" : iconImageUrl);
                                 mHandler.post(() -> loadIconListener.loadIconSuccess(authorFullName, iconImageUrl));
                                 mAuthorFullNameToListenerMap.remove(authorFullName);
                                 mCallingComments.remove(index);
@@ -108,7 +112,12 @@ public class UserProfileImagesBatchLoader {
 
             StringBuilder stringBuilder = new StringBuilder();
             for (int i = 0; i < BATCH_SIZE && !mCommentQueue.isEmpty(); i++) {
-                String authorFullName = mCommentQueue.poll().getAuthorFullName();
+                Comment comment = mCommentQueue.poll();
+                if (comment == null || comment.getAuthorFullName() == null || comment.getAuthorFullName().isEmpty()) {
+                    i--;
+                    continue;
+                }
+                String authorFullName = comment.getAuthorFullName();
                 if (!mAuthorFullNameToImageMap.containsKey(authorFullName)) {
                     stringBuilder.append(authorFullName).append(",");
                     mLoadingAuthorFullNames.add(authorFullName);
@@ -129,20 +138,26 @@ public class UserProfileImagesBatchLoader {
             if (stringBuilder.length() > 0) {
                 stringBuilder.deleteCharAt(stringBuilder.length() - 1);
                 try {
-                    Response<String> response = mRetrofit.create(RedditAPI.class).loadPartialUserData(stringBuilder.toString()).execute();
+                    Response<String> response;
+                    if (accessToken != null) {
+                        response = mOauthRetrofit.create(RedditAPI.class).loadPartialUserDataOauth(
+                                stringBuilder.toString(), APIUtils.getOAuthHeader(accessToken)).execute();
+                    } else {
+                        response = mRetrofit.create(RedditAPI.class).loadPartialUserData(stringBuilder.toString()).execute();
+                    }
                     if (response.isSuccessful()) {
                         parseUserProfileImages(response.body());
-                        callListenerAndLoadNextBatch(true);
+                        callListenerAndLoadNextBatch(accessToken, true);
                     } else {
-                        callListenerAndLoadNextBatch(false);
+                        callListenerAndLoadNextBatch(accessToken, false);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    callListenerAndLoadNextBatch(false);
+                    callListenerAndLoadNextBatch(accessToken, false);
                 }
             } else {
                 mIsLoadingBatch = false;
-                loadNextBatch();
+                loadNextBatch(accessToken);
             }
         });
     }
@@ -163,7 +178,7 @@ public class UserProfileImagesBatchLoader {
         }
     }
 
-    private void callListenerAndLoadNextBatch(boolean loadSuccessful) {
+    private void callListenerAndLoadNextBatch(String accessToken, boolean loadSuccessful) {
         for (String s : mLoadingAuthorFullNames) {
             ViewPostDetailActivityViewModel.LoadIconListener loadIconListener = mAuthorFullNameToListenerMap.get(s);
             if (loadIconListener != null) {
@@ -173,12 +188,12 @@ public class UserProfileImagesBatchLoader {
                 mAuthorFullNameToListenerMap.remove(s);
             }
             if (!loadSuccessful && !mAuthorFullNameToImageMap.containsKey(s)) {
-                mAuthorFullNameToImageMap.put(s, null);
+                mAuthorFullNameToImageMap.put(s, "");
             }
         }
 
         mLoadingAuthorFullNames.clear();
         mIsLoadingBatch = false;
-        loadNextBatch();
+        loadNextBatch(accessToken);
     }
 }

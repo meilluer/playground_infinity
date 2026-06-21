@@ -558,8 +558,12 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         if (startIndex >= 0) {
                             List<Comment> commentBatch = mVisibleComments.subList(startIndex, Math.min(mVisibleComments.size(), UserProfileImagesBatchLoader.BATCH_SIZE + startIndex));
                             mFragment.loadIcon(commentBatch, (authorFullName, iconUrl) -> {
-                                if (authorFullName.equals(comment.getAuthorFullName())) {
-                                    comment.setAuthorIconUrl(iconUrl);
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition >= 0) {
+                                    Comment boundComment = getCurrentComment(currentPosition);
+                                    if (boundComment != null && authorFullName.equals(boundComment.getAuthorFullName())) {
+                                        boundComment.setAuthorIconUrl(iconUrl);
+                                    }
                                 }
 
                                 Comment currentComment = getCurrentComment(holder);
@@ -735,8 +739,12 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                         if (startIndex >= 0) {
                             List<Comment> commentBatch = mVisibleComments.subList(startIndex, Math.min(mVisibleComments.size(), UserProfileImagesBatchLoader.BATCH_SIZE + startIndex));
                             mFragment.loadIcon(commentBatch, (authorFullName, iconUrl) -> {
-                                if (authorFullName.equals(comment.getAuthorFullName())) {
-                                    comment.setAuthorIconUrl(iconUrl);
+                                int currentPosition = holder.getBindingAdapterPosition();
+                                if (currentPosition >= 0) {
+                                    Comment boundComment = getCurrentComment(currentPosition);
+                                    if (boundComment != null && authorFullName.equals(boundComment.getAuthorFullName())) {
+                                        boundComment.setAuthorIconUrl(iconUrl);
+                                    }
                                 }
 
                                 Comment currentComment = getCurrentComment(holder);

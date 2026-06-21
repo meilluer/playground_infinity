@@ -64,4 +64,10 @@ public interface AccountDao {
 
     @Query("UPDATE accounts SET access_token = :accessToken WHERE username = :username")
     void updateAccessToken(String username, String accessToken);
+
+    @Query("SELECT access_token FROM accounts WHERE username = '-'")
+    String getAnonymousAccessToken();
+
+    @Query("UPDATE accounts SET access_token = :accessToken WHERE username = '-'")
+    void setAnonymousAccessToken(String accessToken);
 }

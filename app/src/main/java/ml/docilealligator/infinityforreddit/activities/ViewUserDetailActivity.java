@@ -1524,6 +1524,10 @@ public class ViewUserDetailActivity extends BaseActivity implements SortTypeSele
 
             @Override
             public void afterTextChanged(Editable editable) {
+                if (Account.ANONYMOUS_ACCOUNT.equals(accountName)) {
+                    return;
+                }
+
                 String currentQuery = editable.toString().trim();
                 if (!currentQuery.isEmpty()) {
                     autoCompleteRunnable = () -> {

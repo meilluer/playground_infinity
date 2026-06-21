@@ -318,7 +318,7 @@ public class ViewPostDetailActivity extends BaseActivity implements SortTypeSele
         });
 
         viewPostDetailActivityViewModel = new ViewModelProvider(this, new ViewPostDetailActivityViewModel.Factory(mExecutor,
-                mHandler, mRedditDataRoomDatabase, mRetrofit)).get(ViewPostDetailActivityViewModel.class);
+                mHandler, mRedditDataRoomDatabase, mRetrofit, mOauthRetrofit, accessToken)).get(ViewPostDetailActivityViewModel.class);
 
         checkNewAccountAndBindView(savedInstanceState);
     }

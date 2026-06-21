@@ -32,13 +32,16 @@ public class SubredditListingDataSource extends PageKeyedDataSource<String, Subr
     private final MutableLiveData<NetworkState> initialLoadStateLiveData;
     private final MutableLiveData<Boolean> hasSubredditLiveData;
 
+    private final Retrofit oauthRetrofit;
+
     private LoadParams<String> params;
     private LoadCallback<String, SubredditData> callback;
 
-    SubredditListingDataSource(Executor executor, Handler handler, Retrofit retrofit, String query, String flair, SortType sortType,
+    SubredditListingDataSource(Executor executor, Handler handler, Retrofit retrofit, Retrofit oauthRetrofit, String query, String flair, SortType sortType,
                                @Nullable String accessToken, @NonNull String accountName, boolean nsfw) {
         this.executor = executor;
         this.retrofit = retrofit;
+        this.oauthRetrofit = oauthRetrofit;
         this.query = query;
         this.flair = flair;
         this.sortType = sortType;
@@ -71,7 +74,7 @@ public class SubredditListingDataSource extends PageKeyedDataSource<String, Subr
         if (flair != null && !flair.isEmpty()) {
             finalQuery = query + " flair:\"" + flair + "\"";
         }
-        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, finalQuery, null,
+        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, oauthRetrofit, finalQuery, null,
                 sortType.getType(), accessToken, accountName, nsfw,
                 new FetchSubredditData.FetchSubredditListingDataListener() {
                     @Override
@@ -111,7 +114,7 @@ public class SubredditListingDataSource extends PageKeyedDataSource<String, Subr
         if (flair != null && !flair.isEmpty()) {
             finalQuery = query + " flair:\"" + flair + "\"";
         }
-        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, finalQuery, params.key,
+        FetchSubredditData.fetchSubredditListingData(executor, handler, retrofit, oauthRetrofit, finalQuery, params.key,
                 sortType.getType(), accessToken, accountName, nsfw,
                 new FetchSubredditData.FetchSubredditListingDataListener() {
                     @Override

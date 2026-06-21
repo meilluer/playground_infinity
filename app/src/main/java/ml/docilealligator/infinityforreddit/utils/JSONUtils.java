@@ -67,6 +67,7 @@ public class JSONUtils {
     public static final String ID_KEY = "id";
     public static final String SCORE_HIDDEN_KEY = "score_hidden";
     public static final String SUBREDDIT_KEY = "subreddit";
+    public static final String SR_DETAIL_KEY = "sr_detail";
     public static final String BANNER_IMG_KEY = "banner_img";
     public static final String BANNER_BACKGROUND_IMAGE_KEY = "banner_background_image";
     public static final String ICON_IMG_KEY = "icon_img";

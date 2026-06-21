@@ -16,6 +16,7 @@ import dagger.Module;
 import dagger.Provides;
 import ml.docilealligator.infinityforreddit.apis.StreamableAPI;
 import ml.docilealligator.infinityforreddit.network.AccessTokenAuthenticator;
+import ml.docilealligator.infinityforreddit.network.AnonymousAccessTokenInterceptor;
 import ml.docilealligator.infinityforreddit.network.RedgifsAccessTokenAuthenticator;
 import ml.docilealligator.infinityforreddit.network.ServerAccessTokenAuthenticator;
 import ml.docilealligator.infinityforreddit.network.SortTypeConverterFactory;
@@ -92,9 +93,28 @@ abstract class NetworkModule {
 
     @Provides
     @Named("no_oauth")
-    static Retrofit provideRetrofit(@Named("base") Retrofit retrofit) {
-        return retrofit;
+    static Retrofit provideRetrofit(@Named("base") Retrofit retrofit, @Named("anonymous") OkHttpClient okHttpClient) {
+        return retrofit.newBuilder()
+                .client(okHttpClient)
+                .build();
     }
+
+    @Provides
+    @Named("anonymous")
+    @Singleton
+    static OkHttpClient provideCookieOkHttpClient(@Named("base") OkHttpClient httpClient,
+                                                  @Named("base") Retrofit retrofit,
+                                                  RedditDataRoomDatabase redditDataRoomDatabase,
+                                                  ConnectionPool connectionPool) {
+        AnonymousAccessTokenInterceptor anonymousAccessTokenInterceptor
+                = new AnonymousAccessTokenInterceptor(retrofit, redditDataRoomDatabase);
+
+        return httpClient.newBuilder()
+                .addInterceptor(anonymousAccessTokenInterceptor)
+                .connectionPool(connectionPool)
+                .build();
+    }
+
 
     @Provides
     @Named("oauth")

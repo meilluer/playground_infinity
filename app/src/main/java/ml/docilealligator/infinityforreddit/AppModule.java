@@ -150,6 +150,13 @@ abstract class AppModule {
     }
 
     @Provides
+    @Named("cookies")
+    @Singleton
+    static SharedPreferences provideCookieSharedPreferences(Application application) {
+        return application.getSharedPreferences(SharedPreferencesUtils.COOKIE_SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+    }
+
+    @Provides
     @Named("proxy")
     @Singleton
     static SharedPreferences provideProxySharedPreferences(Application application) {

@@ -151,6 +151,20 @@ public class ParsePost {
         String fullName = data.getString(JSONUtils.NAME_KEY);
         String subredditName = data.getString(JSONUtils.SUBREDDIT_KEY);
         String subredditNamePrefixed = data.getString(JSONUtils.SUBREDDIT_NAME_PREFIX_KEY);
+        String subredditIconUrl = null;
+        try {
+            JSONObject srDetail = data.getJSONObject(JSONUtils.SR_DETAIL_KEY);
+            if (srDetail.isNull(JSONUtils.COMMUNITY_ICON_KEY)) {
+                subredditIconUrl = "";
+            } else {
+                subredditIconUrl = srDetail.getString(JSONUtils.COMMUNITY_ICON_KEY);
+            }
+            if (subredditIconUrl.isEmpty() && !srDetail.isNull(JSONUtils.ICON_IMG_KEY)) {
+                subredditIconUrl = srDetail.getString(JSONUtils.ICON_IMG_KEY);
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
         String author = data.getString(JSONUtils.AUTHOR_KEY);
         StringBuilder authorFlairHTMLBuilder = new StringBuilder();
         if (data.has(JSONUtils.AUTHOR_FLAIR_RICHTEXT_KEY)) {
@@ -243,7 +257,7 @@ public class ParsePost {
             //data.getJSONArray(JSONUtils.CROSSPOST_PARENT_LIST).getJSONObject(0) out of bounds????????????
             data = data.getJSONArray(JSONUtils.CROSSPOST_PARENT_LIST).getJSONObject(0);
             Post crosspostParent = parseBasicData(data);
-            Post post = parseData(data, permalink, id, fullName, subredditName, subredditNamePrefixed,
+            Post post = parseData(data, permalink, id, fullName, subredditName, subredditNamePrefixed, subredditIconUrl,
                     author, authorFlair, authorFlairHTMLBuilder.toString(),
                     postTime, title, previews, mediaMetadataMap,
                     score, voteType, nComments, upvoteRatio, flair, hidden,
@@ -252,7 +266,7 @@ public class ParsePost {
             post.setCrosspostParentId(crosspostParent.getId());
             return post;
         } else {
-            return parseData(data, permalink, id, fullName, subredditName, subredditNamePrefixed,
+            return parseData(data, permalink, id, fullName, subredditName, subredditNamePrefixed, subredditIconUrl,
                     author, authorFlair, authorFlairHTMLBuilder.toString(),
                     postTime, title, previews, mediaMetadataMap,
                     score, voteType, nComments, upvoteRatio, flair, hidden,
@@ -262,7 +276,8 @@ public class ParsePost {
     }
 
     private static Post parseData(JSONObject data, String permalink, String id, String fullName,
-                                  String subredditName, String subredditNamePrefixed, String author,
+                                  String subredditName, String subredditNamePrefixed, String subredditIconUrl,
+                                  String author,
                                   String authorFlair, String authorFlairHTML, long postTimeMillis, String title,
                                   ArrayList<Post.Preview> previews, Map<String, MediaMetadata> mediaMetadataMap,
                                   int score, int voteType, int nComments, int upvoteRatio, String flair,
@@ -854,6 +869,7 @@ public class ParsePost {
         }
 
         post.setMediaMetadataMap(mediaMetadataMap);
+        post.setSubredditIconUrl(subredditIconUrl);
         return post;
     }
 
