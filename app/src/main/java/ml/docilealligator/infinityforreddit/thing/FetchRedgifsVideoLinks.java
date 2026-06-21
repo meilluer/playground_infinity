@@ -202,6 +202,12 @@ public class FetchRedgifsVideoLinks {
                 return;
             }
 
+            if (mp4.contains("thumbs2.redgifs.com")) {
+                mp4 = mp4.replace("thumbs2.redgifs.com", "media.redgifs.com");
+            } else if (mp4.contains("thumbs.redgifs.com")) {
+                mp4 = mp4.replace("thumbs.redgifs.com", "media.redgifs.com");
+            }
+
             if (mp4.contains("-silent")) {
                 mp4 = mp4.substring(0, mp4.indexOf("-silent")) + ".mp4";
             }
@@ -222,14 +228,25 @@ public class FetchRedgifsVideoLinks {
             JSONObject gif = jsonResponse.getJSONObject(JSONUtils.GIF_KEY);
             JSONObject urls = gif.getJSONObject(JSONUtils.URLS_KEY);
 
-            // Try HD first, fall back to SD if not available
+            String mp4;
             if (urls.has(JSONUtils.HD_KEY)) {
-                return urls.getString(JSONUtils.HD_KEY);
+                mp4 = urls.getString(JSONUtils.HD_KEY);
             } else if (urls.has("sd")) {
-                return urls.getString("sd");
+                mp4 = urls.getString("sd");
             } else {
                 return null;
             }
+
+            if (mp4.contains("thumbs2.redgifs.com")) {
+                mp4 = mp4.replace("thumbs2.redgifs.com", "media.redgifs.com");
+            } else if (mp4.contains("thumbs.redgifs.com")) {
+                mp4 = mp4.replace("thumbs.redgifs.com", "media.redgifs.com");
+            }
+
+            if (mp4.contains("-silent")) {
+                mp4 = mp4.substring(0, mp4.indexOf("-silent")) + ".mp4";
+            }
+            return mp4;
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
