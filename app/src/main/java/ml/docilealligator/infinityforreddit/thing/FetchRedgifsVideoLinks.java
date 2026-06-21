@@ -189,28 +189,8 @@ public class FetchRedgifsVideoLinks {
         try {
             JSONObject jsonResponse = new JSONObject(response);
             JSONObject gif = jsonResponse.getJSONObject(JSONUtils.GIF_KEY);
-            JSONObject urls = gif.getJSONObject(JSONUtils.URLS_KEY);
-
-            // Try HD first, fall back to SD if not available
-            String mp4;
-            if (urls.has(JSONUtils.HD_KEY)) {
-                mp4 = urls.getString(JSONUtils.HD_KEY);
-            } else if (urls.has("sd")) {
-                mp4 = urls.getString("sd");
-            } else {
-                handler.post(() -> fetchVideoLinkListener.failed(null));
-                return;
-            }
-
-            if (mp4.contains("thumbs2.redgifs.com")) {
-                mp4 = mp4.replace("thumbs2.redgifs.com", "media.redgifs.com");
-            } else if (mp4.contains("thumbs.redgifs.com")) {
-                mp4 = mp4.replace("thumbs.redgifs.com", "media.redgifs.com");
-            }
-
-            if (mp4.contains("-silent")) {
-                mp4 = mp4.substring(0, mp4.indexOf("-silent")) + ".mp4";
-            }
+            String id = gif.getString(JSONUtils.ID_KEY);
+            String mp4 = "https://media.redgifs.com/" + id + ".mp4";
             final String mp4Name = mp4;
             handler.post(() -> fetchVideoLinkListener.onFetchRedgifsVideoLinkSuccess(mp4Name, mp4Name));
         } catch (JSONException e) {
@@ -222,31 +202,10 @@ public class FetchRedgifsVideoLinks {
     @Nullable
     private static String parseRedgifsVideoLinks(String response) {
         try {
-            /*return new JSONObject(response).getJSONObject(JSONUtils.GIF_KEY).getJSONObject(JSONUtils.URLS_KEY)
-                    .getString(JSONUtils.HD_KEY);*/
             JSONObject jsonResponse = new JSONObject(response);
             JSONObject gif = jsonResponse.getJSONObject(JSONUtils.GIF_KEY);
-            JSONObject urls = gif.getJSONObject(JSONUtils.URLS_KEY);
-
-            String mp4;
-            if (urls.has(JSONUtils.HD_KEY)) {
-                mp4 = urls.getString(JSONUtils.HD_KEY);
-            } else if (urls.has("sd")) {
-                mp4 = urls.getString("sd");
-            } else {
-                return null;
-            }
-
-            if (mp4.contains("thumbs2.redgifs.com")) {
-                mp4 = mp4.replace("thumbs2.redgifs.com", "media.redgifs.com");
-            } else if (mp4.contains("thumbs.redgifs.com")) {
-                mp4 = mp4.replace("thumbs.redgifs.com", "media.redgifs.com");
-            }
-
-            if (mp4.contains("-silent")) {
-                mp4 = mp4.substring(0, mp4.indexOf("-silent")) + ".mp4";
-            }
-            return mp4;
+            String id = gif.getString(JSONUtils.ID_KEY);
+            return "https://media.redgifs.com/" + id + ".mp4";
         } catch (JSONException e) {
             e.printStackTrace();
             return null;
