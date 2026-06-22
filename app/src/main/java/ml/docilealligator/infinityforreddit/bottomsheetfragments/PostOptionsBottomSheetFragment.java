@@ -53,6 +53,7 @@ import ml.docilealligator.infinityforreddit.post.HidePost;
 import ml.docilealligator.infinityforreddit.post.Post;
 import ml.docilealligator.infinityforreddit.services.DownloadMediaService;
 import ml.docilealligator.infinityforreddit.services.DownloadRedditVideoService;
+import ml.docilealligator.infinityforreddit.thing.SaveThing;
 import retrofit2.Retrofit;
 
 /**
@@ -349,11 +350,66 @@ public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBott
             });
 
             if (mBaseActivity.accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                binding.savePostTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
                 binding.commentTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
                 binding.hidePostTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
                 binding.crosspostTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
                 binding.reportTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
             } else {
+                binding.savePostTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                if (mPost.isSaved()) {
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setText(R.string.unsave_comment);
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setCompoundDrawablesWithIntrinsicBounds(
+                            ContextCompat.getDrawable(mBaseActivity, R.drawable.ic_bookmark_grey_24dp),
+                            null, null, null);
+                } else {
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setText(R.string.save_comment);
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setCompoundDrawablesWithIntrinsicBounds(
+                            ContextCompat.getDrawable(mBaseActivity, R.drawable.ic_bookmark_border_grey_24dp),
+                            null, null, null);
+                }
+
+                binding.savePostTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    if (mPost.isSaved()) {
+                        SaveThing.unsaveThing(mOauthRetrofit, mBaseActivity.accessToken, mPost.getFullName(),
+                                new SaveThing.SaveThingListener() {
+                                    @Override
+                                    public void success() {
+                                        mPost.setSaved(false);
+                                        Toast.makeText(mBaseActivity, R.string.post_unsaved_success, Toast.LENGTH_SHORT).show();
+                                        EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                        EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                                        dismiss();
+                                    }
+
+                                    @Override
+                                    public void failed() {
+                                        mPost.setSaved(true);
+                                        Toast.makeText(mBaseActivity, R.string.post_unsaved_failed, Toast.LENGTH_SHORT).show();
+                                        dismiss();
+                                    }
+                                });
+                    } else {
+                        SaveThing.saveThing(mOauthRetrofit, mBaseActivity.accessToken, mPost.getFullName(),
+                                new SaveThing.SaveThingListener() {
+                                    @Override
+                                    public void success() {
+                                        mPost.setSaved(true);
+                                        Toast.makeText(mBaseActivity, R.string.post_saved_success, Toast.LENGTH_SHORT).show();
+                                        EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                        EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                                        dismiss();
+                                    }
+
+                                    @Override
+                                    public void failed() {
+                                        mPost.setSaved(false);
+                                        Toast.makeText(mBaseActivity, R.string.post_saved_failed, Toast.LENGTH_SHORT).show();
+                                        dismiss();
+                                    }
+                                });
+                    }
+                });
                 binding.commentTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
                     Intent intent = new Intent(mBaseActivity, CommentActivity.class);
                     intent.putExtra(CommentActivity.EXTRA_PARENT_FULLNAME_KEY, mPost.getFullName());
