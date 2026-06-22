@@ -78,7 +78,7 @@ class AnonymousAccessTokenInterceptor(
             params["device_id"] = "DO_NOT_TRACK_THIS_DEVICE"
 
             val response = retrofit.create(RedditAPI::class.java).getAccessToken(
-                APIUtils.getHttpBasicAuthHeader(), params
+                APIUtils.getAnonymousHttpBasicAuthHeader(), params
             ).execute()
             if (response.isSuccessful) {
                 val newAccessToken = JSONObject(response.body()!!).getString(APIUtils.ACCESS_TOKEN_KEY)

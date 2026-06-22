@@ -623,7 +623,7 @@ public class ViewSubredditDetailActivity extends BaseActivity implements SortTyp
             params.put(APIUtils.GRANT_TYPE_KEY, APIUtils.GRANT_TYPE_INSTALLED_CLIENT);
             params.put(APIUtils.DEVICE_ID_KEY, java.util.UUID.randomUUID().toString());
 
-            mRetrofit.create(RedditAPI.class).getAccessToken(APIUtils.getHttpBasicAuthHeader(), params).enqueue(new Callback<String>() {
+            mRetrofit.create(RedditAPI.class).getAccessToken(APIUtils.getAnonymousHttpBasicAuthHeader(), params).enqueue(new Callback<String>() {
                 @Override
                 public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                     if (response.isSuccessful() && response.body() != null) {

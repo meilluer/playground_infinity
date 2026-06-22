@@ -261,7 +261,7 @@ public class SubredditListingFragment extends Fragment implements FragmentCommun
             params.put(ml.docilealligator.infinityforreddit.utils.APIUtils.GRANT_TYPE_KEY, ml.docilealligator.infinityforreddit.utils.APIUtils.GRANT_TYPE_INSTALLED_CLIENT);
             params.put(ml.docilealligator.infinityforreddit.utils.APIUtils.DEVICE_ID_KEY, java.util.UUID.randomUUID().toString());
 
-            mRetrofit.create(ml.docilealligator.infinityforreddit.apis.RedditAPI.class).getAccessToken(ml.docilealligator.infinityforreddit.utils.APIUtils.getHttpBasicAuthHeader(), params).enqueue(new retrofit2.Callback<String>() {
+            mRetrofit.create(ml.docilealligator.infinityforreddit.apis.RedditAPI.class).getAccessToken(ml.docilealligator.infinityforreddit.utils.APIUtils.getAnonymousHttpBasicAuthHeader(), params).enqueue(new retrofit2.Callback<String>() {
                 @Override
                 public void onResponse(@NonNull retrofit2.Call<String> call, @NonNull retrofit2.Response<String> response) {
                     if (response.isSuccessful() && response.body() != null) {

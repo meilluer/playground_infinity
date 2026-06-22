@@ -13,6 +13,14 @@
             app:useSimpleSummaryProvider="true" />
 
         <EditTextPreference
+            android:key="anonymous_client_id"
+            android:title="Anonymous Client ID"
+            android:summary="Enter your Anonymous Client ID"
+            android:persistent="true"
+            android:singleLine="true"
+            app:useSimpleSummaryProvider="true" />
+
+        <EditTextPreference
             android:key="giphy_api_key"
             android:title="Giphy API Key"
             android:summary="Enter your Giphy API Key"

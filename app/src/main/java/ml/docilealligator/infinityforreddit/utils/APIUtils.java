@@ -24,7 +24,8 @@ public class APIUtils {
 
     public static void init(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
-        sRedditClientId = preferences.getString("reddit_api_key", "");
+        sRedditClientId = preferences.getString("reddit_api_key", "NOe2iKrPPzwscA");
+        sAnonymousClientId = preferences.getString("anonymous_client_id", "");
         sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:\" + BuildConfig.VERSION_NAME + \" (by /u/Hostilenemy)");
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");
@@ -47,6 +48,7 @@ public class APIUtils {
     public static final String CLIENT_ID_KEY = "client_id";
     public static final String CLIENT_SECRET_KEY = "client_secret";
     public static String sRedditClientId;
+    public static String sAnonymousClientId;
     public static final String IMGUR_CLIENT_ID = "Client-ID cc671794e0ab397";
     public static final String REDGIFS_CLIENT_ID = "1828d0bcc93-15ac-bde6-0005-d2ecbe8daab3";
     public static final String REDGIFS_CLIENT_SECRET = "TJBlw7jRXW65NAGgFBtgZHu97WlzRXHYybK81sZ9dLM=";
@@ -141,11 +143,23 @@ public class APIUtils {
     public static final String HOW_NO = "no";
 
     public static Map<String, String> getHttpBasicAuthHeader() {
+        return getHttpBasicAuthHeader(sRedditClientId);
+    }
+
+    public static Map<String, String> getHttpBasicAuthHeader(String clientId) {
         Map<String, String> params = new HashMap<>();
-        String credentials = String.format("%s:%s", sRedditClientId, "");
+        String credentials = String.format("%s:%s", clientId, "");
         String auth = "Basic " + Base64.encodeToString(credentials.getBytes(), Base64.NO_WRAP);
         params.put(APIUtils.AUTHORIZATION_KEY, auth);
         return params;
+    }
+
+    public static Map<String, String> getAnonymousHttpBasicAuthHeader() {
+        String clientId = sAnonymousClientId;
+        if (clientId == null || clientId.isEmpty()) {
+            clientId = sRedditClientId;
+        }
+        return getHttpBasicAuthHeader(clientId);
     }
 
     public static Map<String, String> getOAuthHeader(String accessToken) {
