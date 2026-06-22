@@ -1043,8 +1043,6 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 }
             }
 
-            boolean shouldHideSave = true;
-
             ConstraintLayout bottomConstraintLayout = baseViewHolder.bottomConstraintLayout;
             if (bottomConstraintLayout != null) {
                 ConstraintSet constraintSet = new ConstraintSet();
@@ -1079,75 +1077,61 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     constraintSet.connect(baseViewHolder.scoreTextView.getId(), ConstraintSet.END, baseViewHolder.downvoteButton.getId(), ConstraintSet.START);
                     constraintSet.connect(baseViewHolder.downvoteButton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
                     
-                    if (shouldHideSave) {
-                        baseViewHolder.saveButton.setVisibility(View.GONE);
-                        constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.START, baseViewHolder.shareButton.getId(), ConstraintSet.END);
-                    } else {
-                        baseViewHolder.saveButton.setVisibility(View.VISIBLE);
-                        constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.START, baseViewHolder.saveButton.getId(), ConstraintSet.END);
-                        constraintSet.connect(baseViewHolder.saveButton.getId(), ConstraintSet.START, baseViewHolder.shareButton.getId(), ConstraintSet.END);
-                    }
+                    baseViewHolder.saveButton.setVisibility(View.GONE);
+                    constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.START, baseViewHolder.shareButton.getId(), ConstraintSet.END);
                     
                     constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.END, baseViewHolder.upvoteButton.getId(), ConstraintSet.START);
                     constraintSet.connect(baseViewHolder.shareButton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
                     constraintSet.setHorizontalBias(baseViewHolder.commentsCountButton.getId(), 0);
                 } else {
-                    if (shouldHideSave) {
-                        baseViewHolder.saveButton.setVisibility(View.GONE);
-                        if (placeholder != null) {
-                            View geminiTarget = null;
-                            View container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_link);
-                            if (container == null) {
-                                container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_no_preview);
-                            }
-                            if (container != null) {
-                                geminiTarget = container;
-                            } else if (baseViewHolder.geminiLogo != null) {
-                                geminiTarget = baseViewHolder.geminiLogo;
-                            }
-
-                            View endPlaceholder = baseViewHolder.itemView.findViewById(R.id.gemini_placeholder_end_item_post_detail_link);
-                            if (endPlaceholder == null) {
-                                endPlaceholder = baseViewHolder.itemView.findViewById(R.id.gemini_placeholder_end_item_post_detail_no_preview);
-                            }
-                            if (endPlaceholder != null) {
-                                endPlaceholder.setVisibility(View.GONE);
-                            }
-
-                            if (geminiTarget != null) {
-                                View progressBar = baseViewHolder.geminiProgressBar;
-                                constraintSet.clear(placeholder.getId(), ConstraintSet.END);
-
-                                if (progressBar != null && progressBar.getId() != View.NO_ID && container == null) {
-                                    constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
-
-                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
-                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
-                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
-                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, progressBar.getId(), ConstraintSet.START);
-
-                                    constraintSet.clear(progressBar.getId(), ConstraintSet.START);
-                                    constraintSet.clear(progressBar.getId(), ConstraintSet.END);
-                                    constraintSet.connect(progressBar.getId(), ConstraintSet.START, geminiTarget.getId(), ConstraintSet.END);
-                                    constraintSet.connect(progressBar.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
-                                } else {
-                                    constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
-
-                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
-                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
-                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
-                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
-                                }
-                            } else {
-                                constraintSet.clear(placeholder.getId(), ConstraintSet.END);
-                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
-                            }
+                    baseViewHolder.saveButton.setVisibility(View.GONE);
+                    if (placeholder != null) {
+                        View geminiTarget = null;
+                        View container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_link);
+                        if (container == null) {
+                            container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_no_preview);
                         }
-                    } else {
-                        baseViewHolder.saveButton.setVisibility(View.VISIBLE);
-                        if (placeholder != null) {
+                        if (container != null) {
+                            geminiTarget = container;
+                        } else if (baseViewHolder.geminiLogo != null) {
+                            geminiTarget = baseViewHolder.geminiLogo;
+                        }
+
+                        View endPlaceholder = baseViewHolder.itemView.findViewById(R.id.gemini_placeholder_end_item_post_detail_link);
+                        if (endPlaceholder == null) {
+                            endPlaceholder = baseViewHolder.itemView.findViewById(R.id.gemini_placeholder_end_item_post_detail_no_preview);
+                        }
+                        if (endPlaceholder != null) {
+                            endPlaceholder.setVisibility(View.GONE);
+                        }
+
+                        if (geminiTarget != null) {
+                            View progressBar = baseViewHolder.geminiProgressBar;
                             constraintSet.clear(placeholder.getId(), ConstraintSet.END);
-                            constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.saveButton.getId(), ConstraintSet.START);
+
+                            if (progressBar != null && progressBar.getId() != View.NO_ID && container == null) {
+                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
+
+                                constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
+                                constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
+                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, progressBar.getId(), ConstraintSet.START);
+
+                                constraintSet.clear(progressBar.getId(), ConstraintSet.START);
+                                constraintSet.clear(progressBar.getId(), ConstraintSet.END);
+                                constraintSet.connect(progressBar.getId(), ConstraintSet.START, geminiTarget.getId(), ConstraintSet.END);
+                                constraintSet.connect(progressBar.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
+                            } else {
+                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
+
+                                constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
+                                constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
+                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
+                            }
+                        } else {
+                            constraintSet.clear(placeholder.getId(), ConstraintSet.END);
+                            constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
                         }
                     }
                 }
@@ -1863,54 +1847,8 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 this.commentsCountButton.setVisibility(View.GONE);
             }
 
-            this.saveButton.setOnClickListener(view -> {
-                if (mAccountName.equals(Account.ANONYMOUS_ACCOUNT)) {
-                    Toast.makeText(mActivity, R.string.login_first, Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                if (mPost.isSaved()) {
-                    this.saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                    SaveThing.unsaveThing(mOauthRetrofit, mAccessToken, mPost.getFullName(),
-                            new SaveThing.SaveThingListener() {
-                                @Override
-                                public void success() {
-                                    mPost.setSaved(false);
-                                    PostDetailBaseViewHolder.this.saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                                    Toast.makeText(mActivity, R.string.post_unsaved_success, Toast.LENGTH_SHORT).show();
-                                    mPostDetailRecyclerViewAdapterCallback.updatePost(mPost);
-                                }
-
-                                @Override
-                                public void failed() {
-                                    mPost.setSaved(true);
-                                    PostDetailBaseViewHolder.this.saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                                    Toast.makeText(mActivity, R.string.post_unsaved_failed, Toast.LENGTH_SHORT).show();
-                                    mPostDetailRecyclerViewAdapterCallback.updatePost(mPost);
-                                }
-                            });
-                } else {
-                    this.saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                    SaveThing.saveThing(mOauthRetrofit, mAccessToken, mPost.getFullName(),
-                            new SaveThing.SaveThingListener() {
-                                @Override
-                                public void success() {
-                                    mPost.setSaved(true);
-                                    PostDetailBaseViewHolder.this.saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                                    Toast.makeText(mActivity, R.string.post_saved_success, Toast.LENGTH_SHORT).show();
-                                    mPostDetailRecyclerViewAdapterCallback.updatePost(mPost);
-                                }
-
-                                @Override
-                                public void failed() {
-                                    mPost.setSaved(false);
-                                    PostDetailBaseViewHolder.this.saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                                    Toast.makeText(mActivity, R.string.post_saved_failed, Toast.LENGTH_SHORT).show();
-                                    mPostDetailRecyclerViewAdapterCallback.updatePost(mPost);
-                                }
-                            });
-                }
-            });
+            // Save button is hidden in detail view; save/unsave is done via the "More options" bottom sheet
+            this.saveButton.setVisibility(View.GONE);
 
             this.shareButton.setOnClickListener(view -> {
                 Bundle bundle = new Bundle();
@@ -1951,9 +1889,8 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 constraintSet.connect(upvoteButton.getId(), ConstraintSet.END, scoreTextView.getId(), ConstraintSet.START);
                 constraintSet.connect(scoreTextView.getId(), ConstraintSet.END, downvoteButton.getId(), ConstraintSet.START);
                 constraintSet.connect(downvoteButton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-                constraintSet.connect(commentsCountButton.getId(), ConstraintSet.START, saveButton.getId(), ConstraintSet.END);
+                constraintSet.connect(commentsCountButton.getId(), ConstraintSet.START, shareButton.getId(), ConstraintSet.END);
                 constraintSet.connect(commentsCountButton.getId(), ConstraintSet.END, upvoteButton.getId(), ConstraintSet.START);
-                constraintSet.connect(saveButton.getId(), ConstraintSet.START, shareButton.getId(), ConstraintSet.END);
                 constraintSet.connect(shareButton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
                 constraintSet.setHorizontalBias(commentsCountButton.getId(), 0);
                 constraintSet.applyTo(bottomConstraintLayout);
