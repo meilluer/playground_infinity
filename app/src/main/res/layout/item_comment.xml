@@ -209,6 +209,7 @@
                 style="?attr/materialIconButtonOutlinedStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
                 app:icon="@drawable/ic_mic_14dp"
                 app:iconSize="24dp"
                 app:iconTint="?attr/textToSpeechIconTint"
