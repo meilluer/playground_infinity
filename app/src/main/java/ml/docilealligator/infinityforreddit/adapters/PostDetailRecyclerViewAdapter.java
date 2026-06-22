@@ -589,7 +589,15 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                         && mPost.getUrl() != null
                         && !mPost.getUrl().isEmpty();
 
+                View container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_link);
+                if (container == null) {
+                    container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_no_preview);
+                }
+
                 if (canSummarizeText || canSummarizeLink) {
+                    if (container != null) {
+                        container.setVisibility(View.VISIBLE);
+                    }
                     baseViewHolder.geminiLogo.setVisibility(View.VISIBLE);
                     baseViewHolder.geminiLogo.setOnClickListener(view -> {
                         Toast.makeText(mActivity, R.string.gemini_summary, Toast.LENGTH_SHORT).show();
@@ -678,6 +686,9 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                         }
                     });
                 } else {
+                    if (container != null) {
+                        container.setVisibility(View.GONE);
+                    }
                     baseViewHolder.geminiLogo.setVisibility(View.GONE);
                     if (baseViewHolder.geminiProgressBar != null) {
                         baseViewHolder.geminiProgressBar.setVisibility(View.GONE);
@@ -1044,8 +1055,8 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     R.id.placeholder_item_post_detail_text,
                     R.id.placeholder_item_post_detail_gallery,
                     R.id.placeholder_item_post_detail_image_and_gif_autoplay,
-                    R.id.gemini_placeholder_end_item_post_detail_link,
-                    R.id.gemini_placeholder_end_item_post_detail_no_preview,
+                    R.id.gemini_placeholder_start_item_post_detail_link,
+                    R.id.gemini_placeholder_start_item_post_detail_no_preview,
                     R.id.placeholder_item_post_detail_video_and_gif_preview,
                     R.id.placeholder_item_post_detail_video_autoplay
                 };
@@ -1084,8 +1095,53 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     if (shouldHideSave) {
                         baseViewHolder.saveButton.setVisibility(View.GONE);
                         if (placeholder != null) {
-                            constraintSet.clear(placeholder.getId(), ConstraintSet.END);
-                            constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
+                            View geminiTarget = null;
+                            View container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_link);
+                            if (container == null) {
+                                container = baseViewHolder.itemView.findViewById(R.id.gemini_container_item_post_detail_no_preview);
+                            }
+                            if (container != null) {
+                                geminiTarget = container;
+                            } else if (baseViewHolder.geminiLogo != null) {
+                                geminiTarget = baseViewHolder.geminiLogo;
+                            }
+
+                            View endPlaceholder = baseViewHolder.itemView.findViewById(R.id.gemini_placeholder_end_item_post_detail_link);
+                            if (endPlaceholder == null) {
+                                endPlaceholder = baseViewHolder.itemView.findViewById(R.id.gemini_placeholder_end_item_post_detail_no_preview);
+                            }
+                            if (endPlaceholder != null) {
+                                endPlaceholder.setVisibility(View.GONE);
+                            }
+
+                            if (geminiTarget != null) {
+                                View progressBar = baseViewHolder.geminiProgressBar;
+                                constraintSet.clear(placeholder.getId(), ConstraintSet.END);
+
+                                if (progressBar != null && progressBar.getId() != View.NO_ID && container == null) {
+                                    constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
+
+                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
+                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, progressBar.getId(), ConstraintSet.START);
+
+                                    constraintSet.clear(progressBar.getId(), ConstraintSet.START);
+                                    constraintSet.clear(progressBar.getId(), ConstraintSet.END);
+                                    constraintSet.connect(progressBar.getId(), ConstraintSet.START, geminiTarget.getId(), ConstraintSet.END);
+                                    constraintSet.connect(progressBar.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
+                                } else {
+                                    constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
+
+                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
+                                    constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
+                                }
+                            } else {
+                                constraintSet.clear(placeholder.getId(), ConstraintSet.END);
+                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
+                            }
                         }
                     } else {
                         baseViewHolder.saveButton.setVisibility(View.VISIBLE);
