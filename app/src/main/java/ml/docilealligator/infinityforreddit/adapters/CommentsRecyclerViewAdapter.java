@@ -705,7 +705,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 if (((CommentBaseViewHolder) holder).textToSpeechButton != null) {
                     boolean hasCommentText = comment.getCommentRawText() != null
                             && !comment.getCommentRawText().isEmpty();
-                    boolean showInlineTts = hasCommentText && comment.getDepth() == 0;
+                    boolean showInlineTts = hasCommentText && comment.getDepth() == 0 && comment.isExpanded();
 
                     if (showInlineTts) {
                         ((CommentBaseViewHolder) holder).textToSpeechButton.setVisibility(View.VISIBLE);
@@ -1756,7 +1756,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_IS_NSFW, mPost.isNSFW());
                     boolean showTtsInMoreMenu = comment.getCommentRawText() != null
                             && !comment.getCommentRawText().isEmpty()
-                            && comment.getDepth() > 0;
+                            && (comment.getDepth() > 0 || !comment.isExpanded());
                     bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_TEXT_TO_SPEECH_OPTION,
                             showTtsInMoreMenu);
                     if (comment.getDepth() >= mDepthThreshold) {
@@ -2054,6 +2054,11 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                                 expandButton.setText("+" + comment.getChildCount());
                             }
                             expandButton.setCompoundDrawablesWithIntrinsicBounds(expandDrawable, null, null, null);
+                            if (textToSpeechButton != null) {
+                                textToSpeechButton.setVisibility(View.GONE);
+                                textToSpeechButton.setOnClickListener(null);
+                                textToSpeechButton.setOnLongClickListener(null);
+                            }
                         } else {
                             comment.setExpanded(true);
                             ArrayList<Comment> newList = new ArrayList<>();
@@ -2072,6 +2077,24 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                                 expandButton.setText("");
                             }
                             expandButton.setCompoundDrawablesWithIntrinsicBounds(collapseDrawable, null, null, null);
+                            if (textToSpeechButton != null) {
+                                boolean hasCommentText = comment.getCommentRawText() != null
+                                        && !comment.getCommentRawText().isEmpty();
+                                if (hasCommentText && comment.getDepth() == 0) {
+                                    textToSpeechButton.setVisibility(View.VISIBLE);
+                                    textToSpeechButton.setOnClickListener(v -> {
+                                        if (mCommentRecyclerViewAdapterCallback != null) {
+                                            mCommentRecyclerViewAdapterCallback.onTtsClick(comment, itemView);
+                                        }
+                                    });
+                                    textToSpeechButton.setOnLongClickListener(v -> {
+                                        if (mCommentRecyclerViewAdapterCallback != null) {
+                                            mCommentRecyclerViewAdapterCallback.onTtsLongClick(comment);
+                                        }
+                                        return true;
+                                    });
+                                }
+                            }
                         }
                     }
                 } else if (mFullyCollapseComment) {
