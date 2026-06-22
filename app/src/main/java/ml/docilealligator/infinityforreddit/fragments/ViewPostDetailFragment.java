@@ -2323,6 +2323,10 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
             unhighlightCurrentSentence();
         }
 
+        if (mSequentialTtsManager == null) {
+            mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+        }
+
         mIsReadingAll = true;
         // Find index of comment
         int index = -1;
@@ -2504,6 +2508,9 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
 
             Comment comment = mCommentsAdapter.getCurrentComment(mCurrentCommentIndex);
             if (comment != null && comment.getCommentRawText() != null && !comment.getCommentRawText().isEmpty()) {
+                if (mSequentialTtsManager == null) {
+                    mSequentialTtsManager = new ml.docilealligator.infinityforreddit.utils.TtsManager(activity);
+                }
                 mSequentialTtsManager.speak(comment.getCommentRawText(), () -> {
                     unhighlightCurrentSentence();
                     if (mIsReadingAll) {
