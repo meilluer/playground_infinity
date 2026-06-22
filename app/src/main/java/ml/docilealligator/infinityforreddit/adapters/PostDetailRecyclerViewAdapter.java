@@ -1031,6 +1031,74 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                             (mPost.isNSFW() && mNeedBlurNsfw && !(mDoNotBlurNsfwInNsfwSubreddits && mFragment != null && mFragment.getIsNsfwSubreddit())) || (mPost.isSpoiler() && mNeedBlurSpoiler));
                 }
             }
+
+            boolean isTtsVisible = baseViewHolder.textToSpeechButton != null && baseViewHolder.textToSpeechButton.getVisibility() == View.VISIBLE;
+            boolean isGeminiVisible = baseViewHolder.geminiLogo != null && baseViewHolder.geminiLogo.getVisibility() == View.VISIBLE;
+            boolean shouldHideSave = isTtsVisible && isGeminiVisible;
+
+            ConstraintLayout bottomConstraintLayout = baseViewHolder.bottomConstraintLayout;
+            if (bottomConstraintLayout != null) {
+                ConstraintSet constraintSet = new ConstraintSet();
+                constraintSet.clone(bottomConstraintLayout);
+
+                View placeholder = null;
+                int[] placeholderIds = {
+                    R.id.placeholder_item_post_detail_text,
+                    R.id.placeholder_item_post_detail_gallery,
+                    R.id.placeholder_item_post_detail_image_and_gif_autoplay,
+                    R.id.gemini_placeholder_end_item_post_detail_link,
+                    R.id.gemini_placeholder_end_item_post_detail_no_preview,
+                    R.id.placeholder_item_post_detail_video_and_gif_preview,
+                    R.id.placeholder_item_post_detail_video_autoplay
+                };
+                for (int id : placeholderIds) {
+                    View v = baseViewHolder.itemView.findViewById(id);
+                    if (v != null) {
+                        placeholder = v;
+                        break;
+                    }
+                }
+
+                if (mVoteButtonsOnTheRight) {
+                    constraintSet.clear(baseViewHolder.upvoteButton.getId(), ConstraintSet.START);
+                    constraintSet.clear(baseViewHolder.scoreTextView.getId(), ConstraintSet.START);
+                    constraintSet.clear(baseViewHolder.downvoteButton.getId(), ConstraintSet.START);
+                    constraintSet.clear(baseViewHolder.saveButton.getId(), ConstraintSet.END);
+                    constraintSet.clear(baseViewHolder.shareButton.getId(), ConstraintSet.END);
+                    
+                    constraintSet.connect(baseViewHolder.upvoteButton.getId(), ConstraintSet.END, baseViewHolder.scoreTextView.getId(), ConstraintSet.START);
+                    constraintSet.connect(baseViewHolder.scoreTextView.getId(), ConstraintSet.END, baseViewHolder.downvoteButton.getId(), ConstraintSet.START);
+                    constraintSet.connect(baseViewHolder.downvoteButton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+                    
+                    if (shouldHideSave) {
+                        baseViewHolder.saveButton.setVisibility(View.GONE);
+                        constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.START, baseViewHolder.shareButton.getId(), ConstraintSet.END);
+                    } else {
+                        baseViewHolder.saveButton.setVisibility(View.VISIBLE);
+                        constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.START, baseViewHolder.saveButton.getId(), ConstraintSet.END);
+                        constraintSet.connect(baseViewHolder.saveButton.getId(), ConstraintSet.START, baseViewHolder.shareButton.getId(), ConstraintSet.END);
+                    }
+                    
+                    constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.END, baseViewHolder.upvoteButton.getId(), ConstraintSet.START);
+                    constraintSet.connect(baseViewHolder.shareButton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+                    constraintSet.setHorizontalBias(baseViewHolder.commentsCountButton.getId(), 0);
+                } else {
+                    if (shouldHideSave) {
+                        baseViewHolder.saveButton.setVisibility(View.GONE);
+                        if (placeholder != null) {
+                            constraintSet.clear(placeholder.getId(), ConstraintSet.END);
+                            constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
+                        }
+                    } else {
+                        baseViewHolder.saveButton.setVisibility(View.VISIBLE);
+                        if (placeholder != null) {
+                            constraintSet.clear(placeholder.getId(), ConstraintSet.END);
+                            constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.saveButton.getId(), ConstraintSet.START);
+                        }
+                    }
+                }
+                constraintSet.applyTo(bottomConstraintLayout);
+            }
         }
     }
 
@@ -1281,74 +1349,6 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 intent.putExtra(ViewRedditGalleryActivity.EXTRA_POST, post);
                 intent.putExtra(ViewRedditGalleryActivity.EXTRA_GALLERY_ITEM_INDEX, galleryItemIndex);
                 mActivity.startActivity(intent);
-            }
-
-            boolean isTtsVisible = baseViewHolder.textToSpeechButton != null && baseViewHolder.textToSpeechButton.getVisibility() == View.VISIBLE;
-            boolean isGeminiVisible = baseViewHolder.geminiLogo != null && baseViewHolder.geminiLogo.getVisibility() == View.VISIBLE;
-            boolean shouldHideSave = isTtsVisible && isGeminiVisible;
-
-            ConstraintLayout bottomConstraintLayout = baseViewHolder.bottomConstraintLayout;
-            if (bottomConstraintLayout != null) {
-                ConstraintSet constraintSet = new ConstraintSet();
-                constraintSet.clone(bottomConstraintLayout);
-
-                View placeholder = null;
-                int[] placeholderIds = {
-                    R.id.placeholder_item_post_detail_text,
-                    R.id.placeholder_item_post_detail_gallery,
-                    R.id.placeholder_item_post_detail_image_and_gif_autoplay,
-                    R.id.gemini_placeholder_end_item_post_detail_link,
-                    R.id.gemini_placeholder_end_item_post_detail_no_preview,
-                    R.id.placeholder_item_post_detail_video_and_gif_preview,
-                    R.id.placeholder_item_post_detail_video_autoplay
-                };
-                for (int id : placeholderIds) {
-                    View v = baseViewHolder.itemView.findViewById(id);
-                    if (v != null) {
-                        placeholder = v;
-                        break;
-                    }
-                }
-
-                if (mVoteButtonsOnTheRight) {
-                    constraintSet.clear(baseViewHolder.upvoteButton.getId(), ConstraintSet.START);
-                    constraintSet.clear(baseViewHolder.scoreTextView.getId(), ConstraintSet.START);
-                    constraintSet.clear(baseViewHolder.downvoteButton.getId(), ConstraintSet.START);
-                    constraintSet.clear(baseViewHolder.saveButton.getId(), ConstraintSet.END);
-                    constraintSet.clear(baseViewHolder.shareButton.getId(), ConstraintSet.END);
-                    
-                    constraintSet.connect(baseViewHolder.upvoteButton.getId(), ConstraintSet.END, baseViewHolder.scoreTextView.getId(), ConstraintSet.START);
-                    constraintSet.connect(baseViewHolder.scoreTextView.getId(), ConstraintSet.END, baseViewHolder.downvoteButton.getId(), ConstraintSet.START);
-                    constraintSet.connect(baseViewHolder.downvoteButton.getId(), ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-                    
-                    if (shouldHideSave) {
-                        baseViewHolder.saveButton.setVisibility(View.GONE);
-                        constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.START, baseViewHolder.shareButton.getId(), ConstraintSet.END);
-                    } else {
-                        baseViewHolder.saveButton.setVisibility(View.VISIBLE);
-                        constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.START, baseViewHolder.saveButton.getId(), ConstraintSet.END);
-                        constraintSet.connect(baseViewHolder.saveButton.getId(), ConstraintSet.START, baseViewHolder.shareButton.getId(), ConstraintSet.END);
-                    }
-                    
-                    constraintSet.connect(baseViewHolder.commentsCountButton.getId(), ConstraintSet.END, baseViewHolder.upvoteButton.getId(), ConstraintSet.START);
-                    constraintSet.connect(baseViewHolder.shareButton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-                    constraintSet.setHorizontalBias(baseViewHolder.commentsCountButton.getId(), 0);
-                } else {
-                    if (shouldHideSave) {
-                        baseViewHolder.saveButton.setVisibility(View.GONE);
-                        if (placeholder != null) {
-                            constraintSet.clear(placeholder.getId(), ConstraintSet.END);
-                            constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
-                        }
-                    } else {
-                        baseViewHolder.saveButton.setVisibility(View.VISIBLE);
-                        if (placeholder != null) {
-                            constraintSet.clear(placeholder.getId(), ConstraintSet.END);
-                            constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.saveButton.getId(), ConstraintSet.START);
-                        }
-                    }
-                }
-                constraintSet.applyTo(bottomConstraintLayout);
             }
         }
     }
