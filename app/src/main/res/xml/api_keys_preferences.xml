@@ -4,7 +4,7 @@
 
     <PreferenceCategory android:title="API Keys">
 
-        <EditTextPreference
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontHelpEditTextPreference
             android:key="reddit_api_key"
             android:title="Reddit API Key"
             android:summary="Enter your Reddit API Key"
@@ -12,7 +12,7 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontHelpEditTextPreference
             android:key="anonymous_client_id"
             android:title="Anonymous Client ID"
             android:summary="Enter your Anonymous Client ID"
@@ -20,7 +20,7 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontHelpEditTextPreference
             android:key="giphy_api_key"
             android:title="Giphy API Key"
             android:summary="Enter your Giphy API Key"
@@ -28,7 +28,7 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontHelpEditTextPreference
             android:key="user_agent"
             android:title="User Agent"
             android:summary="Enter your User Agent"
@@ -36,7 +36,7 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontHelpEditTextPreference
             android:key="gemini_key"
             android:title="Gemini Api"
             android:summary="Enter your Gemmini Api key"
@@ -44,7 +44,7 @@
             android:singleLine="true"
             app:useSimpleSummaryProvider="true" />
 
-        <EditTextPreference
+        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontHelpEditTextPreference
             android:key="redirect_uri"
             android:title="Redirect URI"
             android:summary="Enter your Redirect URI"

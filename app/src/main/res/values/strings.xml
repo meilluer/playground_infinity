@@ -1631,4 +1631,19 @@
     <string name="enable_gemini_summary">Enable Gemini Summary for Links</string>
     <string name="gemini_api_key">Gemini API Key</string>
     <string name="text_to_speech">Text to Speech</string>
+
+    <string name="api_help_explanation_label">Explanation</string>
+    <string name="api_help_example_label">Example</string>
+    <string name="api_help_reddit_api_key_explanation">Used to authenticate the application with Reddit\'s API. It identifies your custom application instance to Reddit.</string>
+    <string name="api_help_reddit_api_key_example">NOe2iKrPPzwscA</string>
+    <string name="api_help_anonymous_client_id_explanation">Used for accessing Reddit\'s API anonymously (without logging into a user account) or for specific features.</string>
+    <string name="api_help_anonymous_client_id_example">k9Hjs83Ksda01</string>
+    <string name="api_help_giphy_api_key_explanation">Used to authenticate with Giphy\'s API, allowing the app to search and display GIFs in comments or posts.</string>
+    <string name="api_help_giphy_api_key_example">dc6zaTOxFJmzC</string>
+    <string name="api_help_user_agent_explanation">A string that identifies your client/app to Reddit\'s servers. Reddit requires a unique and descriptive user agent to prevent rate limiting and block generic/spam clients.</string>
+    <string name="api_help_user_agent_example">android:ml.docilealligator.infinityforreddit:v5.3.0 (by /u/username)</string>
+    <string name="api_help_gemini_key_explanation">Used to authenticate with Google\'s Gemini AI service, enabling AI-powered features like post summaries or comment translations/generation.</string>
+    <string name="api_help_gemini_key_example">AIzaSyD...</string>
+    <string name="api_help_redirect_uri_explanation">The URL that Reddit redirects to after a user successfully authenticates/logs in. It must match the Redirect URI configured in your Reddit App settings.</string>
+    <string name="api_help_redirect_uri_example">http://127.0.0.1</string>
 </resources>

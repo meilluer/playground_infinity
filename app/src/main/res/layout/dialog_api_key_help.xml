@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingStart="24dp"
+        android:paddingEnd="24dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="16dp">
+
+        <TextView
+            android:id="@+id/explanation_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/api_help_explanation_label"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:fontFamily="?attr/font_family" />
+
+        <TextView
+            android:id="@+id/explanation_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:fontFamily="?attr/font_family" />
+
+        <TextView
+            android:id="@+id/example_label"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/api_help_example_label"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:fontFamily="?attr/font_family" />
+
+        <TextView
+            android:id="@+id/example_value"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:textIsSelectable="true"
+            android:fontFamily="?attr/font_family" />
+
+    </LinearLayout>
+</ScrollView>
