@@ -119,6 +119,8 @@ public class SharedPreferencesUtils {
     public static final String SWAP_TAP_AND_LONG_COMMENTS = "swap_tap_and_long_in_comments";
     public static final String SWIPE_UP_TO_HIDE_JUMP_TO_NEXT_TOP_LEVEL_COMMENT_BUTTON = "swipe_up_to_hide_jump_to_next_top_level_comments_button";
     public static final String SHOW_TOP_LEVEL_COMMENTS_FIRST = "show_top_level_comments_first";
+    public static final String OPEN_COMMENTS_LEFT_OFF = "open_comments_left_off";
+    public static final String HIGHLIGHT_NEW_COMMENTS = "highlight_new_comments";
     public static final String MAIN_PAGE_BACK_BUTTON_ACTION = "main_page_back_button_action";
     public static final int MAIN_PAGE_BACK_BUTTON_ACTION_CONFIRM_EXIT = 1;
     public static final int MAIN_PAGE_BACK_BUTTON_ACTION_OPEN_NAVIGATION_DRAWER = 2;

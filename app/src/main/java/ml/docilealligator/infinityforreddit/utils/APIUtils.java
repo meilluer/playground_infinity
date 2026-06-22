@@ -25,10 +25,7 @@ public class APIUtils {
     public static void init(Context context) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
         sRedditClientId = preferences.getString("reddit_api_key", "NOe2iKrPPzwscA");
-<<<<<<< HEAD
         sAnonymousClientId = preferences.getString("anonymous_client_id", "");
-=======
->>>>>>> adc82a1d2c32529c3e383c05f9bfc74e4866e09e
         sUserAgent = preferences.getString("user_agent", "android:ml.docilealligator.infinityforreddit:\" + BuildConfig.VERSION_NAME + \" (by /u/Hostilenemy)");
         USER_AGENT = sUserAgent;
         sGiphyApiKey = preferences.getString("giphy_api_key", "");

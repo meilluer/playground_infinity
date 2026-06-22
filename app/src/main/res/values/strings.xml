@@ -1646,4 +1646,9 @@
     <string name="api_help_gemini_key_example">AIzaSyD...</string>
     <string name="api_help_redirect_uri_explanation">The URL that Reddit redirects to after a user successfully authenticates/logs in. It must match the Redirect URI configured in your Reddit App settings.</string>
     <string name="api_help_redirect_uri_example">http://127.0.0.1</string>
+
+    <string name="settings_open_comments_left_off_title">Open comments from where you left off</string>
+    <string name="settings_open_comments_left_off_summary">Scroll back to the last read comment when opening a post again</string>
+    <string name="settings_highlight_new_comments_title">Highlight new comments</string>
+    <string name="settings_highlight_new_comments_summary">Highlight newly added comments when reopening a post</string>
 </resources>

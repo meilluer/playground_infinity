@@ -1353,6 +1353,9 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     }
 
     private void restoreScrollPosition() {
+        if (!mSharedPreferences.getBoolean(SharedPreferencesUtils.OPEN_COMMENTS_LEFT_OFF, false)) {
+            return;
+        }
         if (mPost != null && activity != null) {
             mExecutor.execute(() -> {
                 ml.docilealligator.infinityforreddit.readpost.ReadComment readComment = mRedditDataRoomDatabase.readCommentDao().getReadComment(activity.accountName, mPost.getId());
@@ -1375,6 +1378,9 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     }
 
     private void saveScrollPosition() {
+        if (mSharedPreferences == null || !mSharedPreferences.getBoolean(SharedPreferencesUtils.OPEN_COMMENTS_LEFT_OFF, false)) {
+            return;
+        }
         if (mCommentsAdapter != null && mPost != null && activity != null) {
             int position = -1;
             boolean includesPost = false;

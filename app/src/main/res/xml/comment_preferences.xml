@@ -71,4 +71,16 @@
         app:title="@string/settings_embedded_media_type_title"
         app:useSimpleSummaryProvider="true" />
 
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="false"
+        app:key="open_comments_left_off"
+        app:title="@string/settings_open_comments_left_off_title"
+        app:summary="@string/settings_open_comments_left_off_summary" />
+
+    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        app:defaultValue="false"
+        app:key="highlight_new_comments"
+        app:title="@string/settings_highlight_new_comments_title"
+        app:summary="@string/settings_highlight_new_comments_summary" />
+
 </PreferenceScreen>

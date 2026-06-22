@@ -512,7 +512,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         if (holder instanceof CommentBaseViewHolder) {
             Comment comment = getCurrentComment(position);
             if (comment != null) {
-                boolean isNew = mLastReadTime > 0 && comment.getCommentTimeMillis() > mLastReadTime;
+                boolean isNew = mSharedPreferences.getBoolean(SharedPreferencesUtils.HIGHLIGHT_NEW_COMMENTS, false) && mLastReadTime > 0 && comment.getCommentTimeMillis() > mLastReadTime;
                 if (mIsSingleCommentThreadMode && comment.getId().equals(mSingleCommentId)) {
                     holder.itemView.setBackgroundColor(mSingleCommentThreadBackgroundColor);
                 } else if (isNew) {
