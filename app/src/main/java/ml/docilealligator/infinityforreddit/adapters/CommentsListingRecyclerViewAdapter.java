@@ -35,7 +35,7 @@ import io.noties.markwon.MarkwonPlugin;
 import io.noties.markwon.core.MarkwonTheme;
 import ml.docilealligator.infinityforreddit.NetworkState;
 import ml.docilealligator.infinityforreddit.R;
-import ml.docilealligator.infinityforreddit.thing.SaveThing;
+
 import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.account.Account;
 import ml.docilealligator.infinityforreddit.activities.BaseActivity;
@@ -314,11 +314,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                         break;
                 }
 
-                if (comment.isSaved()) {
-                    ((CommentBaseViewHolder) holder).saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                } else {
-                    ((CommentBaseViewHolder) holder).saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                }
+
             }
         }
     }
@@ -448,7 +444,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
         MaterialButton downvoteButton;
         View placeholder;
         MaterialButton moreButton;
-        MaterialButton saveButton;
+
         MaterialButton replyButton;
         View commentDivider;
         CustomMarkwonAdapter markwonAdapter;
@@ -468,7 +464,6 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                          MaterialButton downvoteButton,
                          View placeholder,
                          MaterialButton moreButton,
-                         MaterialButton saveButton,
                          TextView expandButton,
                          MaterialButton replyButton,
                          CommentIndentationView commentIndentationView,
@@ -484,7 +479,6 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
             this.downvoteButton = downvoteButton;
             this.placeholder = placeholder;
             this.moreButton = moreButton;
-            this.saveButton = saveButton;
             this.replyButton = replyButton;
             this.commentDivider = commentDivider;
 
@@ -504,8 +498,6 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                 constraintSet.clear(downvoteButton.getId(), ConstraintSet.END);
                 constraintSet.clear(expandButton.getId(), ConstraintSet.START);
                 constraintSet.clear(expandButton.getId(), ConstraintSet.END);
-                constraintSet.clear(saveButton.getId(), ConstraintSet.START);
-                constraintSet.clear(saveButton.getId(), ConstraintSet.END);
                 constraintSet.clear(replyButton.getId(), ConstraintSet.START);
                 constraintSet.clear(replyButton.getId(), ConstraintSet.END);
                 constraintSet.clear(moreButton.getId(), ConstraintSet.START);
@@ -520,12 +512,10 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                 constraintSet.connect(placeholder.getId(), ConstraintSet.START, moreButton.getId(), ConstraintSet.END);
                 constraintSet.connect(moreButton.getId(), ConstraintSet.START, expandButton.getId(), ConstraintSet.END);
                 constraintSet.connect(moreButton.getId(), ConstraintSet.END, placeholder.getId(), ConstraintSet.START);
-                constraintSet.connect(expandButton.getId(), ConstraintSet.START, saveButton.getId(), ConstraintSet.END);
+                constraintSet.connect(expandButton.getId(), ConstraintSet.START, replyButton.getId(), ConstraintSet.END);
                 constraintSet.connect(expandButton.getId(), ConstraintSet.END, moreButton.getId(), ConstraintSet.START);
-                constraintSet.connect(saveButton.getId(), ConstraintSet.START, replyButton.getId(), ConstraintSet.END);
-                constraintSet.connect(saveButton.getId(), ConstraintSet.END, expandButton.getId(), ConstraintSet.START);
                 constraintSet.connect(replyButton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-                constraintSet.connect(replyButton.getId(), ConstraintSet.END, saveButton.getId(), ConstraintSet.START);
+                constraintSet.connect(replyButton.getId(), ConstraintSet.END, expandButton.getId(), ConstraintSet.START);
                 constraintSet.applyTo(bottomConstraintLayout);
             }
 
@@ -551,7 +541,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
             scoreTextView.setTextColor(mCommentIconAndInfoColor);
             downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
             moreButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
-            saveButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+
             replyButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
             commentDivider.setBackgroundColor(mDividerColor);
 
@@ -581,6 +571,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                     }
                     bundle.putParcelable(CommentMoreBottomSheetFragment.EXTRA_COMMENT, comment);
                     bundle.putInt(CommentMoreBottomSheetFragment.EXTRA_POSITION, getBindingAdapterPosition());
+                    bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_REPLY_AND_SAVE_OPTION, true);
                     CommentMoreBottomSheetFragment commentMoreBottomSheetFragment = new CommentMoreBottomSheetFragment();
                     commentMoreBottomSheetFragment.setArguments(bundle);
                     commentMoreBottomSheetFragment.show(mActivity.getSupportFragmentManager(), commentMoreBottomSheetFragment.getTag());
@@ -785,58 +776,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                 }
             });
 
-            saveButton.setOnClickListener(view -> {
-                int position = getBindingAdapterPosition();
-                if (position < 0) {
-                    return;
-                }
-                Comment comment = getItem(position);
-                if (comment != null) {
-                    if (comment.isSaved()) {
-                        comment.setSaved(false);
-                        SaveThing.unsaveThing(mOauthRetrofit, mAccessToken, comment.getFullName(), new SaveThing.SaveThingListener() {
-                            @Override
-                            public void success() {
-                                comment.setSaved(false);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_unsaved_success, Toast.LENGTH_SHORT).show();
-                            }
 
-                            @Override
-                            public void failed() {
-                                comment.setSaved(true);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_unsaved_failed, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        comment.setSaved(true);
-                        SaveThing.saveThing(mOauthRetrofit, mAccessToken, comment.getFullName(), new SaveThing.SaveThingListener() {
-                            @Override
-                            public void success() {
-                                comment.setSaved(true);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_saved_success, Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void failed() {
-                                comment.setSaved(false);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_saved_failed, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-            });
         }
     }
 
@@ -857,7 +797,7 @@ public class CommentsListingRecyclerViewAdapter extends PagedListAdapter<Comment
                     binding.downvoteButtonItemPostComment,
                     binding.placeholderItemPostComment,
                     binding.moreButtonItemPostComment,
-                    binding.saveButtonItemPostComment,
+
                     binding.expandButtonItemPostComment,
                     binding.replyButtonItemPostComment,
                     binding.verticalBlockIndentationItemComment,

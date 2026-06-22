@@ -257,23 +257,10 @@
                 android:textSize="?attr/font_default"
                 android:visibility="gone"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/save_button_item_post_comment"
+                app:layout_constraintEnd_toStartOf="@+id/reply_button_item_post_comment"
                 app:layout_constraintHorizontal_bias="0.5"
                 app:layout_constraintStart_toEndOf="@+id/more_button_item_post_comment"
                 app:layout_constraintTop_toTopOf="parent" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/save_button_item_post_comment"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:strokeWidth="0dp"
-                app:iconSize="24dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/reply_button_item_post_comment"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/expand_button_item_post_comment"
-                app:layout_constraintTop_toTopOf="parent"
-                style="?attr/materialIconButtonOutlinedStyle" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/reply_button_item_post_comment"
@@ -285,7 +272,7 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/save_button_item_post_comment"
+                app:layout_constraintStart_toEndOf="@+id/expand_button_item_post_comment"
                 app:layout_constraintTop_toTopOf="parent"
                 style="?attr/materialIconButtonOutlinedStyle" />
 

@@ -81,7 +81,7 @@ import ml.docilealligator.infinityforreddit.markdown.video.VideoPlugin;
 import ml.docilealligator.infinityforreddit.thing.MediaMetadata;
 import ml.docilealligator.infinityforreddit.activities.ViewVideoActivity;
 import ml.docilealligator.infinityforreddit.post.Post;
-import ml.docilealligator.infinityforreddit.thing.SaveThing;
+
 import ml.docilealligator.infinityforreddit.thing.SortType;
 import ml.docilealligator.infinityforreddit.thing.VoteThing;
 import ml.docilealligator.infinityforreddit.user.UserProfileImagesBatchLoader;
@@ -640,10 +640,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 ((CommentBaseViewHolder) holder).commentIndentationView.setShowOnlyOneDivider(mShowOnlyOneCommentLevelIndicator);
                 ((CommentBaseViewHolder) holder).commentIndentationView.setLevelAndColors(comment.getDepth(), verticalBlockColors);
                 if (comment.getDepth() >= mDepthThreshold) {
-                    ((CommentBaseViewHolder) holder).saveButton.setVisibility(View.GONE);
                     ((CommentBaseViewHolder) holder).replyButton.setVisibility(View.GONE);
                 } else {
-                    ((CommentBaseViewHolder) holder).saveButton.setVisibility(View.VISIBLE);
                     ((CommentBaseViewHolder) holder).replyButton.setVisibility(View.VISIBLE);
                 }
 
@@ -685,11 +683,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     ((CommentBaseViewHolder) holder).replyButton.setIconTint(ColorStateList.valueOf(mVoteAndReplyUnavailableVoteButtonColor));
                 }
 
-                if (comment.isSaved()) {
-                    ((CommentBaseViewHolder) holder).saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                } else {
-                    ((CommentBaseViewHolder) holder).saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                }
+
 
                 if (position == mSearchCommentIndex) {
                     holder.itemView.setBackgroundColor(Color.parseColor("#03A9F4"));
@@ -1469,7 +1463,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         MaterialButton textToSpeechButton;
         View placeholder;
         MaterialButton moreButton;
-        MaterialButton saveButton;
+
         TextView expandButton;
         MaterialButton replyButton;
         CommentIndentationView commentIndentationView;
@@ -1582,7 +1576,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                          MaterialButton textToSpeechButton,
                          View placeholder,
                          MaterialButton moreButton,
-                         MaterialButton saveButton,
                          TextView expandButton,
                          MaterialButton replyButton,
                          CommentIndentationView commentIndentationView,
@@ -1603,7 +1596,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             this.textToSpeechButton = textToSpeechButton;
             this.placeholder = placeholder;
             this.moreButton = moreButton;
-            this.saveButton = saveButton;
             this.expandButton = expandButton;
             this.replyButton = replyButton;
             this.commentIndentationView = commentIndentationView;
@@ -1620,8 +1612,6 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 constraintSet.clear(downvoteButton.getId(), ConstraintSet.END);
                 constraintSet.clear(expandButton.getId(), ConstraintSet.START);
                 constraintSet.clear(expandButton.getId(), ConstraintSet.END);
-                constraintSet.clear(saveButton.getId(), ConstraintSet.START);
-                constraintSet.clear(saveButton.getId(), ConstraintSet.END);
                 constraintSet.clear(replyButton.getId(), ConstraintSet.START);
                 constraintSet.clear(replyButton.getId(), ConstraintSet.END);
                 constraintSet.clear(moreButton.getId(), ConstraintSet.START);
@@ -1636,12 +1626,10 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 constraintSet.connect(placeholder.getId(), ConstraintSet.START, moreButton.getId(), ConstraintSet.END);
                 constraintSet.connect(moreButton.getId(), ConstraintSet.START, expandButton.getId(), ConstraintSet.END);
                 constraintSet.connect(moreButton.getId(), ConstraintSet.END, placeholder.getId(), ConstraintSet.START);
-                constraintSet.connect(expandButton.getId(), ConstraintSet.START, saveButton.getId(), ConstraintSet.END);
+                constraintSet.connect(expandButton.getId(), ConstraintSet.START, replyButton.getId(), ConstraintSet.END);
                 constraintSet.connect(expandButton.getId(), ConstraintSet.END, moreButton.getId(), ConstraintSet.START);
-                constraintSet.connect(saveButton.getId(), ConstraintSet.START, replyButton.getId(), ConstraintSet.END);
-                constraintSet.connect(saveButton.getId(), ConstraintSet.END, expandButton.getId(), ConstraintSet.START);
                 constraintSet.connect(replyButton.getId(), ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-                constraintSet.connect(replyButton.getId(), ConstraintSet.END, saveButton.getId(), ConstraintSet.START);
+                constraintSet.connect(replyButton.getId(), ConstraintSet.END, expandButton.getId(), ConstraintSet.START);
                 constraintSet.applyTo(bottomConstraintLayout);
             }
 
@@ -1701,7 +1689,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
             downvoteButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
             moreButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
             expandButton.setTextColor(mCommentIconAndInfoColor);
-            saveButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
+
             replyButton.setIconTint(ColorStateList.valueOf(mCommentIconAndInfoColor));
 
             authorFlairTextView.setOnClickListener(view -> authorTextView.performClick());
@@ -1759,9 +1747,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                             && (comment.getDepth() > 0 || !comment.isExpanded());
                     bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_TEXT_TO_SPEECH_OPTION,
                             showTtsInMoreMenu);
-                    if (comment.getDepth() >= mDepthThreshold) {
-                        bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_REPLY_AND_SAVE_OPTION, true);
-                    }
+                    bundle.putBoolean(CommentMoreBottomSheetFragment.EXTRA_SHOW_REPLY_AND_SAVE_OPTION, true);
                     CommentMoreBottomSheetFragment commentMoreBottomSheetFragment = new CommentMoreBottomSheetFragment();
                     commentMoreBottomSheetFragment.setArguments(bundle);
                     commentMoreBottomSheetFragment.show(mActivity.getSupportFragmentManager(), commentMoreBottomSheetFragment.getTag());
@@ -1979,55 +1965,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                 }
             });
 
-            saveButton.setOnClickListener(view -> {
-                Comment comment = getCurrentComment(this);
-                if (comment != null) {
-                    int position = getBindingAdapterPosition();
-                    if (comment.isSaved()) {
-                        comment.setSaved(false);
-                        SaveThing.unsaveThing(mOauthRetrofit, mAccessToken, comment.getFullName(), new SaveThing.SaveThingListener() {
-                            @Override
-                            public void success() {
-                                comment.setSaved(false);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_unsaved_success, Toast.LENGTH_SHORT).show();
-                            }
 
-                            @Override
-                            public void failed() {
-                                comment.setSaved(true);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_unsaved_failed, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    } else {
-                        comment.setSaved(true);
-                        SaveThing.saveThing(mOauthRetrofit, mAccessToken, comment.getFullName(), new SaveThing.SaveThingListener() {
-                            @Override
-                            public void success() {
-                                comment.setSaved(true);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_saved_success, Toast.LENGTH_SHORT).show();
-                            }
-
-                            @Override
-                            public void failed() {
-                                comment.setSaved(false);
-                                if (getBindingAdapterPosition() == position) {
-                                    saveButton.setIconResource(R.drawable.ic_bookmark_border_grey_24dp);
-                                }
-                                Toast.makeText(mActivity, R.string.comment_saved_failed, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-            });
 
             authorTextView.setOnClickListener(view -> {
                 Comment comment = getCurrentComment(this);
@@ -2202,7 +2140,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
                     binding.textToSpeechButtonItemPostComment,
                     binding.placeholderItemPostComment,
                     binding.moreButtonItemPostComment,
-                    binding.saveButtonItemPostComment,
+
                     binding.expandButtonItemPostComment,
                     binding.replyButtonItemPostComment,
                     binding.verticalBlockIndentationItemComment,

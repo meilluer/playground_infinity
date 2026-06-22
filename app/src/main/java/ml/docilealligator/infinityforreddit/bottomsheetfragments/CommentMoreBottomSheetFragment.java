@@ -37,6 +37,7 @@ import ml.docilealligator.infinityforreddit.liveactivity.FollowedThing;
 import ml.docilealligator.infinityforreddit.liveactivity.LiveActivityUtils;
 import ml.docilealligator.infinityforreddit.utils.ShareScreenshotUtilsKt;
 import ml.docilealligator.infinityforreddit.utils.Utils;
+import ml.docilealligator.infinityforreddit.thing.SaveThing;
 
 
 import android.content.SharedPreferences;
@@ -289,8 +290,49 @@ public class CommentMoreBottomSheetFragment extends LandscapeExpandedRoundedBott
             });
 
             binding.saveTextViewCommentMoreBottomSheetFragment.setOnClickListener(view -> {
-                if (activity instanceof ViewPostDetailActivity) {
-                    ((ViewPostDetailActivity) activity).saveComment(comment, bundle.getInt(EXTRA_POSITION));
+                int position = bundle.getInt(EXTRA_POSITION);
+                if (comment.isSaved()) {
+                    comment.setSaved(false);
+                    SaveThing.unsaveThing(mOauthRetrofit, activity.accessToken, comment.getFullName(), new SaveThing.SaveThingListener() {
+                        @Override
+                        public void success() {
+                            comment.setSaved(false);
+                            if (activity instanceof ViewPostDetailActivity) {
+                                ((ViewPostDetailActivity) activity).saveComment(comment, position);
+                            }
+                            Toast.makeText(activity, R.string.comment_unsaved_success, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void failed() {
+                            comment.setSaved(true);
+                            if (activity instanceof ViewPostDetailActivity) {
+                                ((ViewPostDetailActivity) activity).saveComment(comment, position);
+                            }
+                            Toast.makeText(activity, R.string.comment_unsaved_failed, Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    comment.setSaved(true);
+                    SaveThing.saveThing(mOauthRetrofit, activity.accessToken, comment.getFullName(), new SaveThing.SaveThingListener() {
+                        @Override
+                        public void success() {
+                            comment.setSaved(true);
+                            if (activity instanceof ViewPostDetailActivity) {
+                                ((ViewPostDetailActivity) activity).saveComment(comment, position);
+                            }
+                            Toast.makeText(activity, R.string.comment_saved_success, Toast.LENGTH_SHORT).show();
+                        }
+
+                        @Override
+                        public void failed() {
+                            comment.setSaved(false);
+                            if (activity instanceof ViewPostDetailActivity) {
+                                ((ViewPostDetailActivity) activity).saveComment(comment, position);
+                            }
+                            Toast.makeText(activity, R.string.comment_saved_failed, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
                 dismiss();
             });
