@@ -1032,14 +1032,7 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                 }
             }
 
-            boolean hasTts = baseViewHolder.textToSpeechButton != null && mPost.getSelfText() != null && !mPost.getSelfText().isEmpty();
-            boolean canSummarizeText = mPost.getSelfTextPlain() != null && !mPost.getSelfTextPlain().isEmpty();
-            boolean canSummarizeLink = (mPost.getPostType() == Post.LINK_TYPE
-                    || mPost.getPostType() == Post.NO_PREVIEW_LINK_TYPE)
-                    && mPost.getUrl() != null
-                    && !mPost.getUrl().isEmpty();
-            boolean hasGemini = baseViewHolder.geminiLogo != null && (canSummarizeText || canSummarizeLink);
-            boolean shouldHideSave = hasTts && hasGemini;
+            boolean shouldHideSave = true;
 
             ConstraintLayout bottomConstraintLayout = baseViewHolder.bottomConstraintLayout;
             if (bottomConstraintLayout != null) {
