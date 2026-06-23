@@ -1120,14 +1120,14 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                                 constraintSet.clear(progressBar.getId(), ConstraintSet.START);
                                 constraintSet.clear(progressBar.getId(), ConstraintSet.END);
                                 constraintSet.connect(progressBar.getId(), ConstraintSet.START, geminiTarget.getId(), ConstraintSet.END);
-                                constraintSet.connect(progressBar.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START, 52);
+                                constraintSet.connect(progressBar.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START, 104);
                             } else {
                                 constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
 
                                 constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
                                 constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
                                 constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
-                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START, 52);
+                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START, 104);
                             }
                         } else {
                             constraintSet.clear(placeholder.getId(), ConstraintSet.END);
