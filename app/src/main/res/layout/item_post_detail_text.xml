@@ -301,7 +301,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:strokeWidth="0dp" />
 
-    <androidx.constraintlayout.widget.Guideline
+        <androidx.constraintlayout.widget.Guideline
             android:id="@+id/gemini_guideline_item_post_detail_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
