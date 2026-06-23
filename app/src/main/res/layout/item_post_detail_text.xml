@@ -291,7 +291,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingStart="8dp"
-            android:paddingEnd="2dp"
+            android:paddingEnd="0dp"
             android:minWidth="0dp"
             app:icon="@drawable/ic_mic_14dp"
             app:iconSize="24dp"
