@@ -301,16 +301,25 @@
             app:layout_constraintTop_toTopOf="parent"
             app:strokeWidth="0dp" />
 
+            <androidx.constraintlayout.widget.Guideline
+    android:id="@+id/gemini_guideline_item_post_detail_text"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    app:layout_constraintGuide_percent="0.82" />
+
         <ImageView
-            android:id="@+id/gemini_logo_item_post_detail_text"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="2dp"
-            android:src="@drawable/gemini_color"
-            android:visibility="visible"
-            app:layout_constraintTop_toTopOf="@+id/comments_count_button_item_post_detail_text"
-            app:layout_constraintBottom_toBottomOf="@+id/comments_count_button_item_post_detail_text"
-            app:layout_constraintStart_toEndOf="@+id/text_to_speech_button_item_post_detail_text" />
+    android:id="@+id/gemini_logo_item_post_detail_text"
+    android:layout_width="20dp"
+    android:layout_height="20dp"
+    android:layout_marginStart="2dp"
+    android:src="@drawable/gemini_color"
+    android:visibility="visible"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="@+id/gemini_guideline_item_post_detail_text" />
+
+    
 
         <com.google.android.material.progressindicator.CircularProgressIndicator
             android:id="@+id/gemini_progress_indicator"
