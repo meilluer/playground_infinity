@@ -1109,12 +1109,18 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                             View progressBar = baseViewHolder.geminiProgressBar;
                             constraintSet.clear(placeholder.getId(), ConstraintSet.END);
 
+                            View geminiGuideline = baseViewHolder.itemView.findViewById(R.id.gemini_guideline_item_post_detail_text);
+
                             if (progressBar != null && progressBar.getId() != View.NO_ID && container == null) {
-                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
+                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
 
                                 constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
                                 constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
-                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                if (geminiGuideline != null) {
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, geminiGuideline.getId(), ConstraintSet.START);
+                                } else {
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                }
                                 constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, progressBar.getId(), ConstraintSet.START);
 
                                 constraintSet.clear(progressBar.getId(), ConstraintSet.START);
@@ -1122,11 +1128,15 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                                 constraintSet.connect(progressBar.getId(), ConstraintSet.START, geminiTarget.getId(), ConstraintSet.END);
                                 constraintSet.connect(progressBar.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START, 104);
                             } else {
-                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, geminiTarget.getId(), ConstraintSet.START);
+                                constraintSet.connect(placeholder.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START);
 
                                 constraintSet.clear(geminiTarget.getId(), ConstraintSet.START);
                                 constraintSet.clear(geminiTarget.getId(), ConstraintSet.END);
-                                constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                if (geminiGuideline != null) {
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, geminiGuideline.getId(), ConstraintSet.START);
+                                } else {
+                                    constraintSet.connect(geminiTarget.getId(), ConstraintSet.START, placeholder.getId(), ConstraintSet.END);
+                                }
                                 constraintSet.connect(geminiTarget.getId(), ConstraintSet.END, baseViewHolder.shareButton.getId(), ConstraintSet.START, 104);
                             }
                         } else {
