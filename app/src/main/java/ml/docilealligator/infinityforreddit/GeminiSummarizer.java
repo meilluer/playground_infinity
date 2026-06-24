@@ -3,7 +3,7 @@ package ml.docilealligator.infinityforreddit;
 import okhttp3.*;
 import com.google.gson.*;
 import java.io.IOException;
-
+import java.util.concurrent.TimeUnit;
 public class GeminiSummarizer {
 
     public interface GeminiCallback {
@@ -19,7 +19,11 @@ public class GeminiSummarizer {
 
         String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey;
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
 
         JsonObject part = new JsonObject();
         part.addProperty("text", " DO NOT RETURN ANYTHING ELSE OTHER THAN THE SUMMARY Summarize the following:\n" + inputText);
@@ -80,9 +84,13 @@ public class GeminiSummarizer {
             return;
         }
 
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + apiKey;
+        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey;
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
 
         JsonObject part = new JsonObject();
         part.addProperty("text", "DO NOT RESPONSE WITH ANYTHING ELSE Translate the following text to english:\n" + inputText);
@@ -143,9 +151,13 @@ public class GeminiSummarizer {
             return;
         }
 
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + apiKey;
+        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey;
 
-        OkHttpClient client = new OkHttpClient();
+        OkHttpClient client = new OkHttpClient.Builder()
+                .connectTimeout(60, TimeUnit.SECONDS)
+                .readTimeout(60, TimeUnit.SECONDS)
+                .writeTimeout(60, TimeUnit.SECONDS)
+                .build();
 
         JsonObject part = new JsonObject();
         String prompt = "Translate the following Title and Body to English. Format the output exactly as:\nTITLE: [Translated Title]\nBODY: [Translated Body]\n\nOriginal Content:\nTitle: " + title + "\nBody: " + (body == null ? "" : body);
