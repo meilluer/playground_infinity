@@ -181,6 +181,8 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
     private int mSearchCommentIndex = -1;
 
+    private final int mAutoCollapseCommentsThreshold;
+
     private ExoCreator mExoCreator;
     private boolean mAutoplayCommentsVideo;
     private boolean mAutoplayNsfwVideos;
@@ -218,6 +220,7 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
         mAutoplayNsfwVideos = sharedPreferences.getBoolean(SharedPreferencesUtils.AUTOPLAY_NSFW_VIDEOS, true);
         mMuteAutoplayingVideos = sharedPreferences.getBoolean(SharedPreferencesUtils.MUTE_AUTOPLAYING_VIDEOS, true);
         mUnmuteAutoplayWithHeadphones = sharedPreferences.getBoolean(SharedPreferencesUtils.UNMUTE_AUTOPLAY_WITH_HEADPHONES, true);
+        mAutoCollapseCommentsThreshold = sharedPreferences.getInt(SharedPreferencesUtils.AUTO_COLLAPSE_COMMENTS_THRESHOLD, 0);
         
         mMuteNSFWVideo = sharedPreferences.getBoolean(SharedPreferencesUtils.MUTE_NSFW_VIDEO, false);
         
@@ -818,13 +821,13 @@ public class CommentsRecyclerViewAdapter extends RecyclerView.Adapter<RecyclerVi
 
                         mVisibleComments.get(commentPosition).setLoadingMoreChildren(true);
                         mVisibleComments.get(commentPosition).setLoadMoreChildrenFailed(false);
-                        ((LoadMoreChildCommentsViewHolder) holder).binding.placeholderTextViewItemLoadMoreComments.setText(R.string.loading);
+                                        ((LoadMoreChildCommentsViewHolder) holder).binding.placeholderTextViewItemLoadMoreComments.setText(R.string.loading);
 
                         Retrofit retrofit = mAccountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;
                         SortType.Type sortType = mCommentRecyclerViewAdapterCallback.getSortType();
                         FetchComment.fetchMoreComment(mExecutor, new Handler(), retrofit, mAccessToken,
                                 mAccountName, parentComment.getMoreChildrenIds(),
-                                mExpandChildren, mPost.getFullName(), sortType, new FetchComment.FetchMoreCommentListener() {
+                                mExpandChildren, mAutoCollapseCommentsThreshold, mPost.getFullName(), sortType, new FetchComment.FetchMoreCommentListener() {
                                     @Override
                                     public void onFetchMoreCommentSuccess(ArrayList<Comment> topLevelComments,
                                                                           ArrayList<Comment> expandedComments,
