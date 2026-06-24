@@ -356,7 +356,7 @@
             android:id="@+id/gemini_container_item_post_detail_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="-2dp"
+            android:layout_marginStart="-5dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
