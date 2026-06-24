@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.preference.PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="true"
         app:key="enable_notification"
         app:icon="@drawable/ic_notifications_day_night_24dp"
         app:title="@string/settings_notification_enable_notification_title"/>
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontListPreference
         app:defaultValue="1"
         app:entries="@array/settings_notification_interval"
         app:entryValues="@array/settings_notification_interval_values"
@@ -20,13 +20,13 @@
     <androidx.preference.PreferenceCategory
         app:title="@string/live_activity">
 
-        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+        <com.meilluer.infinity.customviews.preference.CustomFontSwitchPreference
             app:defaultValue="false"
             app:key="enable_live_activity"
             app:icon="@drawable/ic_notifications_day_night_24dp"
             app:title="@string/enable_live_activity"/>
 
-        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        <com.meilluer.infinity.customviews.preference.CustomFontListPreference
             app:defaultValue="15"
             app:entries="@array/live_activity_refresh_interval_entries"
             app:entryValues="@array/live_activity_refresh_interval_values"
@@ -36,7 +36,7 @@
             app:useSimpleSummaryProvider="true"
             app:dependency="enable_live_activity" />
 
-        <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+        <com.meilluer.infinity.customviews.preference.CustomFontListPreference
             app:defaultValue="0"
             app:entries="@array/live_activity_follow_duration_entries"
             app:entryValues="@array/live_activity_follow_duration_values"

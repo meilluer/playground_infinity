@@ -1,0 +1,514 @@
+package com.meilluer.infinity.bottomsheetfragments;
+
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.PersistableBundle;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Toast;
+
+import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+import androidx.preference.PreferenceManager;
+
+import org.greenrobot.eventbus.EventBus;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.TimeUnit;
+
+import com.meilluer.infinity.GeminiSummarizer;
+import com.meilluer.infinity.Infinity;
+import com.meilluer.infinity.asynctasks.CheckIsFollowingUser;
+import com.meilluer.infinity.user.UserFollowing;
+import retrofit2.Retrofit;
+import com.meilluer.infinity.R;
+import com.meilluer.infinity.RedditDataRoomDatabase;
+import com.meilluer.infinity.liveactivity.FollowedThing;
+import com.meilluer.infinity.liveactivity.LiveActivityUtils;
+import com.meilluer.infinity.liveactivity.LiveActivityWorker;
+import com.meilluer.infinity.utils.SharedPreferencesUtils;
+import com.meilluer.infinity.account.Account;
+import com.meilluer.infinity.activities.BaseActivity;
+import com.meilluer.infinity.activities.CommentActivity;
+import com.meilluer.infinity.activities.PostFilterPreferenceActivity;
+import com.meilluer.infinity.activities.ReportActivity;
+import com.meilluer.infinity.activities.SubmitCrosspostActivity;
+import com.meilluer.infinity.customviews.LandscapeExpandedRoundedBottomSheetDialogFragment;
+import com.meilluer.infinity.databinding.FragmentPostOptionsBottomSheetBinding;
+import com.meilluer.infinity.events.PostUpdateEventToPostList;
+import com.meilluer.infinity.events.PostUpdateEventToPostDetailFragment;
+import com.meilluer.infinity.post.HidePost;
+import com.meilluer.infinity.post.Post;
+import com.meilluer.infinity.services.DownloadMediaService;
+import com.meilluer.infinity.services.DownloadRedditVideoService;
+import com.meilluer.infinity.thing.SaveThing;
+import retrofit2.Retrofit;
+
+/**
+ * A simple {@link Fragment} subclass.
+ * Use the {@link PostOptionsBottomSheetFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class PostOptionsBottomSheetFragment extends LandscapeExpandedRoundedBottomSheetDialogFragment {
+
+    private static final String EXTRA_POST = "EP";
+    private static final String EXTRA_POST_LIST_POSITION = "EPLP";
+    private static final String EXTRA_GALLERY_INDEX = "EGI";
+
+    private BaseActivity mBaseActivity;
+    private Post mPost;
+    private FragmentPostOptionsBottomSheetBinding binding;
+
+    @Inject
+    RedditDataRoomDatabase mRedditDataRoomDatabase;
+
+    @Inject
+    @Named("oauth")
+    Retrofit mOauthRetrofit;
+
+    @Inject
+    @Named("no_oauth")
+    Retrofit mRetrofit;
+
+    @Inject
+    Executor mExecutor;
+
+    public PostOptionsBottomSheetFragment() {
+        // Required empty public constructor
+    }
+
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @param post Post
+     * @return A new instance of fragment PostOptionsBottomSheetFragment.
+     */
+    public static PostOptionsBottomSheetFragment newInstance(Post post, int postListPosition, int galleryIndex) {
+        PostOptionsBottomSheetFragment fragment = new PostOptionsBottomSheetFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(EXTRA_POST, post);
+        args.putInt(EXTRA_POST_LIST_POSITION, postListPosition);
+        args.putInt(EXTRA_GALLERY_INDEX, galleryIndex);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public static PostOptionsBottomSheetFragment newInstance(Post post, int postListPosition) {
+        PostOptionsBottomSheetFragment fragment = new PostOptionsBottomSheetFragment();
+        Bundle args = new Bundle();
+        args.putParcelable(EXTRA_POST, post);
+        args.putInt(EXTRA_POST_LIST_POSITION, postListPosition);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            mPost = getArguments().getParcelable(EXTRA_POST);
+        } else {
+            dismiss();
+        }
+    }
+
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        ((Infinity) mBaseActivity.getApplication()).getAppComponent().inject(this);
+        // Inflate the layout for this fragment
+        binding = FragmentPostOptionsBottomSheetBinding.inflate(inflater, container, false);
+
+        if (mPost != null) {
+            binding.followAuthorTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
+
+            new Thread(() -> {
+                FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(mPost.getId());
+                mBaseActivity.runOnUiThread(() -> {
+                    if (followedThing != null) {
+                        binding.followTextViewPostOptionsBottomSheetFragment.setText(R.string.unfollow_post);
+                    } else {
+                        binding.followTextViewPostOptionsBottomSheetFragment.setText(R.string.follow_post);
+                    }
+                });
+            }).start();
+
+            binding.followTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                new Thread(() -> {
+                    FollowedThing followedThing = mRedditDataRoomDatabase.followedThingDao().getFollowedThingById(mPost.getId());
+                    if (followedThing != null) {
+                        mRedditDataRoomDatabase.followedThingDao().deleteById(mPost.getId());
+                        if (mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings().isEmpty()) {
+                            LiveActivityUtils.cancelWorker(mBaseActivity);
+                        } else {
+                            LiveActivityUtils.triggerImmediateUpdate(mBaseActivity);
+                        }
+                        mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.unfollowed_successfully, Toast.LENGTH_SHORT).show());
+                    } else {
+                        LiveActivityUtils.enableLiveActivity(mBaseActivity);
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mBaseActivity);
+                        String durationStr = sharedPreferences.getString("live_activity_follow_duration", "0");
+                        int durationHours = Integer.parseInt(durationStr);
+                        long expirationTime = durationHours == 0 ? 0 : System.currentTimeMillis() + TimeUnit.HOURS.toMillis(durationHours);
+
+                        FollowedThing newFollowedThing = new FollowedThing(mPost.getId(), mPost.getFullName(), 
+                                FollowedThing.TYPE_POST, mPost.getTitle(), mPost.getSubredditName(), 
+                                null, mPost.getScore(), mPost.getNComments(), mBaseActivity.accountName, System.currentTimeMillis(), expirationTime);
+                        mRedditDataRoomDatabase.followedThingDao().insert(newFollowedThing);
+                        LiveActivityUtils.showCachedNotification(mBaseActivity, mRedditDataRoomDatabase.followedThingDao().getAllFollowedThings(), newFollowedThing);
+                        LiveActivityUtils.scheduleWorker(mBaseActivity);
+                        LiveActivityUtils.triggerImmediateUpdate(mBaseActivity);
+                        mBaseActivity.runOnUiThread(() -> Toast.makeText(mBaseActivity, R.string.followed_successfully, Toast.LENGTH_SHORT).show());
+                    }
+                    dismiss();
+                }).start();
+            });
+
+            switch (mPost.getPostType()) {
+                case Post.IMAGE_TYPE:
+                case Post.GALLERY_TYPE:
+                    binding.downloadTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                    binding.downloadTextViewPostOptionsBottomSheetFragment.setText(R.string.download_image);
+                    break;
+                case Post.GIF_TYPE:
+                    binding.downloadTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                    binding.downloadTextViewPostOptionsBottomSheetFragment.setText(R.string.download_gif);
+                    break;
+                case Post.VIDEO_TYPE:
+                    binding.downloadTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                    binding.downloadTextViewPostOptionsBottomSheetFragment.setText(R.string.download_video);
+                    break;
+            }
+
+            if (binding.downloadTextViewPostOptionsBottomSheetFragment.getVisibility() == View.VISIBLE) {
+                binding.downloadTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    Toast.makeText(mBaseActivity, R.string.download_started, Toast.LENGTH_SHORT).show();
+                    if (mPost.getPostType() == Post.VIDEO_TYPE) {
+                        if (!mPost.isRedgifs() && !mPost.isStreamable() && !mPost.isImgur()) {
+                            PersistableBundle extras = new PersistableBundle();
+                            extras.putString(DownloadRedditVideoService.EXTRA_VIDEO_URL, mPost.getVideoDownloadUrl());
+                            extras.putString(DownloadRedditVideoService.EXTRA_POST_ID, mPost.getId());
+                            extras.putString(DownloadRedditVideoService.EXTRA_SUBREDDIT, mPost.getSubredditName());
+                            extras.putInt(DownloadRedditVideoService.EXTRA_IS_NSFW, mPost.isNSFW() ? 1 : 0);
+
+                            //TODO: contentEstimatedBytes
+                            JobInfo jobInfo = DownloadRedditVideoService.constructJobInfo(mBaseActivity, 5000000, extras);
+                            ((JobScheduler) mBaseActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
+
+                            dismiss();
+                            return;
+                        }
+                    }
+
+                    JobInfo jobInfo = DownloadMediaService.constructJobInfo(mBaseActivity, 5000000, mPost, getArguments().getInt(EXTRA_GALLERY_INDEX, 0));
+                    ((JobScheduler) mBaseActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
+
+                    dismiss();
+                });
+            }
+
+            if (mPost.getPostType() == Post.GALLERY_TYPE) {
+                binding.downloadAllTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                binding.downloadAllTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    JobInfo jobInfo = DownloadMediaService.constructGalleryDownloadAllMediaJobInfo(mBaseActivity, 5000000, mPost);
+                    ((JobScheduler) mBaseActivity.getSystemService(Context.JOB_SCHEDULER_SERVICE)).schedule(jobInfo);
+
+                    dismiss();
+                });
+            }
+
+            binding.shareTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                Bundle bundle = new Bundle();
+                bundle.putString(ShareBottomSheetFragment.EXTRA_POST_LINK, mPost.getPermalink());
+                if (mPost.getPostType() != Post.TEXT_TYPE) {
+                    bundle.putInt(ShareBottomSheetFragment.EXTRA_MEDIA_TYPE, mPost.getPostType());
+                    switch (mPost.getPostType()) {
+                        case Post.IMAGE_TYPE:
+                        case Post.GIF_TYPE:
+                        case Post.LINK_TYPE:
+                        case Post.NO_PREVIEW_LINK_TYPE:
+                            bundle.putString(ShareBottomSheetFragment.EXTRA_MEDIA_LINK, mPost.getUrl());
+                            break;
+                        case Post.VIDEO_TYPE:
+                            bundle.putString(ShareBottomSheetFragment.EXTRA_MEDIA_LINK, mPost.getVideoDownloadUrl());
+                            break;
+                    }
+                }
+                bundle.putParcelable(ShareBottomSheetFragment.EXTRA_POST, mPost);
+                ShareBottomSheetFragment shareBottomSheetFragment = new ShareBottomSheetFragment();
+                shareBottomSheetFragment.setArguments(bundle);
+                Fragment parentFragment = getParentFragment();
+                if (parentFragment != null) {
+                    shareBottomSheetFragment.show(parentFragment.getChildFragmentManager(), shareBottomSheetFragment.getTag());
+                } else {
+                    shareBottomSheetFragment.show(mBaseActivity.getSupportFragmentManager(), shareBottomSheetFragment.getTag());
+                }
+
+                dismiss();
+            });
+
+            binding.addToPostFilterTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                Intent intent = new Intent(mBaseActivity, PostFilterPreferenceActivity.class);
+                intent.putExtra(PostFilterPreferenceActivity.EXTRA_POST, mPost);
+                startActivity(intent);
+
+                dismiss();
+            });
+
+            if (mPost.isTranslated()) {
+                binding.translateTextViewPostOptionsBottomSheetFragment.setText(R.string.see_original);
+            }
+
+            binding.translateTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                if (mPost.isTranslated()) {
+                    mPost.setTitle(mPost.getOriginalTitle());
+                    mPost.setSelfText(mPost.getOriginalBody());
+                    mPost.setIsTranslated(false);
+                    EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                    EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                    Toast.makeText(mBaseActivity, "Original text restored", Toast.LENGTH_SHORT).show();
+                    dismiss();
+                } else {
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mBaseActivity);
+                    String apiKey = sharedPreferences.getString(SharedPreferencesUtils.GEMINI_API_KEY, "");
+                    if (TextUtils.isEmpty(apiKey)) {
+                        Toast.makeText(mBaseActivity, "Gemini API Key is missing", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(mBaseActivity, "Translating...", Toast.LENGTH_SHORT).show();
+                        GeminiSummarizer.translateTitleAndBodyWithGemini(apiKey, mPost.getTitle(), mPost.getSelfText(), new GeminiSummarizer.GeminiCallback() {
+                            @Override
+                            public void onSuccess(String result) {
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    mPost.setOriginalTitle(mPost.getTitle());
+                                    mPost.setOriginalBody(mPost.getSelfText());
+                                    mPost.setIsTranslated(true);
+
+                                    // Parse the result assuming "TITLE: [Title]\nBODY: [Body]"
+                                    String translatedTitle = mPost.getTitle();
+                                    String translatedBody = mPost.getSelfText();
+
+                                    String[] lines = result.split("\n");
+                                    StringBuilder bodyBuilder = new StringBuilder();
+                                    boolean isBody = false;
+
+                                    for (String line : lines) {
+                                        if (line.startsWith("TITLE:")) {
+                                            translatedTitle = line.substring(6).trim();
+                                        } else if (line.startsWith("BODY:")) {
+                                            isBody = true;
+                                            String bodyStart = line.substring(5).trim();
+                                            if (!bodyStart.isEmpty()) {
+                                                bodyBuilder.append(bodyStart).append("\n");
+                                            }
+                                        } else if (isBody) {
+                                            bodyBuilder.append(line).append("\n");
+                                        }
+                                    }
+                                    
+                                    if (bodyBuilder.length() > 0) {
+                                        translatedBody = bodyBuilder.toString().trim();
+                                    } else if (!isBody && lines.length > 0 && !result.contains("TITLE:")) {
+                                         // Fallback if format is not respected, assume it's just the body or just the title?
+                                         // If it doesn't contain TITLE:, maybe the whole thing is the body?
+                                         // Or maybe it just failed to format. Let's leave it safe.
+                                    }
+
+                                    mPost.setTitle(translatedTitle);
+                                    if (mPost.getSelfText() != null && !mPost.getSelfText().isEmpty()) {
+                                         mPost.setSelfText(translatedBody);
+                                    }
+
+                                    EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                    EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                                    Toast.makeText(mBaseActivity, "Translation complete", Toast.LENGTH_SHORT).show();
+                                    dismiss();
+                                });
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                new Handler(Looper.getMainLooper()).post(() -> {
+                                    Toast.makeText(mBaseActivity, "Translation failed: " + error, Toast.LENGTH_SHORT).show();
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+
+            if (mBaseActivity.accountName.equals(Account.ANONYMOUS_ACCOUNT)) {
+                binding.savePostTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
+                binding.commentTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
+                binding.hidePostTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
+                binding.crosspostTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
+                binding.reportTextViewPostOptionsBottomSheetFragment.setVisibility(View.GONE);
+            } else {
+                binding.savePostTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                if (mPost.isSaved()) {
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setText(R.string.unsave_comment);
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setCompoundDrawablesWithIntrinsicBounds(
+                            ContextCompat.getDrawable(mBaseActivity, R.drawable.ic_bookmark_grey_24dp),
+                            null, null, null);
+                } else {
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setText(R.string.save_comment);
+                    binding.savePostTextViewPostOptionsBottomSheetFragment.setCompoundDrawablesWithIntrinsicBounds(
+                            ContextCompat.getDrawable(mBaseActivity, R.drawable.ic_bookmark_border_grey_24dp),
+                            null, null, null);
+                }
+
+                binding.savePostTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    if (mPost.isSaved()) {
+                        SaveThing.unsaveThing(mOauthRetrofit, mBaseActivity.accessToken, mPost.getFullName(),
+                                new SaveThing.SaveThingListener() {
+                                    @Override
+                                    public void success() {
+                                        mPost.setSaved(false);
+                                        Toast.makeText(mBaseActivity, R.string.post_unsaved_success, Toast.LENGTH_SHORT).show();
+                                        EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                        EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                                        dismiss();
+                                    }
+
+                                    @Override
+                                    public void failed() {
+                                        mPost.setSaved(true);
+                                        Toast.makeText(mBaseActivity, R.string.post_unsaved_failed, Toast.LENGTH_SHORT).show();
+                                        dismiss();
+                                    }
+                                });
+                    } else {
+                        SaveThing.saveThing(mOauthRetrofit, mBaseActivity.accessToken, mPost.getFullName(),
+                                new SaveThing.SaveThingListener() {
+                                    @Override
+                                    public void success() {
+                                        mPost.setSaved(true);
+                                        Toast.makeText(mBaseActivity, R.string.post_saved_success, Toast.LENGTH_SHORT).show();
+                                        EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                        EventBus.getDefault().post(new PostUpdateEventToPostDetailFragment(mPost));
+                                        dismiss();
+                                    }
+
+                                    @Override
+                                    public void failed() {
+                                        mPost.setSaved(false);
+                                        Toast.makeText(mBaseActivity, R.string.post_saved_failed, Toast.LENGTH_SHORT).show();
+                                        dismiss();
+                                    }
+                                });
+                    }
+                });
+                binding.commentTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    Intent intent = new Intent(mBaseActivity, CommentActivity.class);
+                    intent.putExtra(CommentActivity.EXTRA_PARENT_FULLNAME_KEY, mPost.getFullName());
+                    intent.putExtra(CommentActivity.EXTRA_COMMENT_PARENT_TITLE_KEY, mPost.getTitle());
+                    intent.putExtra(CommentActivity.EXTRA_COMMENT_PARENT_BODY_MARKDOWN_KEY, mPost.getSelfText());
+                    intent.putExtra(CommentActivity.EXTRA_COMMENT_PARENT_BODY_KEY, mPost.getSelfTextPlain());
+                    intent.putExtra(CommentActivity.EXTRA_SUBREDDIT_NAME_KEY, mPost.getSubredditName());
+                    intent.putExtra(CommentActivity.EXTRA_IS_REPLYING_KEY, false);
+                    intent.putExtra(CommentActivity.EXTRA_PARENT_DEPTH_KEY, 0);
+                    mBaseActivity.startActivity(intent);
+
+                    dismiss();
+                });
+
+                if (mPost.isHidden()) {
+                    binding.hidePostTextViewPostOptionsBottomSheetFragment.setText(R.string.action_unhide_post);
+                } else {
+                    binding.hidePostTextViewPostOptionsBottomSheetFragment.setText(R.string.action_hide_post);
+                }
+
+                binding.hidePostTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    if (mPost.isHidden()) {
+                        HidePost.unhidePost(mOauthRetrofit, mBaseActivity.accessToken, mPost.getFullName(), new HidePost.HidePostListener() {
+                            @Override
+                            public void success() {
+                                mPost.setHidden(false);
+                                Toast.makeText(mBaseActivity, R.string.post_unhide_success, Toast.LENGTH_SHORT).show();
+                                EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                dismiss();
+                            }
+
+                            @Override
+                            public void failed() {
+                                mPost.setHidden(true);
+                                Toast.makeText(mBaseActivity, R.string.post_unhide_failed, Toast.LENGTH_SHORT).show();
+                                EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                dismiss();
+                            }
+                        });
+                    } else {
+                        HidePost.hidePost(mOauthRetrofit, mBaseActivity.accessToken, mPost.getFullName(), new HidePost.HidePostListener() {
+                            @Override
+                            public void success() {
+                                mPost.setHidden(true);
+                                Toast.makeText(mBaseActivity, R.string.post_hide_success, Toast.LENGTH_SHORT).show();
+                                EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                dismiss();
+                            }
+
+                            @Override
+                            public void failed() {
+                                mPost.setHidden(false);
+                                Toast.makeText(mBaseActivity, R.string.post_hide_failed, Toast.LENGTH_SHORT).show();
+                                EventBus.getDefault().post(new PostUpdateEventToPostList(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0)));
+                                dismiss();
+                            }
+                        });
+                    }
+                });
+
+                binding.crosspostTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    Intent submitCrosspostIntent = new Intent(mBaseActivity, SubmitCrosspostActivity.class);
+                    submitCrosspostIntent.putExtra(SubmitCrosspostActivity.EXTRA_POST, mPost);
+                    startActivity(submitCrosspostIntent);
+
+                    dismiss();
+                });
+
+                binding.reportTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                    Intent intent = new Intent(mBaseActivity, ReportActivity.class);
+                    intent.putExtra(ReportActivity.EXTRA_SUBREDDIT_NAME, mPost.getSubredditName());
+                    intent.putExtra(ReportActivity.EXTRA_THING_FULLNAME, mPost.getFullName());
+                    startActivity(intent);
+
+                    dismiss();
+                });
+
+                if (mPost.isCanModPost()) {
+                    binding.modTextViewPostOptionsBottomSheetFragment.setVisibility(View.VISIBLE);
+                    binding.modTextViewPostOptionsBottomSheetFragment.setOnClickListener(view -> {
+                        ModerationActionBottomSheetFragment moderationActionBottomSheetFragment = ModerationActionBottomSheetFragment.newInstance(mPost, getArguments().getInt(EXTRA_POST_LIST_POSITION, 0));
+                        Fragment parentFragment = getParentFragment();
+                        if (parentFragment != null) {
+                            moderationActionBottomSheetFragment.show(parentFragment.getChildFragmentManager(), moderationActionBottomSheetFragment.getTag());
+                        } else {
+                            moderationActionBottomSheetFragment.show(mBaseActivity.getSupportFragmentManager(), moderationActionBottomSheetFragment.getTag());
+                        }
+                        dismiss();
+                    });
+                }
+            }
+        }
+
+        return binding.getRoot();
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        mBaseActivity = (BaseActivity) context;
+    }
+}

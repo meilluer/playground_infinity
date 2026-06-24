@@ -2,19 +2,19 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontPreference
         app:icon="@drawable/ic_info_preference_day_night_24dp"
         app:summary="@string/settings_data_saving_mode_info_summary"
         app:enabled="false" />
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"
         app:key="override_video_autoplay_in_data_saving_mode"
         android:title="@string/settings_override_video_autoplay_in_data_saving_mode_title"
 />
 
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontListPreference
         app:defaultValue="0"
         app:key="data_saving_mode"
         android:title="@string/settings_data_saving_mode"
@@ -22,22 +22,22 @@
         app:entryValues="@array/settings_data_saving_mode_values"
         app:useSimpleSummaryProvider="true" />
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"
         app:key="disable_image_preview"
         android:title="@string/settings_disable_image_preview_title" />
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"
         app:key="only_disable_preview_in_video_and_gif_posts"
         android:title="@string/settings_only_disable_preview_in_video_and_gif_posts_title" />
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"
         app:key="allow_gif_autoplay_in_comments_on_data_saving"
         android:title="@string/settings_allow_gif_autoplay_in_comments_on_data_saving_title" />
 
-    <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontListPreference
+    <com.meilluer.infinity.customviews.preference.CustomFontListPreference
         app:defaultValue="360"
         app:key="reddit_video_default_resolution"
         android:title="@string/settings_reddit_video_default_resolution"

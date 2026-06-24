@@ -6,7 +6,7 @@ plugins {
 android {
     compileSdk 36
     defaultConfig {
-        applicationId "com.mrilluer.infinity.debug"
+        applicationId "com.meilluer.infinity.debug"
         minSdk 21
         targetSdk 36
         versionCode 200
@@ -14,7 +14,7 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
             annotationProcessorOptions {
-                arguments = [eventBusIndex: 'ml.docilealligator.infinityforreddit.EventBusIndex']
+                arguments = [eventBusIndex: 'com.meilluer.infinity.EventBusIndex']
             }
         }
     }
@@ -90,7 +90,7 @@ android {
         buildConfig = true
         viewBinding = true
     }
-    namespace 'ml.docilealligator.infinityforreddit'
+    namespace 'com.meilluer.infinity'
     kotlinOptions {
         jvmTarget = '11'
     }

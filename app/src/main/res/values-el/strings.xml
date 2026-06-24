@@ -415,7 +415,7 @@
     <string name="error_loading_multi_reddit_list">"Αδυναμία συγχρονισμού multireddits"</string>
     <string name="error_loading_subscriptions">"Αδυναμία συγχρονισμού συνδρομών"</string>
     <string name="share_this_app">"Ρίξτε μια ματιά στο Infinity για το Reddit, ένας φοβερός πελάτης Reddit!
-https://play.google.com/store/apps/details?id=ml.docilealligator.infinityforreddit"</string>
+https://play.google.com/store/apps/details?id=com.meilluer.infinity"</string>
     <string name="error_getting_subreddit_name">"Αδυναμία απόκτησης ονόματος subreddit"</string>
     <string name="share_post_link">"Κοινοποίηση Συνδέσμου Ανάρτησης"</string>
     <string name="share_image_link">"Κοινοποίηση Συνδέσμου Εικόνας"</string>

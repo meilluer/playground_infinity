@@ -1,0 +1,98 @@
+package com.meilluer.infinity.settings;
+
+
+import static androidx.biometric.BiometricManager.Authenticators.BIOMETRIC_STRONG;
+import static androidx.biometric.BiometricManager.Authenticators.DEVICE_CREDENTIAL;
+import com.meilluer.infinity.customviews.preference.CustomFontPreferenceWithBackground;
+
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Bundle;
+
+import androidx.annotation.NonNull;
+import androidx.biometric.BiometricManager;
+import androidx.preference.Preference;
+
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import com.meilluer.infinity.Infinity;
+import com.meilluer.infinity.R;
+import com.meilluer.infinity.activities.CommentFilterPreferenceActivity;
+import com.meilluer.infinity.activities.LinkResolverActivity;
+import com.meilluer.infinity.activities.PostFilterPreferenceActivity;
+import com.meilluer.infinity.customviews.preference.CustomFontPreferenceFragmentCompat;
+import com.meilluer.infinity.utils.SharedPreferencesUtils;
+
+public class MainPreferenceFragment extends CustomFontPreferenceFragmentCompat {
+
+
+    @Inject
+    @Named("default")
+    SharedPreferences sharedPreferences;
+
+    @Override
+    public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
+        setPreferencesFromResource(R.xml.main_preferences, rootKey);
+        ((Infinity) activity.getApplication()).getAppComponent().inject(this);
+
+        Preference securityPreference = findPreference(SharedPreferencesUtils.SECURITY);
+        CustomFontPreferenceWithBackground dataSavingModePreference = findPreference(SharedPreferencesUtils.DATA_SAVING_MODE_PREFERENCE);
+        Preference postFilterPreference = findPreference(SharedPreferencesUtils.POST_FILTER);
+        Preference commentFilterPreference = findPreference(SharedPreferencesUtils.COMMENT_FILTER);
+        Preference privacyPolicyPreference = findPreference(SharedPreferencesUtils.PRIVACY_POLICY_KEY);
+        Preference redditUserAgreementPreference = findPreference(SharedPreferencesUtils.REDDIT_USER_AGREEMENT_KEY);
+
+        BiometricManager biometricManager = BiometricManager.from(activity);
+        if (biometricManager.canAuthenticate(BIOMETRIC_STRONG | DEVICE_CREDENTIAL) != BiometricManager.BIOMETRIC_SUCCESS) {
+            if (securityPreference != null) {
+                securityPreference.setVisible(false);
+                if (dataSavingModePreference != null) {
+                    dataSavingModePreference.setTop(true);
+                }
+            }
+        }
+
+        if (postFilterPreference != null) {
+            postFilterPreference.setOnPreferenceClickListener(preference -> {
+                Intent intent = new Intent(activity, PostFilterPreferenceActivity.class);
+                activity.startActivity(intent);
+                return true;
+            });
+        }
+
+        if (commentFilterPreference != null) {
+            commentFilterPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(@NonNull Preference preference) {
+                    Intent intent = new Intent(activity, CommentFilterPreferenceActivity.class);
+                    activity.startActivity(intent);
+                    return true;
+                }
+            });
+        }
+
+        if (privacyPolicyPreference != null) {
+            privacyPolicyPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    Intent intent = new Intent(activity, LinkResolverActivity.class);
+                    intent.setData(Uri.parse("https://docile-alligator.github.io/"));
+                    activity.startActivity(intent);
+                    return true;
+                }
+            });
+        }
+
+        if (redditUserAgreementPreference != null) {
+            redditUserAgreementPreference.setOnPreferenceClickListener(preference -> {
+                Intent intent = new Intent(activity, LinkResolverActivity.class);
+                intent.setData(Uri.parse("https://www.redditinc.com/policies/user-agreement"));
+                activity.startActivity(intent);
+                return true;
+            });
+        }
+    }
+}

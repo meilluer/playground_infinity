@@ -768,7 +768,7 @@
     <string name="error_loading_multi_reddit_list">Cannot sync multireddits</string>
     <string name="error_loading_subscriptions">Cannot sync subscriptions</string>
 
-    <string name="share_this_app">Check out Infinity for Reddit, an awesome Reddit client!\nhttps://play.google.com/store/apps/details?id=ml.docilealligator.infinityforreddit</string>
+    <string name="share_this_app">Check out Infinity for Reddit, an awesome Reddit client!\nhttps://play.google.com/store/apps/details?id=com.meilluer.infinity</string>
 
     <string name="error_getting_subreddit_name">Error getting subreddit name</string>
 
@@ -1643,7 +1643,7 @@
     <string name="api_help_giphy_api_key_explanation">Used to authenticate with Giphy\'s API, allowing the app to search and display GIFs in comments or posts.</string>
     <string name="api_help_giphy_api_key_example">dc6zaTOxFJmzC</string>
     <string name="api_help_user_agent_explanation">A string that identifies your client/app to Reddit\'s servers. Reddit requires a unique and descriptive user agent to prevent rate limiting and block generic/spam clients.</string>
-    <string name="api_help_user_agent_example">android:ml.docilealligator.infinityforreddit:v5.3.0 (by /u/username)</string>
+    <string name="api_help_user_agent_example">android:com.meilluer.infinity:v5.3.0 (by /u/username)</string>
     <string name="api_help_gemini_key_explanation">Used to authenticate with Google\'s Gemini AI service, enabling AI-powered features like post summaries or comment translations/generation.</string>
     <string name="api_help_gemini_key_example">AIzaSyD...</string>
     <string name="api_help_redirect_uri_explanation">The URL that Reddit redirects to after a user successfully authenticates/logs in. It must match the Redirect URI configured in your Reddit App settings.</string>

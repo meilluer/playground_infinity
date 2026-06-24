@@ -1,0 +1,9 @@
+package com.meilluer.infinity.events;
+
+public class ChangeVibrateWhenActionTriggeredEvent {
+    public boolean vibrateWhenActionTriggered;
+
+    public ChangeVibrateWhenActionTriggeredEvent(boolean vibrateWhenActionTriggered) {
+        this.vibrateWhenActionTriggered = vibrateWhenActionTriggered;
+    }
+}

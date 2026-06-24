@@ -10,7 +10,7 @@
         android:id="@+id/recycler_view_customize_theme_listing_activity"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:layoutManager="ml.docilealligator.infinityforreddit.customviews.LinearLayoutManagerBugFixed"
+        app:layoutManager="com.meilluer.infinity.customviews.LinearLayoutManagerBugFixed"
         app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
 </FrameLayout>

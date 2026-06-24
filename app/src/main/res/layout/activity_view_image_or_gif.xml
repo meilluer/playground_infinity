@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
-    tools:application="ml.docilealligator.infinityforreddit.activities.ViewImageActivity">
+    tools:application="com.meilluer.infinity.activities.ViewImageActivity">
 
     <com.google.android.material.loadingindicator.LoadingIndicator
         android:id="@+id/progress_bar_view_image_or_gif_activity"

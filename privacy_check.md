@@ -24,7 +24,7 @@ No evidence was found that the application collects or sends unique device ident
    - **Crash Reporting:** The app uses `com.github.FunkyMuse:Crashy`, a local crash reporting library. Logs are stored locally and only shared if the user manually exports them.
 
 5. **User-Agent**
-   - **Value:** `android:ml.docilealligator.infinityforreddit: (by /u/Hostilenemy)`
+   - **Value:** `android:com.meilluer.infinity: (by /u/Hostilenemy)`
    - **Analysis:** This string is static and generic. It does not contain any unique device information.
 
 ## Conclusion

@@ -475,7 +475,7 @@
             android:name=".liveactivity.LiveActivityReceiver"
             android:exported="false">
             <intent-filter>
-                <action android:name="ml.docilealligator.infinityforreddit.liveactivity.ACTION_UNFOLLOW" />
+                <action android:name="com.meilluer.infinity.liveactivity.ACTION_UNFOLLOW" />
             </intent-filter>
         </receiver>
     </application>

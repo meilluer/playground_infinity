@@ -9,7 +9,7 @@
 ## Preferences reflection
 -keep class * extends androidx.preference.PreferenceFragmentCompat
 
--keep public class ml.docilealligator.infinityforreddit.settings.**
+-keep public class com.meilluer.infinity.settings.**
 
 ## EventBus Rules
 -keepattributes *Annotation*
@@ -62,17 +62,17 @@
 #-keep class com.google.gson.stream.** { *; }
 
 # Application classes that will be serialized/deserialized over Gson
--keep class ml.docilealligator.infinityforreddit.customtheme.CustomTheme { <fields>; }
--keep class ml.docilealligator.infinityforreddit.multireddit.MultiRedditJSONModel { <fields>; }
--keep class ml.docilealligator.infinityforreddit.multireddit.SubredditInMultiReddit { <fields>; }
--keep class ml.docilealligator.infinityforreddit.subscribedsubreddit.SubscribedSubredditData { <fields>; }
--keep class ml.docilealligator.infinityforreddit.subscribeduser.SubscribedUserData { <fields>; }
--keep class ml.docilealligator.infinityforreddit.multireddit.MultiReddit { <fields>; }
--keep class ml.docilealligator.infinityforreddit.multireddit.AnonymousMultiredditSubreddit { <fields>; }
--keep class ml.docilealligator.infinityforreddit.postfilter.PostFilter { <fields>; }
--keep class ml.docilealligator.infinityforreddit.postfilter.PostFilterUsage { <fields>; }
--keep class ml.docilealligator.infinityforreddit.commentfilter.CommentFilter { <fields>; }
--keep class ml.docilealligator.infinityforreddit.commentfilter.CommentFilterUsage { <fields>; }
+-keep class com.meilluer.infinity.customtheme.CustomTheme { <fields>; }
+-keep class com.meilluer.infinity.multireddit.MultiRedditJSONModel { <fields>; }
+-keep class com.meilluer.infinity.multireddit.SubredditInMultiReddit { <fields>; }
+-keep class com.meilluer.infinity.subscribedsubreddit.SubscribedSubredditData { <fields>; }
+-keep class com.meilluer.infinity.subscribeduser.SubscribedUserData { <fields>; }
+-keep class com.meilluer.infinity.multireddit.MultiReddit { <fields>; }
+-keep class com.meilluer.infinity.multireddit.AnonymousMultiredditSubreddit { <fields>; }
+-keep class com.meilluer.infinity.postfilter.PostFilter { <fields>; }
+-keep class com.meilluer.infinity.postfilter.PostFilterUsage { <fields>; }
+-keep class com.meilluer.infinity.commentfilter.CommentFilter { <fields>; }
+-keep class com.meilluer.infinity.commentfilter.CommentFilterUsage { <fields>; }
 
 # Prevent proguard from stripping interface information from TypeAdapter, TypeAdapterFactory,
 # JsonSerializer, JsonDeserializer instances (so they can be used in @JsonAdapter)

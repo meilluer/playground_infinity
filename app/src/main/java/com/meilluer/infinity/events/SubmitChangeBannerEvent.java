@@ -1,0 +1,11 @@
+package com.meilluer.infinity.events;
+
+public class SubmitChangeBannerEvent {
+    public final boolean isSuccess;
+    public final String errorMessage;
+
+    public SubmitChangeBannerEvent(boolean isSuccess, String errorMessage) {
+        this.isSuccess = isSuccess;
+        this.errorMessage = errorMessage;
+    }
+}
