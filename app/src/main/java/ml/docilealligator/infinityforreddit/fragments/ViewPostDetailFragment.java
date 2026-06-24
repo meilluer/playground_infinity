@@ -220,6 +220,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
     private boolean mLockFab;
     private boolean mSwipeUpToHideFab;
     private boolean mExpandChildren;
+    private int mAutoCollapseCommentsThreshold;
     private boolean mSeparatePostAndComments = false;
     private boolean mMarkPostsAsRead;
     private ConcatAdapter mConcatAdapter;
@@ -309,6 +310,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
         mLockFab = mSharedPreferences.getBoolean(SharedPreferencesUtils.LOCK_JUMP_TO_NEXT_TOP_LEVEL_COMMENT_BUTTON, false);
         mSwipeUpToHideFab = mSharedPreferences.getBoolean(SharedPreferencesUtils.SWIPE_UP_TO_HIDE_JUMP_TO_NEXT_TOP_LEVEL_COMMENT_BUTTON, false);
         mExpandChildren = !mSharedPreferences.getBoolean(SharedPreferencesUtils.SHOW_TOP_LEVEL_COMMENTS_FIRST, false);
+        mAutoCollapseCommentsThreshold = mSharedPreferences.getInt(SharedPreferencesUtils.AUTO_COLLAPSE_COMMENTS_THRESHOLD, 0);
         mMarkPostsAsRead = mPostHistorySharedPreferences.getBoolean(activity.accountName + SharedPreferencesUtils.MARK_POSTS_AS_READ_BASE, false);
         if (savedInstanceState == null) {
             mRespectSubredditRecommendedSortType = mSharedPreferences.getBoolean(SharedPreferencesUtils.RESPECT_SUBREDDIT_RECOMMENDED_COMMENT_SORT_TYPE, false);
@@ -1578,7 +1580,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                                                 fetchCommentsRespectRecommendedSort(false);
                                             } else {
                                                 ParseComment.parseComment(mExecutor, new Handler(), response.body(),
-                                                        mExpandChildren, mCommentFilter, new ParseComment.ParseCommentListener() {
+                                                        mExpandChildren, mCommentFilter, mAutoCollapseCommentsThreshold, new ParseComment.ParseCommentListener() {
                                                             @Override
                                                             public void onParseCommentSuccess(ArrayList<Comment> topLevelComments, ArrayList<Comment> expandedComments, String parentId, ArrayList<String> moreChildrenIds) {
                                                                 ViewPostDetailFragment.this.children = moreChildrenIds;
@@ -1684,7 +1686,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
                 if (offlineComments != null && !offlineComments.isEmpty()) {
                     String json = offlineComments.get(0).getCommentJson();
                     new Handler(Looper.getMainLooper()).post(() -> {
-                        ParseComment.parseComment(mExecutor, new Handler(Looper.getMainLooper()), json, mExpandChildren, mCommentFilter, new ParseComment.ParseCommentListener() {
+                        ParseComment.parseComment(mExecutor, new Handler(Looper.getMainLooper()), json, mExpandChildren, mCommentFilter, mAutoCollapseCommentsThreshold, new ParseComment.ParseCommentListener() {
                             @Override
                             public void onParseCommentSuccess(ArrayList<Comment> topLevelComments, ArrayList<Comment> expandedComments, String parentId, ArrayList<String> children) {
                                 ViewPostDetailFragment.this.children = children;
@@ -1727,7 +1729,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
 
         Retrofit retrofit = activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;
         FetchComment.fetchComments(mExecutor, new Handler(), retrofit, activity.accessToken, activity.accountName, mPost.getId(), commentId, sortType,
-                mContextNumber, mExpandChildren, mCommentFilter, new FetchComment.FetchCommentListener() {
+                mContextNumber, mExpandChildren, mCommentFilter, mAutoCollapseCommentsThreshold, new FetchComment.FetchCommentListener() {
                     @Override
                     public void onFetchCommentSuccess(ArrayList<Comment> expandedComments,
                                                       String parentId, ArrayList<String> children) {
@@ -1774,7 +1776,7 @@ public class ViewPostDetailFragment extends Fragment implements FragmentCommunic
 
         Retrofit retrofit = activity.accountName.equals(Account.ANONYMOUS_ACCOUNT) ? mRetrofit : mOauthRetrofit;
         FetchComment.fetchMoreComment(mExecutor, new Handler(), retrofit, activity.accessToken, activity.accountName,
-                children, mExpandChildren, mPost.getFullName(), sortType, new FetchComment.FetchMoreCommentListener() {
+                children, mExpandChildren, mAutoCollapseCommentsThreshold, mPost.getFullName(), sortType, new FetchComment.FetchMoreCommentListener() {
                     @Override
                     public void onFetchMoreCommentSuccess(ArrayList<Comment> topLevelComments,
                                                           ArrayList<Comment> expandedComments,

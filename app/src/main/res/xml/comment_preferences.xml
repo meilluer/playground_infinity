@@ -7,6 +7,14 @@
         app:key="show_top_level_comments_first"
         app:title="@string/settings_show_top_level_comments_first_title" />
 
+    <ml.docilealligator.infinityforreddit.customviews.preference.SliderPreference
+        app:defaultValue="0"
+        app:sliderMax="50"
+        app:key="auto_collapse_comments_threshold"
+        app:title="@string/settings_auto_collapse_comments_threshold_title"
+        app:summary="@string/settings_auto_collapse_comments_threshold_summary"
+        app:singleLineTitle="false" />
+
     <ml.docilealligator.infinityforreddit.customviews.preference.CustomFontSwitchPreference
         app:defaultValue="false"
         app:key="show_comment_divider"

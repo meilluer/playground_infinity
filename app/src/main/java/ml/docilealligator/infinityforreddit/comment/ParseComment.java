@@ -26,7 +26,7 @@ import ml.docilealligator.infinityforreddit.utils.Utils;
 
 public class ParseComment {
     public static void parseComment(Executor executor, Handler handler, String response,
-                                    boolean expandChildren, CommentFilter commentFilter,
+                                    boolean expandChildren, CommentFilter commentFilter, int autoCollapseThreshold,
                                     ParseCommentListener parseCommentListener) {
         executor.execute(() -> {
             try {
@@ -40,7 +40,7 @@ public class ParseComment {
                 ArrayList<Comment> newComments = new ArrayList<>();
 
                 parseCommentRecursion(childrenArray, newComments, moreChildrenIds, 0, commentFilter);
-                expandChildren(newComments, expandedNewComments, expandChildren);
+                expandChildren(newComments, expandedNewComments, expandChildren, autoCollapseThreshold);
 
                 ArrayList<Comment> commentData;
                 if (expandChildren) {
@@ -57,7 +57,7 @@ public class ParseComment {
         });
     }
 
-    static void parseMoreComment(Executor executor, Handler handler, String response, boolean expandChildren,
+    static void parseMoreComment(Executor executor, Handler handler, String response, boolean expandChildren, int autoCollapseThreshold,
                                  ParseCommentListener parseCommentListener) {
         executor.execute(() -> {
             try {
@@ -131,7 +131,7 @@ public class ParseComment {
                 }
 
                 updateChildrenCount(newComments);
-                expandChildren(newComments, expandedNewComments, expandChildren);
+                expandChildren(newComments, expandedNewComments, expandChildren, autoCollapseThreshold);
 
                 ArrayList<Comment> commentData;
                 if (expandChildren) {
@@ -234,15 +234,22 @@ public class ParseComment {
     }
 
     private static void expandChildren(ArrayList<Comment> comments, ArrayList<Comment> visibleComments,
-                                       boolean setExpanded) {
+                                       boolean setExpanded, int autoCollapseThreshold) {
         for (Comment c : comments) {
-            visibleComments.add(c);
+            if (visibleComments != null) {
+                visibleComments.add(c);
+            }
+            
+            boolean expandThis = setExpanded;
+            if (setExpanded && autoCollapseThreshold > 0 && getChildCount(c) > autoCollapseThreshold) {
+                expandThis = false;
+            }
+
             if (!c.isFilteredOut()) {
                 if (c.hasReply()) {
-                    if (setExpanded) {
-                        c.setExpanded(true);
-                    }
-                    expandChildren(c.getChildren(), visibleComments, setExpanded);
+                    c.setExpanded(expandThis);
+                    ArrayList<Comment> targetList = expandThis ? visibleComments : null;
+                    expandChildren(c.getChildren(), targetList, setExpanded, autoCollapseThreshold);
                 } else {
                     c.setExpanded(true);
                 }
@@ -250,7 +257,7 @@ public class ParseComment {
             if (c.hasMoreChildrenIds() && !c.getMoreChildrenIds().isEmpty()) {
                 //Add a load more placeholder
                 Comment placeholder = new Comment(c.getFullName(), c.getDepth() + 1, Comment.PLACEHOLDER_LOAD_MORE_COMMENTS);
-                if (!c.isFilteredOut()) {
+                if (!c.isFilteredOut() && visibleComments != null && expandThis) {
                     visibleComments.add(placeholder);
                 }
                 c.addChild(placeholder, c.getChildren().size());

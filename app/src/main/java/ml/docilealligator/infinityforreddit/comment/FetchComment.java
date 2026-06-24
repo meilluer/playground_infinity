@@ -22,7 +22,7 @@ public class FetchComment {
     public static void fetchComments(Executor executor, Handler handler, Retrofit retrofit,
                                      @Nullable String accessToken, @NonNull String accountName, String article,
                                      String commentId, SortType.Type sortType, String contextNumber,
-                                     boolean expandChildren, CommentFilter commentFilter,
+                                     boolean expandChildren, CommentFilter commentFilter, int autoCollapseThreshold,
                                      FetchCommentListener fetchCommentListener) {
         RedditAPI api = retrofit.create(RedditAPI.class);
         Call<String> comments;
@@ -46,7 +46,7 @@ public class FetchComment {
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                 if (response.isSuccessful()) {
                     ParseComment.parseComment(executor, handler, response.body(),
-                            expandChildren, commentFilter,
+                            expandChildren, commentFilter, autoCollapseThreshold,
                             new ParseComment.ParseCommentListener() {
                                 @Override
                                 public void onParseCommentSuccess(ArrayList<Comment> topLevelComments,
@@ -76,7 +76,7 @@ public class FetchComment {
     public static void fetchMoreComment(Executor executor, Handler handler, Retrofit retrofit,
                                         @Nullable String accessToken, @NonNull String accountName,
                                         ArrayList<String> allChildren,
-                                        boolean expandChildren, String postFullName,
+                                        boolean expandChildren, int autoCollapseThreshold, String postFullName,
                                         SortType.Type sortType,
                                         FetchMoreCommentListener fetchMoreCommentListener) {
         if (allChildren == null) {
@@ -103,7 +103,7 @@ public class FetchComment {
             public void onResponse(@NonNull Call<String> call, @NonNull Response<String> response) {
                 if (response.isSuccessful()) {
                     ParseComment.parseMoreComment(executor, handler, response.body(),
-                            expandChildren, new ParseComment.ParseCommentListener() {
+                            expandChildren, autoCollapseThreshold, new ParseComment.ParseCommentListener() {
                                 @Override
                                 public void onParseCommentSuccess(ArrayList<Comment> topLevelComments,
                                                                   ArrayList<Comment> expandedComments,
