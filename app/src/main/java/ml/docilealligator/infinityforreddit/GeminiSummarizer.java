@@ -17,7 +17,7 @@ public class GeminiSummarizer {
             return;
         }
 
-        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=" + apiKey;
+        String endpoint = "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=" + apiKey;
 
         OkHttpClient client = new OkHttpClient();
 
