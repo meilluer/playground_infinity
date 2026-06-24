@@ -1053,8 +1053,6 @@ public class PostDetailRecyclerViewAdapter extends RecyclerView.Adapter<Recycler
                     R.id.placeholder_item_post_detail_text,
                     R.id.placeholder_item_post_detail_gallery,
                     R.id.placeholder_item_post_detail_image_and_gif_autoplay,
-                    R.id.gemini_placeholder_start_item_post_detail_link,
-                    R.id.gemini_placeholder_start_item_post_detail_no_preview,
                     R.id.placeholder_item_post_detail_video_and_gif_preview,
                     R.id.placeholder_item_post_detail_video_autoplay
                 };

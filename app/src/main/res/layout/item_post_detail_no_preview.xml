@@ -317,25 +317,16 @@
             app:layout_constraintTop_toTopOf="parent"
             app:strokeWidth="0dp" />
 
-        <View
-            android:id="@+id/gemini_placeholder_start_item_post_detail_no_preview"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/gemini_container_item_post_detail_no_preview"
-            app:layout_constraintHorizontal_weight="1"
-            app:layout_constraintStart_toEndOf="@+id/text_to_speech_button_item_post_detail_no_preview"
-            app:layout_constraintTop_toTopOf="parent" />
-
         <LinearLayout
             android:id="@+id/gemini_container_item_post_detail_no_preview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="-7dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/gemini_placeholder_end_item_post_detail_no_preview"
-            app:layout_constraintStart_toEndOf="@+id/gemini_placeholder_start_item_post_detail_no_preview"
+            app:layout_constraintStart_toEndOf="@+id/text_to_speech_button_item_post_detail_no_preview"
             app:layout_constraintTop_toTopOf="parent">
 
             <ImageView
